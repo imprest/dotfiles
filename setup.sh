@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # packages
-sudo pacman -Syu zsh firefox firefox-i18n-en-gb \
+sudo pacman -Syu zsh gitg firefox firefox-i18n-en-gb \
   erlang rebar nodejs gvim the_silver_searcher ctags \
-  thunderbird thunderbird-i18n-en-gb clamav simple-scan gnucash freerdp \
-  ethtool intel-ucode gimp
+  thunderbird thunderbird-i18n-en-gb clamav simple-scan gnucash freerdp gimp \
+  ethtool intel-ucode
 
 # git
 git config --global user.email "hardikvaria@gmail.com"
