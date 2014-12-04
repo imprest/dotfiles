@@ -29,10 +29,10 @@ chsh -s /bin/zsh
 
 # vim
 mkdir ~/.vim
-ln -sf `pwd`\vimrc ~/.vimrc
+ln -sf `pwd`/vimrc ~/.vimrc
 
 # psql
-ln -sf `pwd`\psqlrc ~/.psqlrc
+ln -sf `pwd`/psqlrc ~/.psqlrc
 
 # erlang
 cd /usr/lib/erlang/lib
