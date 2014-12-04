@@ -1,0 +1,16 @@
+-- Don't display helpful messages
+\set QUIET 1
+
+-- Show how long each query takes to execute
+\timing
+
+-- Use best avaialable output format
+\pset border 2
+\pset null ¤
+\pset linestyle unicode
+\x auto
+\set VERBOSITY verbose
+\set HISTFILE ~/.psql_history- :DBNAME
+\set HISTCONTROL ignoredups
+\set COMP_KEYWORD_CASE upper
+\unset QUIET
