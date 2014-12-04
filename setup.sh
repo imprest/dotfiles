@@ -27,9 +27,16 @@ echo "export PATH='`ruby -e 'print Gem.user_dir'`/bin:$PATH'" >> ~/.zshrc
 
 chsh -s /bin/zsh
 
+# node pacakges
+sudo npm install -g jshint
+
 # vim
 mkdir ~/.vim
+cd ~/.
+curl https://raw.githubusercontent.com/Shougo/neobundle.vim/master/bin/install.sh | sh
+cd ~/dotfiles
 ln -sf `pwd`/vimrc ~/.vimrc
+vim +NeoBundleInstall +qall
 
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
