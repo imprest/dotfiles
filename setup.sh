@@ -20,10 +20,10 @@ ln -sf ~/.zprezto/runcoms/zprofile  ~/.zprofile
 ln -sf ~/.zprezto/runcoms/zshenv    ~/.zshenv
 ln -sf ~/.zprezto/runcoms/zshrc     ~/.zshrc
 
-echo "export MYVIMRC='.vim/vimrc'" >> ~/.zshrc
+echo "export MYVIMRC='~/.vim/vimrc'" >> ~/.zshrc
 echo "export EDITOR='vim --servername psql --remote-tab-wait'" >> ~/.zshrc
 echo "export pgdatabase='legacy'" >> ~/.zshrc
-echo "export path=$(ruby -rubygems -e "puts gem.user_dir")/bin:$path" >> ~/.zshrc
+echo "export PATH='`ruby -e 'print Gem.user_dir'`/bin:$PATH'" >> ~/.zshrc
 
 chsh -s /bin/zsh
 
