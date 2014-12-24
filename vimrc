@@ -462,7 +462,7 @@ set lazyredraw
 set noshowmode
 set foldenable
 set foldmethod=syntax
-set foldlevelstart=3
+set foldlevelstart=99
 let g:xml_syntax_folding=1
 
 set t_Co=256
