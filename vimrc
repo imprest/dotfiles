@@ -130,11 +130,9 @@ NeoBundle 'bling/vim-airline'
   " let g:airline_theme='powerlineish' " 'luna' 'tomorrow' 'powerlineish'
   " let g:Powerline_symbols = 'fancy'
   let g:airline_powerline_fonts  = 1
+  let g:airline_detect_paste     = 1
   let g:airline_enable_branch    = 1
   let g:airline_enable_syntastic = 1
-  let g:airline_left_sep  = ''
-  let g:airline_right_sep = ''
-  let g:airline_section_z = ''
   let g:airline_linecolumn_prefix = '␊ '
   let g:airline_linecolumn_prefix = '␤ '
   let g:airline_linecolumn_prefix = '¶ '
@@ -353,7 +351,6 @@ NeoBundle 'kien/ctrlp.vim.git', { 'depends': 'tacahiroy/ctrlp-funky' }
   nnoremap [ctrlp]o :CtrlPFunky<cr>
   nnoremap [ctrlp]b :CtrlPBuffer<cr>
 NeoBundle 'tpope/vim-vinegar' " navigate up a directory with '-' in netrw, among other things
-" NeoBundle 'ervandew/supertab'
 
 """"""" Colorscheme
 NeoBundle 'chankaward/vim-railscasts-theme'
@@ -368,6 +365,7 @@ NeoBundle 'chankaward/vim-railscasts-theme'
 set mouse=a
 set mousehide
 set history=1000
+set ruler
 set ttyfast
 set viewoptions=folds,options,cursor,unix,slash
 set encoding=utf-8
