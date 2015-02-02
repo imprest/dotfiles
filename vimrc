@@ -305,7 +305,7 @@ NeoBundle 'matthewsimo/angular-vim-snippets', {'autoload':{'filetypes':['javascr
 " sudo npm intall -g jshint html5 etc etc
 
 """"""" Navigation
-NeoBundle 'kien/ctrlp.vim.git', { 'depends': 'tacahiroy/ctrlp-funky' }
+NeoBundle 'ctrlpvim/ctrlp.vim', { 'depends': 'tacahiroy/ctrlp-funky' }
   let g:ctrlp_clear_cache_on_exit = 1
   let g:ctrlp_follow_symlinks = 1
   let g:ctrlp_max_files = 20000
