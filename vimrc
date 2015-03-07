@@ -205,7 +205,7 @@ NeoBundle 'Shougo/neosnippet.vim'
 NeoBundle 'Shougo/neocomplete.vim', {'autoload':{'insert':1}}
   let g:neocomplete#enable_at_startup=1
   let g:neocomplete#data_directory='~/.vim/.cache/neocomplete'
-NeoBundle 'Shougo/vimshell'
+NeoBundleLazy 'Shougo/vimshell'
   let g:vimshell_editor_command='vim'
   let g:vimshell_right_prompt='getcwd()'
   let g:vimshell_data_directory='~/.vim/.cache/vimshell'
@@ -233,7 +233,6 @@ NeoBundle 'bling/vim-airline'
   let g:airline#extensions#tabline#enabled         = 1
   let g:airline#extensions#tabline#left_sep        = ' '
   let g:airline#extensions#tabline#left_alt_sep    = '¦'
-  let g:airline#extensions#tabline#buffer_idx_mode = 1
   let g:airline_mode_map = {
     \ 'n' : 'N',
     \ 'i' : 'I',
@@ -265,14 +264,14 @@ NeoBundle 'tpope/vim-fugitive'
   nnoremap <silent> <Leader>gw :Gwrite<CR>
   nnoremap <silent> <Leader>gr :Gremove<CR>
   autocmd BufReadPost fugitive://* set bufhidden=delete
-NeoBundle 'gregsexton/gitv', {'depends':['tpope/vim-fugitive'], 'autoload':{'commands':'Gitv'}}
+NeoBundleLazy 'gregsexton/gitv', {'depends':['tpope/vim-fugitive'], 'autoload':{'commands':'Gitv'}}
   nnoremap <silent> <Leader>gv :Gitv<CR>
   nnoremap <silent> <Leader>gV :Gitv!<CR>
 NeoBundle 'mhinz/vim-signify'
   let g:signify_update_on_bufenter=0
 
 """"""" Editing Bundles
-NeoBundle 'editorconfig/editorconfig-vim', {'autoload':{'insert':1}}
+NeoBundleLazy 'editorconfig/editorconfig-vim', {'autoload':{'insert':1}}
 NeoBundle 'tpope/vim-endwise'
 NeoBundle 'tpope/vim-speeddating'
 NeoBundle 'thinca/vim-visualstar'
@@ -284,7 +283,7 @@ NeoBundle 'terryma/vim-multiple-cursors'
 NeoBundle 'jiangmiao/auto-pairs'
 NeoBundle 'justinmk/vim-sneak'
   let g:sneak#streak=1
-NeoBundle 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
+NeoBundleLazy 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
   nmap <Leader>a& :Tabularize /&<CR>
   vmap <Leader>a& :Tabularize /&<CR>
   nmap <Leader>a= :Tabularize /=<CR>
@@ -299,9 +298,9 @@ NeoBundle 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
   vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 NeoBundleLazy 'tpope/vim-scriptease', {'autoload':{'filetypes':['vim']}}
 NeoBundle 'scrooloose/syntastic'
-  let g:syntastic_error_symbol = '✗'
-  let g:syntastic_style_error_symbol = '✠'
-  let g:syntastic_warning_symbol = '∆'
+  let g:syntastic_error_symbol         = '✗'
+  let g:syntastic_style_error_symbol   = '✠'
+  let g:syntastic_warning_symbol       = '∆'
   let g:syntastic_style_warning_symbol = '≈'
 NeoBundle 'Shougo/vinarise.vim'
 NeoBundle 'cohama/lexima.vim'
@@ -316,22 +315,22 @@ NeoBundle 'rking/ag.vim'
     let g:ackprg = "ag --nogroup --column --smart-case --follow"
   endif
 NeoBundleLazy 'mbbill/undotree', {'autoload':{'commands':'UndotreeToggle'}}
-  let g:undotree_SplitLocation='botright'
-  let g:undotree_SetFocusWhenToggle=1
+  let g:undotree_SplitLocation      = 'botright'
+  let g:undotree_SetFocusWhenToggle = 1
   nnoremap <silent> <F5> :UndotreeToggle<CR>
 NeoBundleLazy 'EasyGrep', {'autoload':{'commands':'GrepOptions'}}
-  let g:EasyGrepRecursive=1
-  let g:EasyGrepAllOptionsInExplorer=1
-  let g:EasyGrepCommand=1
+  let g:EasyGrepRecursive            = 1
+  let g:EasyGrepAllOptionsInExplorer = 1
+  let g:EasyGrepCommand              = 1
   nnoremap <Leader>vo :GrepOptions<CR>
 NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}}
-  let NERDTreeShowHidden=1
-  let NERDTreeQuitOnOpen=0
-  let NERDTreeShowLineNumbers=1
-  let NERDTreeChDirMode=0
-  let NERDTreeShowBookmarks=1
-  let NERDTreeIgnore=['\.git','\.hg','\.npm','\node_modules','\.rebar']
-  let NERDTreeBookmarksFile='~/.vim/.cache/NERDTreeBookmarks'
+  let NERDTreeShowHidden      = 1
+  let NERDTreeQuitOnOpen      = 0
+  let NERDTreeShowLineNumbers = 1
+  let NERDTreeChDirMode       = 0
+  let NERDTreeShowBookmarks   = 1
+  let NERDTreeIgnore          = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
+  let NERDTreeBookmarksFile   = '~/.vim/.cache/NERDTreeBookmarks'
   nnoremap <F2> :NERDTreeToggle<CR>
   nnoremap <F3> :NERDTreeFind<CR>
 NeoBundle 'majutsushi/tagbar', {'autoload':{'commands':'TagbarToggle'}}
@@ -352,22 +351,22 @@ NeoBundle 'jimenezrick/vimerl'
   autocmd FileType erlang setlocal expandtab tabstop=4 shiftwidth=4 softtabstop=4
   autocmd FileType erlang setlocal cc=80
 NeoBundle 'edkolev/erlang-motions.vim'
-" NeoBundle 'elixir-lang/vim-elixir.vim'
+NeoBundle 'elixir-lang/vim-elixir'
 
 """"""" Markdown
-NeoBundle 'jtratner/vim-flavored-markdown', {'autoload':{'filetypes':['markdown']}}
+NeoBundleLazy 'jtratner/vim-flavored-markdown', {'autoload':{'filetypes':['markdown']}}
   let g:markdown_fenced_languages=['ruby', 'javascript', 'elixir', 'clojure', 'sh', 'html', 'sass', 'scss', 'haml']
   autocmd BufNewFile,BufReadPost *.md,*.markdown set filetype=markdown
   autocmd FileType markdown set tw=80
 
 """"""" Web Bundle
-NeoBundle 'lukaszb/vim-web-indent', {'autoload':{'filetypes':['html', 'javascript','scss']}}
-NeoBundle 'cakebaker/scss-syntax.vim', {'autoload':{'filetypes':['scss','sass']}}
-NeoBundle 'hail2u/vim-css3-syntax', {'autoload':{'filetypes':['css','scss','sass']}}
-NeoBundle 'ap/vim-css-color', {'autoload':{'filetypes':['css','scss','sass','less','styl']}}
-NeoBundle 'othree/html5.vim', {'autoload':{'filetypes':['html']}}
-NeoBundle 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
-NeoBundle 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache']}}
+NeoBundleLazy 'lukaszb/vim-web-indent', {'autoload':{'filetypes':['html', 'javascript','scss']}}
+NeoBundleLazy 'cakebaker/scss-syntax.vim', {'autoload':{'filetypes':['scss','sass']}}
+NeoBundleLazy 'hail2u/vim-css3-syntax', {'autoload':{'filetypes':['css','scss','sass']}}
+NeoBundleLazy 'ap/vim-css-color', {'autoload':{'filetypes':['css','scss','sass','less','styl']}}
+NeoBundleLazy 'othree/html5.vim', {'autoload':{'filetypes':['html']}}
+NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
+NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache']}}
   function! s:zen_html_tab()
     let line = getline('.')
     if match(line, '<.*>') < 0
@@ -379,21 +378,21 @@ NeoBundle 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt'
   autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
 
 """"""" Javascript Bundle
-NeoBundle 'marijnh/tern_for_vim', {'autoload':{'filetypes':['javascript']},'build':{'unix':'npm install'}}
-NeoBundle 'pangloss/vim-javascript', {'autoload':{'filetypes':['javascript']}}
-NeoBundle 'jelera/vim-javascript-syntax', {'autoload':{'filetypes':['javascript']}}
-  au FileType javascript call JavaScriptFold()
-NeoBundle 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}}
-  nnoremap <Leader>fjs :call JsBeautify()<CR>
-NeoBundle 'othree/javascript-libraries-syntax.vim', {'autoload':{'filetypes':['javascript','coffee','ls','typescript']}}
-NeoBundle 'mustache/vim-mustache-handlebars', {'autoload':{'filetypes':['handlebars', 'html']}}
-NeoBundle 'mmalecki/vim-node.js', {'autoload':{'filetypes':['javascript']}}
-NeoBundle 'Shutnik/jshint2.vim', {'autoload':{'filetypes':['javascript']}}
-NeoBundle 'leshill/vim-json', {'autoload':{'filetypes':['javascript','json']}}
-NeoBundle 'burnettk/vim-angular', {'autoload':{'filetypes':['javascript','html']}}
-  let g:angular_find_ignore = ['build/','dist/']
-NeoBundle 'matthewsimo/angular-vim-snippets', {'autoload':{'filetypes':['javascript','html']}}
 " sudo npm intall -g jshint html5 etc etc
+NeoBundleLazy 'marijnh/tern_for_vim', {'autoload':{'filetypes':['javascript']},'build':{'unix':'npm install'}}
+NeoBundleLazy 'pangloss/vim-javascript', {'autoload':{'filetypes':['javascript']}}
+NeoBundleLazy 'jelera/vim-javascript-syntax', {'autoload':{'filetypes':['javascript']}}
+  au FileType javascript call JavaScriptFold()
+NeoBundleLazy 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}}
+  nnoremap <Leader>fjs :call JsBeautify()<CR>
+NeoBundleLazy 'leafgarland/typescript-vim', {'autoload':{'filetypes':['typescript']}}
+NeoBundleLazy 'othree/javascript-libraries-syntax.vim', {'autoload':{'filetypes':['javascript','coffee','ls','typescript']}}
+NeoBundleLazy 'mustache/vim-mustache-handlebars', {'autoload':{'filetypes':['handlebars', 'html']}}
+NeoBundleLazy 'mmalecki/vim-node.js', {'autoload':{'filetypes':['javascript']}}
+NeoBundleLazy 'Shutnik/jshint2.vim', {'autoload':{'filetypes':['javascript']}}
+NeoBundleLazy 'leshill/vim-json', {'autoload':{'filetypes':['javascript','json']}}
+NeoBundleLazy 'burnettk/vim-angular', {'autoload':{'filetypes':['javascript','html']}}
+  let g:angular_find_ignore = ['build/','dist/']
 
 """"""" Navigation
 NeoBundle 'ctrlpvim/ctrlp.vim', { 'depends': 'tacahiroy/ctrlp-funky' }
