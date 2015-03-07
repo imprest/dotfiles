@@ -2,9 +2,9 @@
 " 1. Customize
 " 2. Setup Neobundle
 " 3. Functions
-" 4. NeoBundle Packages
-" 5. Vim Tweaks
-" 6. Keyboard Shortcuts
+" 4. Keyboard Shortcuts
+" 5. NeoBundle Packages
+" 6. Vim Tweaks
 " 7. Autocmd
 " 8. Fin
 
@@ -93,6 +93,98 @@ function! MakeViewCheck()
 endfunction
 """ End Functions =========================
 
+""" Keyboard shortcuts ====================
+""""""" key bindings
+let mapleader = ","
+let g:mapleader = ","
+""""""" formatting shortcuts
+nmap <Leader>fef :call Preserve("normal gg=G")<CR>
+nmap <Leader>f$ :call StripTrailingWhitespace()<CR>
+vmap <Leader>s :sort<CR>
+""""""" common actions shortcuts
+nnoremap <Leader>q :q<CR>
+nnoremap <Leader>w :w<CR>
+nnoremap <Leader>o :CtrlP<CR>
+nmap <Leader><Leader> V
+""""""" toggle paste
+map <F6> :set invpaste<CR>:set paste?<cr>
+""""""" remap alt keys for navigation
+nnoremap <Left> :bprev<CR>
+nnoremap <Right> :bnext<CR>
+""""""" smash escape
+inoremap jk <esc>
+inoremap kj <esc>
+""""""" Easier to type
+noremap H ^
+noremap L $
+noremap F %
+vnoremap L g_
+""""""" change cursor position in insert mode
+inoremap <C-h> <left>
+inoremap <C-l> <right>
+inoremap <C-u> <C-g>u<C-u>
+""""""" sane regex
+nnoremap / /\v
+vnoremap / /\v
+nnoremap ? ?\v
+vnoremap ? ?\v
+nnoremap :s/ :s/\v
+""""""" command-line window
+nnoremap q: q:i
+nnoremap q/ q/i
+nnoremap q? q?i
+""""""" folds
+nnoremap zr zr:echo &foldlevel<CR>
+nnoremap zm zm:echo &foldlevel<CR>
+nnoremap zR zR:echo &foldlevel<CR>
+nnoremap zM zM:echo &foldlevel<CR>
+""""""" screen line scroll
+nnoremap <silent> j gj
+nnoremap <silent> k gk
+""""""" auto center
+nnoremap <silent> n nzz
+nnoremap <silent> N Nzz
+nnoremap <silent> * *zz
+nnoremap <silent> # #zz
+nnoremap <silent> g* g*zz
+nnoremap <silent> g# g#zz
+nnoremap <silent> <C-o> <C-o>zz
+nnoremap <silent> <C-i> <C-i>zz
+""""""" reselect visual block after indent
+vnoremap < <gv
+vnoremap > >gv
+""""""" reselect last paste
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
+""""""" find current word in quickfix
+nnoremap <Leader>fw :execute "vimgrep ".expand("<cword>")." %"<CR>:copen<cr>
+""""""" find last search in quickfix
+nnoremap <Leader>ff :execute 'vimgrep /'.@/.'/g %'<CR>:copen<cr>
+""""""" shortcuts for windows
+nnoremap <Leader>v <C-w>v<C-w>l
+nnoremap <Leader>s <C-w>s
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+nnoremap <C-k> <C-w>k
+nnoremap <C-j> <C-w>j
+""""""" tab shortcuts
+map <Leader>tn :tabnew<CR>
+map <Leader>tc :tabclose<CR>
+""""""" quick buffer open
+nnoremap gb :ls<CR>:e #
+""""""" Close window/buffer function and shortcut
+nnoremap <silent> Q :call CloseWindowOrKillBuffer()<CR>
+""""""" make Y consistent with C and D. See :help Y
+nnoremap Y y$
+""""""" toggle list and hlsearch
+nmap <Leader>l :set list! list?<CR>
+nnoremap <BS> :set hlsearch! hlsearch?<CR>
+""""""" Vim Dispatch
+nnoremap <Leader>tag :Dispatch ctags -R<CR>
+""""""" Move visual block
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+""" End Keyboard shortcuts ================
+
 """ NeoBundle Packages ====================
 """"""" Core Bundles
 NeoBundle 'honza/vim-snippets'
@@ -127,8 +219,6 @@ NeoBundle 'mhinz/vim-startify'
 NeoBundle 'matchit.zip'
 NeoBundle 'bling/vim-airline'
   set laststatus=2 " enable airline even if no splits
-  " let g:airline_theme='powerlineish' " 'luna' 'tomorrow' 'powerlineish'
-  " let g:Powerline_symbols = 'fancy'
   let g:airline_powerline_fonts  = 1
   let g:airline_detect_paste     = 1
   let g:airline_enable_branch    = 1
@@ -136,13 +226,14 @@ NeoBundle 'bling/vim-airline'
   let g:airline_linecolumn_prefix = '␊ '
   let g:airline_linecolumn_prefix = '␤ '
   let g:airline_linecolumn_prefix = '¶ '
-  let g:airline_branch_prefix = '⎇ '
+  let g:airline_branch_prefix     = '⎇ '
   let g:airline_paste_symbol  = 'ρ'
   let g:airline_paste_symbol  = 'Þ'
   let g:airline_paste_symbol  = '∥'
-  let g:airline#extensions#tabline#enabled      = 1
-  let g:airline#extensions#tabline#left_sep     = ''
-  let g:airline#extensions#tabline#left_alt_sep = '¦'
+  let g:airline#extensions#tabline#enabled         = 1
+  let g:airline#extensions#tabline#left_sep        = ' '
+  let g:airline#extensions#tabline#left_alt_sep    = '¦'
+  let g:airline#extensions#tabline#buffer_idx_mode = 1
   let g:airline_mode_map = {
     \ 'n' : 'N',
     \ 'i' : 'I',
@@ -481,99 +572,6 @@ if has('gui_running')
   endif
 endif
 """ End VIM Tweaks ========================
-
-""" Keyboard shortcuts ====================
-""""""" key bindings
-let mapleader = ","
-let g:mapleader = ","
-""""""" formatting shortcuts
-nmap <Leader>fef :call Preserve("normal gg=G")<CR>
-nmap <Leader>f$ :call StripTrailingWhitespace()<CR>
-vmap <Leader>s :sort<CR>
-""""""" common actions shortcuts
-nnoremap <Leader>q :q<CR>
-nnoremap <Leader>w :w<CR>
-nnoremap <Leader>o :CtrlP<CR>
-nmap <Leader><Leader> V
-""""""" toggle paste
-map <F6> :set invpaste<CR>:set paste?<cr>
-""""""" remap alt keys for navigation
-nnoremap <Left> :bprev<CR>
-nnoremap <Right> :bnext<CR>
-""""""" smash escape
-inoremap jk <esc>
-inoremap kj <esc>
-""""""" Easier to type
-noremap H ^
-noremap L $
-noremap F %
-vnoremap L g_
-""""""" change cursor position in insert mode
-inoremap <C-h> <left>
-inoremap <C-l> <right>
-inoremap <C-u> <C-g>u<C-u>
-""""""" sane regex
-nnoremap / /\v
-vnoremap / /\v
-nnoremap ? ?\v
-vnoremap ? ?\v
-nnoremap :s/ :s/\v
-""""""" command-line window
-nnoremap q: q:i
-nnoremap q/ q/i
-nnoremap q? q?i
-""""""" folds
-nnoremap zr zr:echo &foldlevel<CR>
-nnoremap zm zm:echo &foldlevel<CR>
-nnoremap zR zR:echo &foldlevel<CR>
-nnoremap zM zM:echo &foldlevel<CR>
-""""""" screen line scroll
-nnoremap <silent> j gj
-nnoremap <silent> k gk
-""""""" auto center
-nnoremap <silent> n nzz
-nnoremap <silent> N Nzz
-nnoremap <silent> * *zz
-nnoremap <silent> # #zz
-nnoremap <silent> g* g*zz
-nnoremap <silent> g# g#zz
-nnoremap <silent> <C-o> <C-o>zz
-nnoremap <silent> <C-i> <C-i>zz
-""""""" reselect visual block after indent
-vnoremap < <gv
-vnoremap > >gv
-""""""" reselect last paste
-nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
-""""""" find current word in quickfix
-nnoremap <Leader>fw :execute "vimgrep ".expand("<cword>")." %"<CR>:copen<cr>
-""""""" find last search in quickfix
-nnoremap <Leader>ff :execute 'vimgrep /'.@/.'/g %'<CR>:copen<cr>
-""""""" shortcuts for windows
-nnoremap <Leader>v <C-w>v<C-w>l
-nnoremap <Leader>s <C-w>s
-nnoremap <C-h> <C-w>h
-nnoremap <C-l> <C-w>l
-nnoremap <C-k> <C-w>k
-nnoremap <C-j> <C-w>j
-""""""" tab shortcuts
-map <Leader>tn :tabnew<CR>
-map <Leader>tc :tabclose<CR>
-""""""" quick buffer open
-nnoremap gb :ls<CR>:e #
-""""""" Close window/buffer function and shortcut
-nnoremap <silent> Q :call CloseWindowOrKillBuffer()<CR>
-""""""" make Y consistent with C and D. See :help Y
-nnoremap Y y$
-""""""" toggle list and hlsearch
-nmap <Leader>l :set list! list?<CR>
-nnoremap <BS> :set hlsearch! hlsearch?<CR>
-""""""" Vim Dispatch
-nnoremap <Leader>tag :Dispatch ctags -R<CR>
-""""""" Move visual block
-vnoremap J :m '>+1<CR>gv=gv
-vnoremap K :m '<-2<CR>gv=gv
-""" End Keyboard shortcuts ================
-
 
 """ Auto Commands =========================
 " autocmd
