@@ -223,16 +223,10 @@ NeoBundle 'bling/vim-airline'
   let g:airline_detect_paste     = 1
   let g:airline_enable_branch    = 1
   let g:airline_enable_syntastic = 1
-  let g:airline_linecolumn_prefix = '␊ '
-  let g:airline_linecolumn_prefix = '␤ '
-  let g:airline_linecolumn_prefix = '¶ '
-  let g:airline_branch_prefix     = '⎇ '
-  let g:airline_paste_symbol  = 'ρ'
-  let g:airline_paste_symbol  = 'Þ'
-  let g:airline_paste_symbol  = '∥'
-  let g:airline#extensions#tabline#enabled         = 1
-  let g:airline#extensions#tabline#left_sep        = ' '
-  let g:airline#extensions#tabline#left_alt_sep    = '¦'
+  let g:airline_branch_prefix    = '⎇ '
+  let g:airline#extensions#tabline#enabled      = 1
+  let g:airline#extensions#tabline#left_sep     = ' '
+  let g:airline#extensions#tabline#left_alt_sep = '¦'
   let g:airline_mode_map = {
     \ 'n' : 'N',
     \ 'i' : 'I',
@@ -344,7 +338,7 @@ NeoBundle 'lucapette/vim-textobj-underscore'
 
 """"""" Erlang & Elixir Bundle
 NeoBundle 'jimenezrick/vimerl'
-  let erlang_folding     = 1
+  let erlang_folding     = 0
   let erlang_show_errors = 0
   let erlang_skel_header = {'author': 'Hardik Varia <hardikvaria@gmail.com>',
                         \  'owner' : 'Hardik Varia'}
@@ -382,7 +376,6 @@ NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','x
 NeoBundleLazy 'marijnh/tern_for_vim', {'autoload':{'filetypes':['javascript']},'build':{'unix':'npm install'}}
 NeoBundleLazy 'pangloss/vim-javascript', {'autoload':{'filetypes':['javascript']}}
 NeoBundleLazy 'jelera/vim-javascript-syntax', {'autoload':{'filetypes':['javascript']}}
-  au FileType javascript call JavaScriptFold()
 NeoBundleLazy 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}}
   nnoremap <Leader>fjs :call JsBeautify()<CR>
 NeoBundleLazy 'leafgarland/typescript-vim', {'autoload':{'filetypes':['typescript']}}
@@ -457,7 +450,7 @@ set mousehide
 set history=1000
 set ruler
 set ttyfast
-set viewoptions=folds,options,cursor,unix,slash
+" set viewoptions=folds,options,cursor,unix,slash
 set encoding=utf-8
 if exists('$TMUX')
   set clipboard=
@@ -474,6 +467,9 @@ set modeline
 set modelines=5
 set shell=/usr/bin/zsh
 set noshelltemp "use pipes
+set fillchars=fold:\ , "get rid of '-' characters in folds
+set tildeop     "use ~ to toggle case as an operator, not a motion
+set breakindent "indent wrapped lines up to the same level
 augroup AutoView
   autocmd!
   " Autosave & Load Views
@@ -567,29 +563,40 @@ if has('gui_running')
   set guioptions-=T
 
   if has('gui_gtk')
-    set gfn=Ubuntu\ Mono\ Bold\ 12
+    set gfn=Ubuntu\ Mono\ derivative\ Powerline\ Bold\ 12
   endif
 endif
 """ End VIM Tweaks ========================
 
 """ Auto Commands =========================
 " autocmd
-" go back to previous position of cursor if any
-autocmd BufReadPost *
-  \ if line("'\"") > 1 && line("'\"") <= line("$") |
-  \ exe 'normal! g`"zvzz' |
-  \ endif
-autocmd FileType js,scss,css,erlang autocmd BufWritePre <buffer> call StripTrailingWhitespace()
-autocmd FileType css,scss setlocal foldmethod=marker foldmarker={,}
-autocmd FileType css,scss nnoremap <silent> <Leader>S vi{:sort<CR>
-autocmd FileType markdown setlocal nolist
-autocmd FileType vim setlocal fdm=indent keywordprg=:help
-autocmd BufNewFile,BufRead relx.config setlocal filetype=erlang
+syntax on
+
+augroup vimrc
+  au!
+  " go back to previous position of cursor if any
+  autocmd BufReadPost *
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \ exe 'normal! g`"zvzz' |
+    \ endif
+augroup END
+
+" FileType Settings
+filetype plugin indent on
+
+augroup myFileTypes
+  au!
+
+  au FileType js,scss,css,erlang autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+  au FileType css,scss setlocal foldmethod=marker foldmarker={,}
+  au FileType css,scss nnoremap <silent> <Leader>S vi{:sort<CR>
+  au FileType markdown setlocal nolist
+  au FileType vim setlocal fdm=indent keywordprg=:help
+  au BufNewFile,BufRead relx.config setlocal filetype=erlang
+augroup END
 """ End Auto Commands =====================
 
 """ Fin ===================================
 call neobundle#end()
-filetype plugin indent on
-syntax enable
 exec 'colorscheme '.s:settings.colorscheme
-NeoBundleCheck
+" NeoBundleCheck
