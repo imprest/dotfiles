@@ -599,4 +599,4 @@ augroup END
 """ Fin ===================================
 call neobundle#end()
 exec 'colorscheme '.s:settings.colorscheme
-" NeoBundleCheck
+NeoBundleCheck
