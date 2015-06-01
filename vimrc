@@ -297,7 +297,6 @@ NeoBundle 'scrooloose/syntastic'
   let g:syntastic_warning_symbol       = '∆'
   let g:syntastic_style_warning_symbol = '≈'
 NeoBundle 'Shougo/vinarise.vim'
-NeoBundle 'cohama/lexima.vim'
 
 """"""" Navigation Bundles
 NeoBundle 'haya14busa/incsearch.vim'
