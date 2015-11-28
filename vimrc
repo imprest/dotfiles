@@ -11,7 +11,7 @@
 """ Customize =============================
 let s:settings = {}
 let s:settings.default_indent=2
-let s:settings.colorscheme='railscasts'
+let s:settings.colorscheme='hybrid_material'
 let s:cache_dir = '~/.vim/.cache'
 if exists("g:loaded_restore_view")
   finish
@@ -219,14 +219,15 @@ NeoBundle 'mhinz/vim-startify'
 NeoBundle 'matchit.zip'
 NeoBundle 'bling/vim-airline'
   set laststatus=2 " enable airline even if no splits
-  let g:airline_powerline_fonts  = 1
-  let g:airline_detect_paste     = 1
-  let g:airline_enable_branch    = 1
-  let g:airline_enable_syntastic = 1
-  let g:airline_branch_prefix    = '⎇ '
+  let g:airline_theme                           = 'hybrid'
+  let g:airline_powerline_fonts                 = 1
+  let g:airline_detect_paste                    = 1
+  let g:airline#extensions#branch#enabled       = 1
+  let g:airline#extensions#syntastic#enabled    = 1
   let g:airline#extensions#tabline#enabled      = 1
   let g:airline#extensions#tabline#left_sep     = ' '
   let g:airline#extensions#tabline#left_alt_sep = '¦'
+  let g:airline#extensions#tabline#buffer_idx_mode = 1
   let g:airline_mode_map = {
     \ 'n' : 'N',
     \ 'i' : 'I',
@@ -236,6 +237,15 @@ NeoBundle 'bling/vim-airline'
     \ 'c' : 'CMD ',
     \ '': 'V-BLCK',
     \ }
+  nmap <leader>1 <Plug>AirlineSelectTab1
+  nmap <leader>2 <Plug>AirlineSelectTab2
+  nmap <leader>3 <Plug>AirlineSelectTab3
+  nmap <leader>4 <Plug>AirlineSelectTab4
+  nmap <leader>5 <Plug>AirlineSelectTab5
+  nmap <leader>6 <Plug>AirlineSelectTab6
+  nmap <leader>7 <Plug>AirlineSelectTab7
+  nmap <leader>8 <Plug>AirlineSelectTab8
+  nmap <leader>9 <Plug>AirlineSelectTab9
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-repeat'
 NeoBundle 'tpope/vim-dispatch'
@@ -278,16 +288,16 @@ NeoBundle 'jiangmiao/auto-pairs'
 NeoBundle 'justinmk/vim-sneak'
   let g:sneak#streak=1
 NeoBundleLazy 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
-  nmap <Leader>a& :Tabularize /&<CR>
-  vmap <Leader>a& :Tabularize /&<CR>
-  nmap <Leader>a= :Tabularize /=<CR>
-  vmap <Leader>a= :Tabularize /=<CR>
-  nmap <Leader>a: :Tabularize /:<CR>
-  vmap <Leader>a: :Tabularize /:<CR>
+  nmap <Leader>a&  :Tabularize /&<CR>
+  vmap <Leader>a&  :Tabularize /&<CR>
+  nmap <Leader>a=  :Tabularize /=<CR>
+  vmap <Leader>a=  :Tabularize /=<CR>
+  nmap <Leader>a:  :Tabularize /:<CR>
+  vmap <Leader>a:  :Tabularize /:<CR>
   nmap <Leader>a:: :Tabularize /:\zs<CR>
   vmap <Leader>a:: :Tabularize /:\zs<CR>
-  nmap <Leader>a, :Tabularize /,<CR>
-  vmap <Leader>a, :Tabularize /,<CR>
+  nmap <Leader>a,  :Tabularize /,<CR>
+  vmap <Leader>a,  :Tabularize /,<CR>
   nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
   vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
 NeoBundleLazy 'tpope/vim-scriptease', {'autoload':{'filetypes':['vim']}}
@@ -345,6 +355,7 @@ NeoBundle 'jimenezrick/vimerl'
   autocmd FileType erlang setlocal cc=80
 NeoBundle 'edkolev/erlang-motions.vim'
 NeoBundle 'elixir-lang/vim-elixir'
+NeoBundle 'mattreduce/vim-mix'
 
 """"""" Markdown
 NeoBundleLazy 'jtratner/vim-flavored-markdown', {'autoload':{'filetypes':['markdown']}}
@@ -370,6 +381,12 @@ NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','x
   autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
   autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
 
+""""""" Elm Bundle
+NeoBundle 'lambdatoast/elm.vim'
+  nnoremap <leader>el :ElmEvalLine<CR>
+  vnoremap <leader>es :<C-u>ElmEvalSelection<CR>
+  nnoremap <leader>em :ElmMakeCurrentFile<CR>
+
 """"""" Javascript Bundle
 " sudo npm intall -g jshint html5 etc etc
 NeoBundleLazy 'marijnh/tern_for_vim', {'autoload':{'filetypes':['javascript']},'build':{'unix':'npm install'}}
@@ -379,7 +396,6 @@ NeoBundleLazy 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}
   nnoremap <Leader>fjs :call JsBeautify()<CR>
 NeoBundleLazy 'leafgarland/typescript-vim', {'autoload':{'filetypes':['typescript']}}
 NeoBundleLazy 'othree/javascript-libraries-syntax.vim', {'autoload':{'filetypes':['javascript','coffee','ls','typescript']}}
-NeoBundleLazy 'mustache/vim-mustache-handlebars', {'autoload':{'filetypes':['handlebars', 'html']}}
 NeoBundleLazy 'mmalecki/vim-node.js', {'autoload':{'filetypes':['javascript']}}
 NeoBundleLazy 'Shutnik/jshint2.vim', {'autoload':{'filetypes':['javascript']}}
 NeoBundleLazy 'leshill/vim-json', {'autoload':{'filetypes':['javascript','json']}}
@@ -435,7 +451,7 @@ NeoBundle 'ctrlpvim/ctrlp.vim', { 'depends': 'tacahiroy/ctrlp-funky' }
 NeoBundle 'tpope/vim-vinegar' " navigate up a directory with '-' in netrw, among other things
 
 """"""" Colorscheme
-NeoBundle 'chankaward/vim-railscasts-theme'
+NeoBundle 'kristijanhusak/vim-hybrid-material'
 
 """"""" Latex
 " NeoBundle 'coot/atp_vim'
@@ -449,7 +465,7 @@ set mousehide
 set history=1000
 set ruler
 set ttyfast
-" set viewoptions=folds,options,cursor,unix,slash
+set viewoptions=folds,options,cursor,unix,slash
 set encoding=utf-8
 if exists('$TMUX')
   set clipboard=
@@ -560,29 +576,37 @@ if has('gui_running')
   " open maximized
   set guioptions="agimrLt"
   set guioptions-=T
+  set guicursor+=a:blinkon0
 
   if has('gui_gtk')
-    set gfn=Ubuntu\ Mono\ derivative\ Powerline\ Bold\ 12
+    set gfn=Ubuntu\ Mono\ derivative\ Powerline\ 12
   endif
 endif
 """ End VIM Tweaks ========================
 
 """ Auto Commands =========================
 " autocmd
-syntax on
+augroup CURSOR
+  au InsertEnter *
+        \ if v:insertmode == 'i' |
+        \   silent execute "!dconf list /org/gnome/terminal/legacy/profiles:/ | xargs -I '{}' dconf write /org/gnome/terminal/legacy/profiles:/'{}'cursor-shape \"'ibeam'\"" |
+        \ elseif v:insertmode == 'r' |
+        \   silent execute "!dconf list /org/gnome/terminal/legacy/profiles:/ | xargs -I '{}' dconf write /org/gnome/terminal/legacy/profiles:/'{}'cursor-shape \"'underline'\"" |
+        \ endif
+  au InsertLeave * silent execute "!dconf list /org/gnome/terminal/legacy/profiles:/ | xargs -I '{}' dconf write /org/gnome/terminal/legacy/profiles:/'{}'cursor-shape \"'block'\""
+  au VimLeave * silent execute "!dconf list /org/gnome/terminal/legacy/profiles:/ | xargs -I '{}' dconf write /org/gnome/terminal/legacy/profiles:/'{}'cursor-shape \"'block'\""
+augroup END
 
 augroup vimrc
   au!
   " go back to previous position of cursor if any
   autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
     \ exe 'normal! g`"zvzz' |
     \ endif
 augroup END
 
 " FileType Settings
-filetype plugin indent on
-
 augroup myFileTypes
   au!
 
@@ -597,5 +621,7 @@ augroup END
 
 """ Fin ===================================
 call neobundle#end()
+filetype plugin indent on
+syntax enable
 exec 'colorscheme '.s:settings.colorscheme
 NeoBundleCheck
