@@ -11,7 +11,7 @@
 """ Customize =============================
 let s:settings = {}
 let s:settings.default_indent=2
-let s:settings.colorscheme='hybrid_material'
+let s:settings.colorscheme='hybrid_reverse'
 let s:cache_dir = '~/.vim/.cache'
 if exists("g:loaded_restore_view")
   finish
@@ -108,9 +108,11 @@ nnoremap <Leader>o :CtrlP<CR>
 nmap <Leader><Leader> V
 """"""" toggle paste
 map <F6> :set invpaste<CR>:set paste?<cr>
-""""""" remap alt keys for navigation
-nnoremap <Left> :bprev<CR>
-nnoremap <Right> :bnext<CR>
+""""""" resizing windows
+nnoremap <Right> :vertical resize -1<CR>
+nnoremap <Up>    :resize +1<CR>
+nnoremap <Down>  :resize -1<CR>
+nnoremap <Left>  :vertical resize +1<CR>
 """"""" smash escape
 inoremap jk <esc>
 inoremap kj <esc>
@@ -225,7 +227,7 @@ NeoBundle 'bling/vim-airline'
   let g:airline#extensions#branch#enabled       = 1
   let g:airline#extensions#syntastic#enabled    = 1
   let g:airline#extensions#tabline#enabled      = 1
-  let g:airline#extensions#tabline#left_sep     = ' '
+  let g:airline#extensions#tabline#left_sep     = ''
   let g:airline#extensions#tabline#left_alt_sep = '¦'
   let g:airline#extensions#tabline#buffer_idx_mode = 1
   let g:airline_mode_map = {
@@ -259,11 +261,12 @@ NeoBundle 'bufkill.vim'
 
 """"""" Git Bundles
 NeoBundle 'tpope/vim-fugitive'
-  nnoremap <silent> <Leader>gs :Gstatus<aR>
-  nnoremap <silent> <Leader>gd :Gdiff<CRu
+  nnoremap <silent> <Leader>gs :Gstatus<CR>
+  nnoremap <silent> <Leader>gd :Gdiff<CR>
+  nnoremap <silent> <Leader>gD :Gdiff HEAD<CR>
   nnoremap <silent> <Leader>gc :Gcommit<CR>
   nnoremap <silent> <Leader>gb :Gblame<CR>
-  nnoremap <silent> <Leader>gl :Glog<CR>
+  nnoremap <silent> <Leader>gl :Git log<CR>
   nnoremap <silent> <Leader>gp :Git push<CR>
   nnoremap <silent> <Leader>gw :Gwrite<CR>
   nnoremap <silent> <Leader>gr :Gremove<CR>
@@ -284,22 +287,16 @@ NeoBundle 'terryma/vim-expand-region'
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
 NeoBundle 'terryma/vim-multiple-cursors'
+  let g:multi_cursor_use_default_mapping=0
+  " Default mapping
+  let g:multi_cursor_next_key='<c-f>'
+  let g:multi_cursor_prev_key='<c-b>'
+  let g:multi_cursor_skip_key='<c-x>'
+  let g:multi_cursor_quit_key='<Esc>'
 NeoBundle 'jiangmiao/auto-pairs'
 NeoBundle 'justinmk/vim-sneak'
   let g:sneak#streak=1
-NeoBundleLazy 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
-  nmap <Leader>a&  :Tabularize /&<CR>
-  vmap <Leader>a&  :Tabularize /&<CR>
-  nmap <Leader>a=  :Tabularize /=<CR>
-  vmap <Leader>a=  :Tabularize /=<CR>
-  nmap <Leader>a:  :Tabularize /:<CR>
-  vmap <Leader>a:  :Tabularize /:<CR>
-  nmap <Leader>a:: :Tabularize /:\zs<CR>
-  vmap <Leader>a:: :Tabularize /:\zs<CR>
-  nmap <Leader>a,  :Tabularize /,<CR>
-  vmap <Leader>a,  :Tabularize /,<CR>
-  nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
-  vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+NeoBundleLazy 'junegunn/vim-easy-align'
 NeoBundleLazy 'tpope/vim-scriptease', {'autoload':{'filetypes':['vim']}}
 NeoBundle 'scrooloose/syntastic'
   let g:syntastic_error_symbol         = '✗'
@@ -307,6 +304,7 @@ NeoBundle 'scrooloose/syntastic'
   let g:syntastic_warning_symbol       = '∆'
   let g:syntastic_style_warning_symbol = '≈'
 NeoBundle 'Shougo/vinarise.vim'
+NeoBundle 'Konfekt/FastFold'
 
 """"""" Navigation Bundles
 NeoBundle 'haya14busa/incsearch.vim'
@@ -344,6 +342,8 @@ NeoBundle 'kana/vim-textobj-user'
 NeoBundle 'kana/vim-textobj-indent'
 NeoBundle 'kana/vim-textobj-entire'
 NeoBundle 'lucapette/vim-textobj-underscore'
+NeoBundle 'glts/vim-textobj-comment'
+NeoBundle 'wellle/targets.vim'
 
 """"""" Erlang & Elixir Bundle
 NeoBundle 'jimenezrick/vimerl'
@@ -369,6 +369,7 @@ NeoBundleLazy 'cakebaker/scss-syntax.vim', {'autoload':{'filetypes':['scss','sas
 NeoBundleLazy 'hail2u/vim-css3-syntax', {'autoload':{'filetypes':['css','scss','sass']}}
 NeoBundleLazy 'ap/vim-css-color', {'autoload':{'filetypes':['css','scss','sass','less','styl']}}
 NeoBundleLazy 'othree/html5.vim', {'autoload':{'filetypes':['html']}}
+NeoBundleLazy 'othree/html5-syntax.vim', {'autoload':{'filetypes':['html']}}
 NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
 NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache']}}
   function! s:zen_html_tab()
@@ -609,7 +610,6 @@ augroup END
 " FileType Settings
 augroup myFileTypes
   au!
-
   au FileType js,scss,css,erlang autocmd BufWritePre <buffer> call StripTrailingWhitespace()
   au FileType css,scss setlocal foldmethod=marker foldmarker={,}
   au FileType css,scss nnoremap <silent> <Leader>S vi{:sort<CR>
