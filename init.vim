@@ -37,7 +37,6 @@ Plug 'myusuf3/numbers.vim'
 Plug 'bling/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
-
 " javascript
 Plug 'guileen/vim-node-dict'
 Plug 'moll/vim-node'
@@ -72,6 +71,8 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 call plug#end()
 
 " Settings
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
+let $NVIM_TUI_ENABLE_TRUE_COLOR   = 1
 set background=dark
 colorscheme gruvbox
 
@@ -87,21 +88,10 @@ set scrolloff=5
 " searching
 set ignorecase
 set smartcase
+set undofile
+set undodir="$HOME/.VIM_UNDO_FILES"
 
 " Auto Commands
-" For Gnome-terminal change cursor depending on mode
-augroup CURSOR
-  au InsertEnter *
-        \ if v:insertmode == 'i' |
-        \   silent execute "!dconf list /org/gnome/terminal/legacy/profiles:/ | xargs -I '{}' dconf write /org/gnome/terminal/legacy/profiles:/'{}'cursor-shape \"'ibeam'\"" |
-        \ elseif v:insertmode == 'r' |
-        \   silent execute "!dconf list /org/gnome/terminal/legacy/profiles:/ | xargs -I '{}' dconf write /org/gnome/terminal/legacy/profiles:/'{}'cursor-shape \"'underline'\"" |
-        \ endif
-  au InsertLeave * silent execute "!dconf list /org/gnome/terminal/legacy/profiles:/ | xargs -I '{}' dconf write /org/gnome/terminal/legacy/profiles:/'{}'cursor-shape \"'block'\""
-  au VimLeave * silent execute "!dconf list /org/gnome/terminal/legacy/profiles:/ | xargs -I '{}' dconf write /org/gnome/terminal/legacy/profiles:/'{}'cursor-shape \"'block'\""
-augroup END
-
-" Go back to previous position of cursor if any
 augroup vimrc
   au!
 
@@ -120,11 +110,23 @@ augroup END
 
 " Keyboard mappings
 let g:mapleader = ','
-" quickly replace string under cursor
-:nnoremap <Leader>s :%s/\<<C-r><C-w>\>/
+" Navigation made easy
+noremap H ^
+noremap L g_
+noremap J 5j
+noremap K 5k
+" Navigation between display lines
+noremap <silent> <Up>   gk
+noremap <silent> <Down> gj
+noremap <silent> k gk
+noremap <silent> j gj
+noremap <silent> <Home> g<Home>
+noremap <silent> <End>  g<End>
+inoremap <silent> <Home> <C-o>g<Home>
+inoremap <silent> <End> <C-o>g<End>
 " common actions
 nnoremap <Leader>q :q<CR>
-nnoremap <Leader>w :w<CR>
+nnoremap <Leader>d :bdelete<CR>
 " smash escape insert mode
 inoremap jk <esc>
 inoremap kj <esc>
@@ -157,8 +159,16 @@ tnoremap <C-k> <C-\><C-n><C-w>k
 tnoremap <C-l> <C-\><C-n><C-w>l
 " Open terminal below
 nnoremap <Leader>c :below 10sp term://zsh<CR>
+" quickly replace string under cursor for line
+nnoremap <Leader>R :s/\<<C-r><C-w>\>/
+" Delete line and enter insert mode
+inoremap <c-d> <esc>ddi
+" Sort selected lines
+vmap <Leader>s :sort<CR>
 
 " Plugin Configurations
+" Relative Numbers
+let g:enable_numbers = 0
 " SuperTab
 let g:SuperTabDefaultCompletionType = "<c-n>"
 " Deoplete
@@ -196,10 +206,13 @@ endif
 let g:airline_powerline_fonts = 1
 let g:airline_left_sep        = ''
 let g:airline_right_sep       = ''
+let g:airline_detect_paste    = 1
 let g:airline_theme           = 'bubblegum'
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#syntastic#enabled       = 1
 let g:airline#extensions#tabline#enabled         = 1
+let g:airline#extensions#tabline#left_sep        = ''
+let g:airline#extensions#tabline#left_alt_sep    = '¦'
 let g:airline#extensions#tabline#buffer_idx_mode = 1
 nmap <leader>1 <Plug>AirlineSelectTab1
 nmap <leader>2 <Plug>AirlineSelectTab2
@@ -212,6 +225,7 @@ nmap <leader>8 <Plug>AirlineSelectTab8
 nmap <leader>9 <Plug>AirlineSelectTab9
 " NERDTree
 map <F2> :NERDTreeToggle<CR>
+let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
 "set timeout
 set timeoutlen=1000
 "set ttimeout
