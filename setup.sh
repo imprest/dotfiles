@@ -2,10 +2,10 @@
 
 # packages
 sudo pacman -Syu zsh gitg \
-  elixir neovim python-neovim the_silver_searcher ctags \
+  neovim python-neovim the_silver_searcher ctags \
+  erlang elixir npm \
   thunderbird thunderbird-i18n-en-gb clamav simple-scan gnucash freerdp gimp \
-  otf-fira-mono otf-fira-sans \
-  ethtool intel-ucode
+  otf-fira-mono otf-fira-sans
 
 # git
 git config --global user.email "hardikvaria@gmail.com"
@@ -21,12 +21,9 @@ ln -sf ~/.zprezto/runcoms/zprofile  ~/.zprofile
 ln -sf ~/.zprezto/runcoms/zshenv    ~/.zshenv
 ln -sf ~/.zprezto/runcoms/zshrc     ~/.zshrc
 
-echo "export MYVIMRC='~/.vim/vimrc'" >> ~/.zshrc
 echo "export pgdatabase='legacy'" >> ~/.zshrc
 
 chsh -s /bin/zsh
-
-# node pacakges
 
 # Neovim
 
