@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # packages
-sudo pacman -Syu zsh gitg firefox firefox-i18n-en-gb \
-  elixir vim the_silver_searcher ctags \
+sudo pacman -Syu zsh gitg \
+  elixir neovim python-neovim the_silver_searcher ctags \
   thunderbird thunderbird-i18n-en-gb clamav simple-scan gnucash freerdp gimp \
+  otf-fira-mono otf-fira-sans \
   ethtool intel-ucode
 
 # git
@@ -26,15 +27,8 @@ echo "export pgdatabase='legacy'" >> ~/.zshrc
 chsh -s /bin/zsh
 
 # node pacakges
-sudo npm install -g jshint
 
-# vim
-mkdir ~/.vim
-cd ~/.
-curl https://raw.githubusercontent.com/Shougo/neobundle.vim/master/bin/install.sh | sh
-cd ~/dotfiles
-ln -sf `pwd`/vimrc ~/.vimrc
-vim +NeoBundleInstall +qall
+# Neovim
 
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
