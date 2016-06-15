@@ -244,7 +244,7 @@ tnoremap <C-j> <C-\><C-n><C-w>j
 tnoremap <C-k> <C-\><C-n><C-w>k
 tnoremap <C-l> <C-\><C-n><C-w>l
 " Open terminal below
-nnoremap <Leader>t :below 10sp term://zsh<CR>
+nnoremap <Leader>c :below 10sp term://zsh<CR>
 " quickly replace string under cursor for line
 nnoremap <Leader>R :s/\<<C-r><C-w>\>/
 " Sort selected lines
