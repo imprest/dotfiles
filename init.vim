@@ -1,69 +1,87 @@
 call plug#begin('~/.config/nvim/plugged')
 
-" colorschemes
-Plug 'morhetz/gruvbox'
-Plug 'ryanoasis/vim-devicons'
-
 " general
+Plug 'mhinz/vim-startify'
+
+" Autocompleteion
 Plug 'ervandew/supertab'
-Plug 'benekastah/neomake'
-Plug 'Shougo/deoplete.nvim'
+function! DoRemote(arg)
+  UpdateRemotePlugins
+endfunction
+Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
 Plug 'Shougo/neosnippet-snippets'
 Plug 'Shougo/neosnippet.vim'
-Plug 'mhinz/vim-startify'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-Plug 'haya14busa/incsearch.vim'
-Plug 'kien/ctrlp.vim'
-Plug 'Yggdroot/indentLine'
-Plug 'majutsushi/tagbar'
+
+" Linter
+Plug  'scrooloose/syntastic', { 'on': 'SyntasticCheck' }
 
 " Project Management
 Plug 'airblade/vim-rooter'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 
 " editing
-Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
-Plug 'mbbill/undotree',         { 'on': 'UndotreeToggle' }
-Plug 'tpope/vim-commentary'
-Plug 'airblade/vim-gitgutter'
-Plug 'nathanaelkane/vim-indent-guides' " `,ig` to toggle
+Plug 'AndrewRadev/splitjoin.vim'
 Plug 'Raimondi/delimitMate'
+Plug 'airblade/vim-gitgutter'
+Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
+Plug 'junegunn/vim-peekaboo'
+Plug 'justinmk/vim-sneak'
+Plug 'mbbill/undotree',         { 'on': 'UndotreeToggle' }
+Plug 'nathanaelkane/vim-indent-guides' " `,ig` to toggle
+Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
-Plug 'justinmk/vim-sneak'
 Plug 'vim-scripts/camelcasemotion'
+Plug 'terryma/vim-expand-region'
+  vmap v <Plug>(expand_region_expand)
+  vmap <C-v> <Plug>(expand_region_shrink)
+
+" navigation
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'justinmk/vim-gtfo'
+Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
 
 " searching
-Plug 'junegunn/vim-pseudocl'
 Plug 'junegunn/vim-oblique'
+Plug 'junegunn/vim-pseudocl'
+Plug 'rking/ag.vim'
+let g:ag_working_path_mode="r"
+if executable('ag')
+    let g:ackprg = "ag --nogroup --column --smart-case --follow"
+endif
+Plug 'Chun-Yang/vim-action-ag'
 
 " git
-Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
+Plug 'tpope/vim-fugitive'
 
 " eye candy
-Plug 'myusuf3/numbers.vim'
+Plug 'Yggdroot/indentLine'
 Plug 'bling/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
+Plug 'morhetz/gruvbox'
+Plug 'myusuf3/numbers.vim'
+Plug 'ryanoasis/vim-devicons'
+Plug 'vim-airline/vim-airline-themes'
 
 " javascript
-Plug 'guileen/vim-node-dict'
-Plug 'moll/vim-node'
-Plug 'othree/yajs.vim'
-Plug 'othree/javascript-libraries-syntax.vim'
 Plug '1995eaton/vim-better-javascript-completion'
-Plug 'marijnh/tern_for_vim', { 'do': 'npm install' }
 Plug 'digitaltoad/vim-jade'
 Plug 'elzr/vim-json'
+Plug 'guileen/vim-node-dict'
+Plug 'marijnh/tern_for_vim', { 'do': 'npm install' }
+Plug 'moll/vim-node'
 Plug 'mxw/vim-jsx'
+Plug 'othree/javascript-libraries-syntax.vim'
+Plug 'othree/yajs.vim'
 
 " typescript
-Plug 'leafgarland/typescript-vim'
 Plug 'jason0x43/vim-js-indent'
+Plug 'leafgarland/typescript-vim'
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript'] }
@@ -75,20 +93,20 @@ Plug 'hail2u/vim-css3-syntax', { 'for': ['css', 'scss']}
 Plug 'othree/csscomplete.vim'
 
 " Elixir & Erlang
-Plug 'tpope/vim-endwise'
 Plug 'elixir-lang/vim-elixir'
 Plug 'jimenezrick/vimerl'
 Plug 'mattreduce/vim-mix'
-Plug 'thinca/vim-ref'
 Plug 'slashmili/alchemist.vim'
+Plug 'thinca/vim-ref'
+Plug 'tpope/vim-endwise'
 
 " text objects
-Plug 'wellle/targets.vim'
-Plug 'kana/vim-textobj-user'
 Plug 'glts/vim-textobj-comment'
 Plug 'kana/vim-textobj-fold'
-Plug 'kana/vim-textobj-indent'
 Plug 'kana/vim-textobj-function'
+Plug 'kana/vim-textobj-indent'
+Plug 'kana/vim-textobj-user'
+Plug 'wellle/targets.vim'
 
 " Markdown
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
@@ -99,7 +117,9 @@ call plug#end()
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
 let $NVIM_TUI_ENABLE_TRUE_COLOR   = 1
 set background=dark
+let g:gruvbox_italic = 1
 colorscheme gruvbox
+set cc=80
 
 set number
 set complete-=i
@@ -165,6 +185,7 @@ let g:mapleader = ','
 " common actions
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>d :bdelete<CR>
+nmap <Leader><Leader> V
 nnoremap ; :
 nnoremap Q @q
 nnoremap <C-s> :<C-u>w<CR>
@@ -173,6 +194,8 @@ cnoremap <C-s> <C-u>w<CR>
 " Navigation made easy
 noremap H ^
 noremap L g_
+noremap F %
+vnoremap L g_
 " Navigation between display lines
 noremap <silent> <Up>   gk
 noremap <silent> <Down> gj
@@ -182,7 +205,7 @@ noremap <silent> <Home> g<Home>
 noremap <silent> <End>  g<End>
 inoremap <silent> <Home> <C-o>g<Home>
 inoremap <silent> <End> <C-o>g<End>
-" smash escape insert mode
+" smash escape
 inoremap jk <esc>
 inoremap kj <esc>
 " buffer keys
@@ -221,7 +244,7 @@ tnoremap <C-j> <C-\><C-n><C-w>j
 tnoremap <C-k> <C-\><C-n><C-w>k
 tnoremap <C-l> <C-\><C-n><C-w>l
 " Open terminal below
-nnoremap <Leader>c :below 10sp term://zsh<CR>
+nnoremap <Leader>t :below 10sp term://zsh<CR>
 " quickly replace string under cursor for line
 nnoremap <Leader>R :s/\<<C-r><C-w>\>/
 " Sort selected lines
@@ -269,19 +292,25 @@ augroup omnifuncs
   autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
   autocmd FileType typescript setlocal completeopt-=menu
 augroup end
+" NeoSnippet
+let g:neosnippet#snippets_directory='~/.config/nvim/plugged/vim-snippets/snippets'
+imap <C-k> <Plug>(neosnippet_expand_or_jump)
+smap <C-k> <Plug>(neosnippet_expand_or_jump)
+xmap <C-k> <Plug>(neosnippet_expand_target)
+smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+  \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+if has('conceal')
+  set conceallevel=2 concealcursor=niv
+endif
 " Rooter
 let g:rooter_silent_chdir = 1
 let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
-" Neomake
-let g:neomake_javascript_enabled_makers = ['tsc']
-let g:neomake_warning_sign = {
-      \ 'text': 'W',
-      \ 'texthl': 'WarningMsg',
-      \ }
-let g:neomake_error_sign = {
-      \ 'text': 'E',
-      \ 'texthl': 'ErrorMsg',
-      \ }
+" Peekaboo
+let g:peekaboo_window = 'vertical botright 50new'
+" Syntastic
+let g:syntastic_javascript_checkers = ['standard']
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
 " Typescript
 let g:typescript_indent_disable = 1
 " let g:tsuquyomi_completion_detail = 1
@@ -293,7 +322,8 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,
 nnoremap <Leader>o :CtrlP<CR>
 noremap  <Leader>r :CtrlPMRUFiles<CR>
 nnoremap <Leader>l :CtrlPLine<CR>
-nnoremap <Leader>t :CtrlPTag<CR>
+nnoremap <Leader>t :CtrlPBufTag<CR>
+nnoremap <Leader>T :CtrlPTag<CR>
 nnoremap <Leader>b :CtrlPBuffer<CR>
 " tern
 if exists('g:plugs["tern_for_vim"]')
@@ -307,6 +337,8 @@ runtime macros/matchit.vim
 let g:airline_powerline_fonts     = 1
 let g:airline_detect_paste        = 1
 let g:airline_skip_empty_sections = 1
+let g:airline_left_sep            = ''
+let g:airline_right_sep           = ''
 let g:airline_theme               = 'bubblegum'
 let g:airline_extensions = ['branch', 'tabline']
 let g:airline#extensions#branch#enabled          = 1
@@ -314,6 +346,7 @@ let g:airline#extensions#tabline#enabled         = 1
 let g:airline#extensions#tabline#left_sep        = ''
 let g:airline#extensions#tabline#left_alt_sep    = '¦'
 let g:airline#extensions#tabline#buffer_idx_mode = 1
+let g:airline#extensions#tabline#fnamemod        = ':t'
 let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree|zsh'
 nmap <leader>1 <Plug>AirlineSelectTab1
 nmap <leader>2 <Plug>AirlineSelectTab2
@@ -329,8 +362,17 @@ let g:indentLine_enabled = 1
 " let g:indentLine_char    = '┆'
 let g:indentLine_char    = "\u250A"
 " NERDTree
-map <F2> :NERDTreeToggle<CR>
+map <C-\> :NERDTreeToggle<CR>
 let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
+augroup nerd_loader
+  autocmd!
+  autocmd VimEnter * silent! autocmd! FileExplorer
+  autocmd BufEnter,BufNew *
+        \  if isdirectory(expand('<amatch>'))
+        \|   call plug#load('nerdtree')
+        \|   execute 'autocmd! nerd_loader'
+        \| endif
+augroup END
 "set timeout
 set timeoutlen=1000
 "set ttimeout
