@@ -1,3 +1,11 @@
+" vim-plug (https://github.com/junegunn/vim-plug) settings
+" Automatically install vim-plug and run PlugInstall if vim-plug not found
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+  silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall | source $MYVIMRC
+endif
+
 call plug#begin('~/.config/nvim/plugged')
 
 " general
@@ -9,25 +17,51 @@ function! DoRemote(arg)
   UpdateRemotePlugins
 endfunction
 Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
-Plug 'Shougo/neosnippet-snippets'
-Plug 'Shougo/neosnippet.vim'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 " Linter
-Plug  'scrooloose/syntastic', { 'on': 'SyntasticCheck' }
+Plug 'neomake/neomake'
+
+let g:neomake_serialize = 1
+let g:neomake_serialize_abort_on_error = 1
+
+let g:neomake_elixir_mix_maker = {
+  \ 'exe': 'mix',
+  \ 'args': ['compile', '%:p', '--warnings-as-errors'],
+  \ 'errorformat':
+    \ '** %s %f:%l: %m,' .
+    \ '%f:%l: warning: %m'
+  \ }
+let g:neomake_elixir_lint_maker = {
+  \ 'exe': 'mix',
+  \ 'args': ['credo', 'list', '%:p', '--one-line', '-i', 'readability'],
+  \ 'errorformat': '[%t] %. %f:%l:%c %m'
+  \ }
+let g:neomake_elixir_enabled_makers    = ['mix'] ", 'lint']
+let g:neomake_open_list                = 2
+let g:neomake_list_height              = 4
+let g:neomake_serialize                = 1
+let g:neomake_serialize_abort_on_error = 1
+let g:neomake_verbose                  = 2
+
+
+autocmd! BufWritePost *.ex Neomake
+autocmd! BufWritePost *.exs Neomake
+
 
 " Project Management
 Plug 'airblade/vim-rooter'
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree', { 'on':  ['NERDTreeToggle', 'NERDTreeFind'] }
 
-" editing
+" Editing
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'Raimondi/delimitMate'
 Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
 Plug 'junegunn/vim-peekaboo'
 Plug 'justinmk/vim-sneak'
+let g:sneak#streak = 1
 Plug 'mbbill/undotree',         { 'on': 'UndotreeToggle' }
 Plug 'nathanaelkane/vim-indent-guides' " `,ig` to toggle
 Plug 'tpope/vim-commentary'
@@ -37,38 +71,39 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'vim-scripts/camelcasemotion'
 Plug 'terryma/vim-expand-region'
-  vmap v <Plug>(expand_region_expand)
-  vmap <C-v> <Plug>(expand_region_shrink)
+vmap v <Plug>(expand_region_expand)
+vmap <C-v> <Plug>(expand_region_shrink)
+" Plug 'dhruvasagar/vim-table-mode'
+" Plug 'sts10/vim-zipper'
+Plug 'chrisbra/unicode.vim'
 
-" navigation
+" Navigation
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'justinmk/vim-gtfo'
-Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
+Plug 'majutsushi/tagbar'
 
-" searching
+" Searching
 Plug 'junegunn/vim-oblique'
 Plug 'junegunn/vim-pseudocl'
 Plug 'rking/ag.vim'
-let g:ag_working_path_mode="r"
-if executable('ag')
-    let g:ackprg = "ag --nogroup --column --smart-case --follow"
-endif
 Plug 'Chun-Yang/vim-action-ag'
 
-" git
+" Git
 Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
 
-" eye candy
+" Eye candy
 Plug 'Yggdroot/indentLine'
 Plug 'bling/vim-airline'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
-Plug 'morhetz/gruvbox'
 Plug 'myusuf3/numbers.vim'
 Plug 'ryanoasis/vim-devicons'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'kristijanhusak/vim-hybrid-material'
+Plug 'terryma/vim-smooth-scroll'
+Plug 'acarapetis/vim-colors-github'
 
-" javascript
+" Javascript
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'digitaltoad/vim-jade'
 Plug 'elzr/vim-json'
@@ -79,26 +114,33 @@ Plug 'mxw/vim-jsx'
 Plug 'othree/javascript-libraries-syntax.vim'
 Plug 'othree/yajs.vim'
 
-" typescript
+" Typescript
 Plug 'jason0x43/vim-js-indent'
 Plug 'leafgarland/typescript-vim'
+Plug 'Quramy/tsuquyomi'
+
+" Elm
+Plug 'lambdatoast/elm.vim'
+nnoremap <leader>el :ElmEvalLine<CR>
+vnoremap <leader>es :<C-u>ElmEvalSelection<CR>
+nnoremap <leader>em :ElmMakeCurrentFile<CR>
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript'] }
-Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript'] }
-Plug 'othree/html5.vim', { 'for': ['html', 'javascript'] }
+Plug 'mattn/emmet-vim',     { 'for': ['html', 'javascript', 'css'] }
+Plug 'othree/html5.vim',    { 'for': ['html', 'javascript'] }
 
 " CSS
 Plug 'hail2u/vim-css3-syntax', { 'for': ['css', 'scss']}
 Plug 'othree/csscomplete.vim'
 
 " Elixir & Erlang
-Plug 'elixir-lang/vim-elixir'
+Plug 'elixir-lang/vim-elixir', { 'for': ['eelixir', 'elixir']}
 Plug 'jimenezrick/vimerl'
-Plug 'mattreduce/vim-mix'
 Plug 'slashmili/alchemist.vim'
-Plug 'thinca/vim-ref'
-Plug 'tpope/vim-endwise'
+Plug 'powerman/vim-plugin-AnsiEsc'
+Plug 'tpope/vim-endwise', { 'for': ['elixir']}
+Plug 'ctags.vim'
 
 " text objects
 Plug 'glts/vim-textobj-comment'
@@ -111,29 +153,74 @@ Plug 'wellle/targets.vim'
 " Markdown
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 
+" Latex
+" Plug 'lervag/vimtex'
+
 call plug#end()
 
-" Settings
+" Neovim Settings
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
 let $NVIM_TUI_ENABLE_TRUE_COLOR   = 1
-set background=dark
-let g:gruvbox_italic = 1
-colorscheme gruvbox
-set cc=80
 
-set number
+
+" Colors
+set background=dark
+colorscheme hybrid_reverse
+" Light scheme
+" colorscheme github
+" highlight NonText guibg=#060606
+" highlight Folded guibg=#0A0A0A guifg=#9090D0
+
+" set cc=80
+syntax enable
+filetype plugin indent on
+set ruler
+set autoread
 set complete-=i
 set nrformats-=octal
-set conceallevel=1
-set listchars+=tab:>\ ,trail:-,extends:❯,precedes:❮,conceal:Δ,nbsp:+
-set scrolloff=7
-set sidescrolloff=5
-set lazyredraw
-set noshowmode
 set laststatus=2
 set showtabline=2
 set cmdheight=1
+set tildeop " Make ~ toggle case for whole line
+
+" ui options
+set showmatch
+set matchtime=2
+set number
+set lazyredraw
+set noshowmode
+set tw=80
+set t_ut= " improve screen clearing by using the background colour
+
+" autocomplete list options
+set wildmode=longest,list,full " show similar and all options
+set wildignorecase
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
+set timeoutlen=300 " mapping timeout
+set ttimeoutlen=100 " keycode timeout
+
+" Split window behaviour
+set splitbelow
+set splitright
+
+" disable error sounds
+set noerrorbells
+set novisualbell
+set t_vb=
+
+" scroll options
+set scrolloff=7
+set sidescrolloff=5
 set display+=lastline
+
+" whitespace & hidden characters
+set nolist      " Toggle showing hidden characters i.e. space
+set listchars+=tab:│\ ,trail:•,extends:❯,precedes:❮,conceal:Δ,nbsp:+
+set conceallevel=1
+set concealcursor=i
+set breakindent " Wrap lines will be indented
+set linebreak   " Wrap long lines at a character
+let &showbreak="↪ "
 
 " tab stuff
 set tabstop=2
@@ -146,10 +233,42 @@ set smartindent
 
 " fold stuff
 set nofoldenable
+set fillchars=fold:\ , " get rid of '-' characters in folds
 
 " searching
 set ignorecase
 set smartcase
+let g:ag_working_path_mode="r"
+if executable('ag')
+  let g:ackprg = "ag --nogroup --column --smart-case --follow"
+  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+  set grepformat=%f:%l:%c:%m
+endif
+
+" tags
+set tags=tags;/
+set showfulltag
+" tagbar elixir support
+let g:tagbar_type_elixir = {
+      \ 'ctagstype' : 'elixir',
+      \ 'kinds' : [
+      \ 'f:functions',
+      \ 'functions:functions',
+      \ 'c:callbacks',
+      \ 'd:delegates',
+      \ 'e:exceptions',
+      \ 'i:implementations',
+      \ 'a:macros',
+      \ 'o:operators',
+      \ 'm:modules',
+      \ 'p:protocols',
+      \ 'r:records'
+      \ ]
+      \ }
+
+" shell
+set shell=/usr/bin/zsh
+set noshelltemp " use pipes
 
 " backup, undo and file management
 set backup
@@ -176,9 +295,27 @@ unlet g:undo_dir
 set undodir=$HOME/.data/undofile
 set backupdir=$HOME/.data/backup
 set directory=$HOME/.data/swap
+set noswapfile
 set undofile
 set undolevels=1000
 set undoreload=1000
+
+" Functions
+function! CloseWindowOrKillBuffer()
+  let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
+
+  " never bdelete a nerd tree
+  if matchstr(expand("%"), 'NERD') == 'NERD'
+    wincmd c
+    return
+  endif
+
+  if number_of_windows_to_this_buffer > 1
+    wincmd c
+  else
+    bdelete
+  endif
+endfunction
 
 " Keyboard mappings
 let g:mapleader = ','
@@ -186,9 +323,9 @@ let g:mapleader = ','
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>d :bdelete<CR>
 nmap <Leader><Leader> V
-nnoremap ; :
-nnoremap Q @q
-nnoremap <C-s> :<C-u>w<CR>
+" nnoremap ; :               " Use ; for commands X Conflicts with sneak
+nnoremap Q @q              " Use Q to execute default register
+nnoremap <C-s> :<C-u>w<CR> " Ctrl-S to save in most modes
 vnoremap <C-s> :<C-u>w<CR>
 cnoremap <C-s> <C-u>w<CR>
 " Navigation made easy
@@ -205,17 +342,16 @@ noremap <silent> <Home> g<Home>
 noremap <silent> <End>  g<End>
 inoremap <silent> <Home> <C-o>g<Home>
 inoremap <silent> <End> <C-o>g<End>
+" smooth scrolling
+nnoremap <C-e> <C-u>
+nnoremap <C-u> <C-e>
+noremap <silent> <c-e> :call smooth_scroll#up(&scroll, 15, 2)<CR>
+noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 15, 2)<CR>
+noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
+noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
 " smash escape
 inoremap jk <esc>
 inoremap kj <esc>
-" buffer keys
-nnoremap <Leader>bb :b#<CR>
-nnoremap <Leader>bn :bn<CR>
-nnoremap <Leader>bp :bp<CR>
-nnoremap <Leader>bf :bf<CR>
-nnoremap <Leader>bl :bl<CR>
-nnoremap <Leader>bw :w<CR>:bd<CR>
-nnoremap <Leader>bd :bd!<CR>
 " quickly move between open buffers
 nnoremap <Right> :bnext<CR>
 nnoremap <Left>  :bprev<CR>
@@ -224,9 +360,9 @@ nnoremap <M-Right> :vertical resize -1<CR>
 nnoremap <M-Up>    :resize -1<CR>
 nnoremap <M-Down>  :resize +1<CR>
 nnoremap <M-Left>  :vertical resize +1<CR>
-nnoremap <Leader>s  :split<CR>
-nnoremap <Leader>v  <C-w>v<C-w>l
-nnoremap <Leader>x  :close<CR>
+nnoremap <Leader>s :split<CR>
+nnoremap <Leader>v <C-w>v<C-w>l
+nnoremap <Leader>x :call CloseWindowOrKillBuffer()<CR>
 " reselect visual block after indent
 vnoremap < <gv
 vnoremap > >gv
@@ -250,25 +386,30 @@ nnoremap <Leader>R :s/\<<C-r><C-w>\>/
 " Sort selected lines
 vmap <Leader>s :sort<CR>
 " indent whole file according to syntax rules
-noremap <F9> gg=G<C-o><C-o>
+noremap <F10> gg=G<C-o><C-o>
 " start interactive EasyAlign in visual mode
 vmap <Enter> <Plug>(EasyAlign)
-" neomake
-nmap <Leader><Space>o :lopen<CR>
-nmap <Leader><Space>c :lclose<CR>
-nmap <Leader><Space>, :ll<CR>
-nmap <Leader><Space>n :lnext<CR>
-nmap <Leader><Space>p :lprev<CR>
 " colorizer
-nmap <Leader>C :ColorToggle<CR>
+nmap <F5> :ColorToggle<CR>
 " tern
 autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
 " Tagbar
-nmap <F8> :TagbarToggle<CR>
-" Move cursor to middle after each search
+nmap <F9> :TagbarToggle<CR>
+" Move cursor to middle after each search i.e. auto-center
 autocmd! User Oblique       normal! zz
 autocmd! User ObliqueStar   normal! zz
 autocmd! User ObliqueRepeat normal! zz
+nnoremap <silent> <C-o> <C-o>zz
+nnoremap <silent> <C-i> <C-i>zz
+" reselect last paste
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
+" find current word in quickfix
+nnoremap <Leader>fw :execute "vimgrep ".expand("<cword>")." %"<CR>:copen<cr>
+" find last search in quickfix
+nnoremap <Leader>ff :execute 'vimgrep /'.@/.'/g %'<CR>:copen<cr>
+" Move visual block
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
 
 " Plugin Configurations
 " Relative Numbers
@@ -283,6 +424,7 @@ if !exists('g:deoplete#omni#input_patterns')
   let g:deoplete#omni#input_patterns = {}
 endif
 " Completion
+set completeopt=longest,menu " preview
 augroup omnifuncs
   autocmd!
   autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -292,33 +434,26 @@ augroup omnifuncs
   autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
   autocmd FileType typescript setlocal completeopt-=menu
 augroup end
-" NeoSnippet
-let g:neosnippet#snippets_directory='~/.config/nvim/plugged/vim-snippets/snippets'
-imap <C-k> <Plug>(neosnippet_expand_or_jump)
-smap <C-k> <Plug>(neosnippet_expand_or_jump)
-xmap <C-k> <Plug>(neosnippet_expand_target)
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-  \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-if has('conceal')
-  set conceallevel=2 concealcursor=niv
-endif
 " Rooter
 let g:rooter_silent_chdir = 1
 let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
 " Peekaboo
 let g:peekaboo_window = 'vertical botright 50new'
-" Syntastic
-let g:syntastic_javascript_checkers = ['standard']
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-" Typescript
+
+"" Typescript
+" Disable leafgarland/typescript indenting and use jason0x43/vim-js-indent
 let g:typescript_indent_disable = 1
 " let g:tsuquyomi_completion_detail = 1
+
+" Vim-Startify
+let g:startify_session_dir = '~/.data/sessions'
+let g:startify_change_to_vcs_root = 1
+let g:startify_show_sessions = 1
+
 " CtrlP
 let g:ctrlp_reuse_window='startify'
 let g:ctrlp_extensions=['funky']
 let g:ctrlp_custom_ignore = { 'dir': '\v[\/]\.(git|hg|svn)$' }
-set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
 nnoremap <Leader>o :CtrlP<CR>
 noremap  <Leader>r :CtrlPMRUFiles<CR>
 nnoremap <Leader>l :CtrlPLine<CR>
@@ -337,14 +472,15 @@ runtime macros/matchit.vim
 let g:airline_powerline_fonts     = 1
 let g:airline_detect_paste        = 1
 let g:airline_skip_empty_sections = 1
-let g:airline_left_sep            = ''
-let g:airline_right_sep           = ''
+" let g:airline_left_sep            = ''
+" let g:airline_right_sep           = ''
+let g:airline_skip_empty_sections = 1
 let g:airline_theme               = 'bubblegum'
-let g:airline_extensions = ['branch', 'tabline']
+let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1
 let g:airline#extensions#tabline#left_sep        = ''
-let g:airline#extensions#tabline#left_alt_sep    = '¦'
+let g:airline#extensions#tabline#left_alt_sep    = '┆'
 let g:airline#extensions#tabline#buffer_idx_mode = 1
 let g:airline#extensions#tabline#fnamemod        = ':t'
 let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree|zsh'
@@ -357,12 +493,23 @@ nmap <leader>6 <Plug>AirlineSelectTab6
 nmap <leader>7 <Plug>AirlineSelectTab7
 nmap <leader>8 <Plug>AirlineSelectTab8
 nmap <leader>9 <Plug>AirlineSelectTab9
+call airline#parts#define_raw('linenr', '%l')
+"call airline#parts#define_accent('linenr', 'bold')
+let g:airline_section_z = airline#section#create(['%3p%% ',
+      \ g:airline_symbols.linenr .' ', 'linenr', ':%2c'])
+
 " IndentLine
 let g:indentLine_enabled = 1
-" let g:indentLine_char    = '┆'
-let g:indentLine_char    = "\u250A"
+let g:indentLine_char    = "\u250A" " '┆'
+let g:indent_guides_start_level = 1
+let g:indent_guides_guide_size = 1
+let g:indent_guides_enable_on_vim_startup = 0
+let g:indent_guides_color_change_percent = 3
+
 " NERDTree
 map <C-\> :NERDTreeToggle<CR>
+map <F2>  :NERDTreeToggle<CR>
+map <F3>  :NERDTreeFind<CR>
 let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
 augroup nerd_loader
   autocmd!
@@ -373,12 +520,8 @@ augroup nerd_loader
         \|   execute 'autocmd! nerd_loader'
         \| endif
 augroup END
-"set timeout
-set timeoutlen=1000
-"set ttimeout
-set ttimeoutlen=50
 "Emmet settings
-let g:user__install_global = 0
+let g:user_emmet_install_global = 0
 autocmd FileType html,css EmmetInstall
 
 " Auto Commands
@@ -397,10 +540,8 @@ augroup vimrc
   " For terminal start in insert mode
   au BufEnter * if &buftype == 'terminal' | :startinsert | endif
 augroup END
-autocmd FileType javascript noremap <buffer>  <c-f> :call JsBeautify()<cr>
-" for html
-autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
-" for css or scss
-autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
-autocmd FileType scss noremap <buffer> <c-f> :call CSSBeautify()<cr>
 
+augroup MyFileTypes
+  au!
+  au FileType vim setlocal fdm=indent keywordprg=:help
+augroup END

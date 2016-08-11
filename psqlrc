@@ -7,7 +7,7 @@
 -- Use best avaialable output format
 \pset border 2
 \pset null ¤
-\pset linestyle unicode
+-- \pset linestyle unicode
 \x auto
 \set VERBOSITY verbose
 \set HISTFILE ~/.psql_history- :DBNAME
