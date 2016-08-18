@@ -81,6 +81,7 @@ Plug 'chrisbra/unicode.vim'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'justinmk/vim-gtfo'
 Plug 'majutsushi/tagbar'
+Plug 'christoomey/vim-tmux-navigator'
 
 " Searching
 Plug 'junegunn/vim-oblique'
@@ -97,7 +98,7 @@ Plug 'Yggdroot/indentLine'
 Plug 'bling/vim-airline'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
 Plug 'myusuf3/numbers.vim'
-Plug 'ryanoasis/vim-devicons'
+" Plug 'ryanoasis/vim-devicons'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'terryma/vim-smooth-scroll'
@@ -155,25 +156,28 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 
 " Latex
 " Plug 'lervag/vimtex'
-
+Plug 'chriskempson/base16-vim'
+Plug 'morhetz/gruvbox'
 call plug#end()
 
 " Neovim Settings
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
 let $NVIM_TUI_ENABLE_TRUE_COLOR   = 1
 
-
 " Colors
 set background=dark
+let base16colorspace=256
+"colorscheme base16-default-dark
+"colorscheme gruvbox
 colorscheme hybrid_reverse
 " Light scheme
 " colorscheme github
 " highlight NonText guibg=#060606
 " highlight Folded guibg=#0A0A0A guifg=#9090D0
 
-" set cc=80
 syntax enable
 filetype plugin indent on
+set cc=80
 set ruler
 set autoread
 set complete-=i
@@ -369,9 +373,12 @@ vnoremap > >gv
 " make Y consistent with C & D
 nnoremap Y y$
 " toggle highlight search
-nnoremap <BS> :set hlsearch! hlsearch?<CR>
+nnoremap <Leader>h :set hlsearch! hlsearch?<CR>
 " Map ctrl-movement keys to window switching
 map <silent> <C-h> <C-w>h
+if has('nvim')
+  nmap <bs> :<c-u>TmuxNavigateLeft<cr>
+endif
 map <silent> <C-j> <C-w>j
 map <silent> <C-k> <C-w>k
 map <silent> <C-l> <C-w>l
@@ -413,7 +420,7 @@ vnoremap K :m '<-2<CR>gv=gv
 
 " Plugin Configurations
 " Relative Numbers
-let g:enable_numbers = 0
+let g:enable_numbers = 1
 " SuperTab
 let g:SuperTabDefaultCompletionType = "<c-n>"
 " Deoplete
@@ -472,8 +479,8 @@ runtime macros/matchit.vim
 let g:airline_powerline_fonts     = 1
 let g:airline_detect_paste        = 1
 let g:airline_skip_empty_sections = 1
-" let g:airline_left_sep            = ''
-" let g:airline_right_sep           = ''
+let g:airline_left_sep            = ''
+let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
 let g:airline_theme               = 'bubblegum'
 let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar']
