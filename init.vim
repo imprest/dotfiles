@@ -98,11 +98,10 @@ Plug 'Yggdroot/indentLine'
 Plug 'bling/vim-airline'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
 Plug 'myusuf3/numbers.vim'
-" Plug 'ryanoasis/vim-devicons'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'kristijanhusak/vim-hybrid-material'
+Plug 'w0ng/vim-hybrid'
 Plug 'terryma/vim-smooth-scroll'
-Plug 'acarapetis/vim-colors-github'
 
 " Javascript
 Plug '1995eaton/vim-better-javascript-completion'
@@ -156,27 +155,22 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 
 " Latex
 " Plug 'lervag/vimtex'
-Plug 'chriskempson/base16-vim'
-Plug 'morhetz/gruvbox'
+
 call plug#end()
 
 " Neovim Settings
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
 let $NVIM_TUI_ENABLE_TRUE_COLOR   = 1
 
-" Colors
-set background=dark
-let base16colorspace=256
-"colorscheme base16-default-dark
-"colorscheme gruvbox
-colorscheme hybrid_reverse
-" Light scheme
-" colorscheme github
-" highlight NonText guibg=#060606
-" highlight Folded guibg=#0A0A0A guifg=#9090D0
-
 syntax enable
 filetype plugin indent on
+
+" Colors
+set background=dark
+let g:hybrid_custom_term_colors = 1
+let g:hybrid_reduced_contrast   = 1
+colorscheme hybrid_reverse
+
 set cc=80
 set ruler
 set autoread
@@ -201,7 +195,7 @@ set wildmode=longest,list,full " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
 set timeoutlen=300 " mapping timeout
-set ttimeoutlen=100 " keycode timeout
+set ttimeoutlen=10 " keycode timeout
 
 " Split window behaviour
 set splitbelow
