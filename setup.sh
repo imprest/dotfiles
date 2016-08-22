@@ -1,32 +1,32 @@
 #!/bin/bash
 
 # packages
-sudo pacman -Syu zsh gitg \
+sudo pacman -Syu zsh tmux gitg fzf \
   neovim python-neovim the_silver_searcher ctags \
   erlang elixir npm \
-  thunderbird thunderbird-i18n-en-gb clamav simple-scan gnucash freerdp gimp \
-  otf-fira-mono otf-fira-sans
+  noto-fonts-cjk noto-fonts-emoji \
+  postgresql pgadmin3 \
+  thunderbird thunderbird-i18n-en-gb clamav simple-scan gnucash freerdp gimp
+
+# yaourt packages
+yaourt -S gitsh
 
 # git
 git config --global user.email "hardikvaria@gmail.com"
-git config --global user.name "Hardik Varia"
+git config --global user.name  "Hardik Varia"
 
-# zsh
-mkdir ~/.zprezto
-git clone --recursive https://github.com/sorin-ionescu/prezto.git ~/.zprezto/
-ln -sf ~/.zprezto/runcoms/zlogin    ~/.zlogin
-ln -sf ~/.zprezto/runcoms/zlogout   ~/.zlogout
-ln -sf ~/.zprezto/runcoms/zpreztorc ~/.zpreztorc
-ln -sf ~/.zprezto/runcoms/zprofile  ~/.zprofile
-ln -sf ~/.zprezto/runcoms/zshenv    ~/.zshenv
-ln -sf ~/.zprezto/runcoms/zshrc     ~/.zshrc
+# tmux
+ln -sf ~/dotfiles/tmux.conf ~/.tmux.conf
 
-echo "export pgdatabase='legacy'" >> ~/.zshrc
-
-chsh -s /bin/zsh
-
-# Neovim
+# neovim
+mkdir -p ~/.config/nvim
+ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
 
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
 
+# zsh
+ln -sf ~/dotfiles/zshrc ~/.zshrc
+chsh -s /bin/zsh
+cd ~
+git clone https://github.com/tarjoilija/zgen.git .zgen

@@ -159,18 +159,6 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 call plug#end()
 
 " Neovim Settings
-let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
-let $NVIM_TUI_ENABLE_TRUE_COLOR   = 1
-
-syntax enable
-filetype plugin indent on
-
-" Colors
-set background=dark
-let g:hybrid_custom_term_colors = 1
-let g:hybrid_reduced_contrast   = 1
-colorscheme hybrid_reverse
-
 set cc=80
 set ruler
 set autoread
@@ -181,13 +169,21 @@ set showtabline=2
 set cmdheight=1
 set tildeop " Make ~ toggle case for whole line
 
+" Colors
+set termguicolors
+"set t_Co=256
+set background=dark
+let g:hybrid_custom_term_colors = 1
+let g:hybrid_reduced_contrast   = 1
+colorscheme hybrid_reverse
+
 " ui options
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 set showmatch
 set matchtime=2
 set number
 set lazyredraw
 set noshowmode
-set tw=80
 set t_ut= " improve screen clearing by using the background colour
 
 " autocomplete list options

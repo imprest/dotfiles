@@ -24,10 +24,13 @@ if ! zgen saved; then
   zgen prezto directory
 	zgen prezto git
   zgen prezto history
+  zgen prezto node
   zgen prezto pacman
   zgen prezto rsync
   zgen prezto spectrum
+  zgeb prezto ssh
   zgen prezto utility
+  zgen prezto terminal
   zgen prezto completion
 	zgen prezto syntax-highlighting
 	zgen prezto history-substring-search
@@ -57,6 +60,8 @@ export EDITOR=$VISUAL
 export LANG=en_GB.UTF-8
 export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡  '
 export LESS='--tabs=4 --no-init --LONG-PROMPT --ignore-case --quit-if-one-screen --RAW-CONTROL-CHARS'
+export PATH=$HOME/Downloads/android-sdk-linux/tools:$PATH
+export PGDATABASE='legacy' # frequently used database
 
 ## Keybindings
 bindkey '^ ' autosuggest-accept # Autosuggestion
