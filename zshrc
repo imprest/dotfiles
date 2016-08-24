@@ -67,11 +67,6 @@ export PGDATABASE='legacy' # frequently used database
 bindkey '^ ' autosuggest-accept # Autosuggestion
 bindkey '^u' backward-kill-line # Like bash
 
-# Install tmux plugin manager if not installed
-if "test ! -d ~/.tmux/plugins/tpm" \
-   "run 'git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm'"
-
 # fzf
 . /usr/share/fzf/key-bindings.zsh
 . /usr/share/fzf/completion.zsh
-
