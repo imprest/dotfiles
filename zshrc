@@ -13,7 +13,7 @@ if ! zgen saved; then
   # Prezto module options i.e. zgen prezto <modulename> <option> <value(s)>
   zgen prezto terminal auto-title 'yes'
 	zgen prezto editor key-bindings 'emacs'
-  # zgen prezto tmux:auto-start local 'yes'
+  zgen prezto tmux:auto-start local 'yes'
 	zgen prezto prompt theme 'sorin'
   # Load Prezto and other modules not set above
   zgen prezto
@@ -66,6 +66,10 @@ export PGDATABASE='legacy' # frequently used database
 ## Keybindings
 bindkey '^ ' autosuggest-accept # Autosuggestion
 bindkey '^u' backward-kill-line # Like bash
+
+# Install tmux plugin manager if not installed
+if "test ! -d ~/.tmux/plugins/tpm" \
+   "run 'git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm'"
 
 # fzf
 . /usr/share/fzf/key-bindings.zsh
