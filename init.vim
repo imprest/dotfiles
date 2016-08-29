@@ -168,10 +168,10 @@ set laststatus=2
 set showtabline=2
 set cmdheight=1
 set tildeop " Make ~ toggle case for whole line
+set clipboard+=unnamedplus " Use system clipboard
 
 " Colors
 set termguicolors
-"set t_Co=256
 set background=dark
 let g:hybrid_custom_term_colors = 1
 let g:hybrid_reduced_contrast   = 1
