@@ -13,7 +13,7 @@ if ! zgen saved; then
   # Prezto module options i.e. zgen prezto <modulename> <option> <value(s)>
   zgen prezto terminal auto-title 'yes'
 	zgen prezto editor key-bindings 'emacs'
-  zgen prezto tmux:auto-start local 'yes'
+  # zgen prezto tmux:auto-start local 'yes'
 	zgen prezto prompt theme 'sorin'
   # Load Prezto and other modules not set above
   zgen prezto
@@ -28,7 +28,7 @@ if ! zgen saved; then
   zgen prezto pacman
   zgen prezto rsync
   zgen prezto spectrum
-  zgeb prezto ssh
+  zgen prezto ssh
   zgen prezto utility
   zgen prezto terminal
   zgen prezto completion
