@@ -23,9 +23,6 @@ Plug 'honza/vim-snippets'
 " Linter
 Plug 'neomake/neomake'
 
-let g:neomake_serialize = 1
-let g:neomake_serialize_abort_on_error = 1
-
 let g:neomake_elixir_mix_maker = {
   \ 'exe': 'mix',
   \ 'args': ['compile', '%:p', '--warnings-as-errors'],
@@ -39,12 +36,9 @@ let g:neomake_elixir_lint_maker = {
   \ 'errorformat': '[%t] %. %f:%l:%c %m'
   \ }
 let g:neomake_elixir_enabled_makers    = ['mix'] ", 'lint']
-let g:neomake_open_list                = 2
-let g:neomake_list_height              = 4
+let g:neomake_open_list                = 1
 let g:neomake_serialize                = 1
 let g:neomake_serialize_abort_on_error = 1
-let g:neomake_verbose                  = 2
-
 
 autocmd! BufWritePost *.ex Neomake
 autocmd! BufWritePost *.exs Neomake
@@ -92,16 +86,6 @@ Plug 'Chun-Yang/vim-action-ag'
 " Git
 Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
-
-" Eye candy
-Plug 'Yggdroot/indentLine'
-Plug 'bling/vim-airline'
-Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
-Plug 'myusuf3/numbers.vim'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'kristijanhusak/vim-hybrid-material'
-Plug 'w0ng/vim-hybrid'
-Plug 'terryma/vim-smooth-scroll'
 
 " Javascript
 Plug '1995eaton/vim-better-javascript-completion'
@@ -156,26 +140,42 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 " Latex
 " Plug 'lervag/vimtex'
 
+" Eye candy
+Plug 'Yggdroot/indentLine'
+Plug 'bling/vim-airline'
+Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
+Plug 'myusuf3/numbers.vim'
+Plug 'terryma/vim-smooth-scroll'
+Plug 'vim-airline/vim-airline-themes'
+
+" Colorschemes
+Plug 'w0ng/vim-hybrid'
+Plug 'kristijanhusak/vim-hybrid-material'
+Plug 'rakr/vim-one'
+
 call plug#end()
 
 " Neovim Settings
 set cc=80
+set numberwidth=5
 set ruler
 set autoread
 set complete-=i
 set nrformats-=octal
 set laststatus=2
+set winwidth=80
 set showtabline=2
 set cmdheight=1
 set tildeop " Make ~ toggle case for whole line
 set clipboard+=unnamedplus " Use system clipboard
 
 " Colors
-set termguicolors
-set background=dark
-let g:hybrid_custom_term_colors = 1
-let g:hybrid_reduced_contrast   = 1
-colorscheme hybrid_reverse
+set termguicolors " Enable 24-bit colors in supported terminals
+" let g:hybrid_custom_term_colors = 1
+" let g:hybrid_reduced_contrast   = 1
+set background=light
+let g:one_allow_italics = 1
+colorscheme one
 
 " ui options
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
@@ -208,8 +208,9 @@ set sidescrolloff=5
 set display+=lastline
 
 " whitespace & hidden characters
-set nolist      " Toggle showing hidden characters i.e. space
-set listchars+=tab:│\ ,trail:•,extends:❯,precedes:❮,conceal:Δ,nbsp:+
+set nowrap
+set list      " Toggle showing hidden characters i.e. space
+set listchars+=tab:»·,trail:•,extends:❯,precedes:❮,conceal:Δ,nbsp:+
 set conceallevel=1
 set concealcursor=i
 set breakindent " Wrap lines will be indented
@@ -316,7 +317,7 @@ let g:mapleader = ','
 " common actions
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>d :bdelete<CR>
-nmap <Leader><Leader> V
+nnoremap <Leader><Leader> <c-^> " Swith between last two files
 " nnoremap ; :               " Use ; for commands X Conflicts with sneak
 nnoremap Q @q              " Use Q to execute default register
 nnoremap <C-s> :<C-u>w<CR> " Ctrl-S to save in most modes
@@ -407,6 +408,10 @@ nnoremap <Leader>ff :execute 'vimgrep /'.@/.'/g %'<CR>:copen<cr>
 " Move visual block
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
+" Make K or help open in vertical split
+" nnoremap K :vsp <CR>:execute(expand(&keywordprg).' '.expand("<cword>"))<CR>
+autocmd FileType help wincmd L | vert resize 120
+autocmd FileType ExDoc wincmd L | vert resize 120
 
 " Plugin Configurations
 " Relative Numbers
@@ -450,6 +455,7 @@ let g:startify_show_sessions = 1
 " CtrlP
 let g:ctrlp_reuse_window='startify'
 let g:ctrlp_extensions=['funky']
+let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s' " Use ag
 let g:ctrlp_custom_ignore = { 'dir': '\v[\/]\.(git|hg|svn)$' }
 nnoremap <Leader>o :CtrlP<CR>
 noremap  <Leader>r :CtrlPMRUFiles<CR>
@@ -472,7 +478,7 @@ let g:airline_skip_empty_sections = 1
 let g:airline_left_sep            = ''
 let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
-let g:airline_theme               = 'bubblegum'
+let g:airline_theme               = 'one'
 let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1
@@ -480,7 +486,7 @@ let g:airline#extensions#tabline#left_sep        = ''
 let g:airline#extensions#tabline#left_alt_sep    = '┆'
 let g:airline#extensions#tabline#buffer_idx_mode = 1
 let g:airline#extensions#tabline#fnamemod        = ':t'
-let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree|zsh'
+let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree|zsh|*:zsh'
 nmap <leader>1 <Plug>AirlineSelectTab1
 nmap <leader>2 <Plug>AirlineSelectTab2
 nmap <leader>3 <Plug>AirlineSelectTab3
@@ -530,9 +536,9 @@ augroup vimrc
 
   " Jump to last known position of cursor in file
   autocmd BufReadPost *
-        \ if line("'\"") > 0 && line ("'\"") <= line("$") |
-        \   exe 'normal! g`"zvzz' |
-        \ endif
+    \ if line("'\"") > 0 && line ("'\"") <= line("$") |
+    \   exe 'normal! g`"zvzz' |
+    \ endif
 
   " For terminal start in insert mode
   au BufEnter * if &buftype == 'terminal' | :startinsert | endif
@@ -540,5 +546,13 @@ augroup END
 
 augroup MyFileTypes
   au!
-  au FileType vim setlocal fdm=indent keywordprg=:help
+  au filetype vim setlocal fdm=indent keywordprg=:help
+
+  " Help System Speedups
+  autocmd filetype help nnoremap <buffer><cr> <c-]>
+  autocmd filetype help nnoremap <buffer><bs> <c-T>
+  autocmd filetype help nnoremap <buffer>q :q<CR>
+
+  autocmd filetype qf setlocal wrap
+
 augroup END

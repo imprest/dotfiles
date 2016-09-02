@@ -58,6 +58,7 @@ WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export LANG=en_GB.UTF-8
+export TERM='xterm-256color'
 export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡  '
 export LESS='--tabs=4 --no-init --LONG-PROMPT --ignore-case --quit-if-one-screen --RAW-CONTROL-CHARS'
 export PATH=$HOME/Downloads/android-sdk-linux/tools:$PATH
