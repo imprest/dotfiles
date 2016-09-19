@@ -149,7 +149,7 @@ Plug 'terryma/vim-smooth-scroll'
 Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
-Plug 'w0ng/vim-hybrid'
+"Plug 'w0ng/vim-hybrid'
 Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'rakr/vim-one'
 
@@ -163,7 +163,7 @@ set autoread
 set complete-=i
 set nrformats-=octal
 set laststatus=2
-set winwidth=80
+" set winwidth=80
 set showtabline=2
 set cmdheight=1
 set tildeop " Make ~ toggle case for whole line
@@ -173,7 +173,7 @@ set clipboard+=unnamedplus " Use system clipboard
 set termguicolors " Enable 24-bit colors in supported terminals
 " let g:hybrid_custom_term_colors = 1
 " let g:hybrid_reduced_contrast   = 1
-set background=light
+set background=dark
 let g:one_allow_italics = 1
 colorscheme one
 
