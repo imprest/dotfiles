@@ -138,19 +138,20 @@ Plug 'wellle/targets.vim'
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 
 " Latex
-" Plug 'lervag/vimtex'
+Plug 'lervag/vimtex'
 
 " Eye candy
 Plug 'Yggdroot/indentLine'
 Plug 'bling/vim-airline'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
-Plug 'myusuf3/numbers.vim'
+" Plug 'myusuf3/numbers.vim'
 Plug 'terryma/vim-smooth-scroll'
 Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
 "Plug 'w0ng/vim-hybrid'
-Plug 'kristijanhusak/vim-hybrid-material'
+" Plug 'kristijanhusak/vim-hybrid-material'
+Plug 'NLKNguyen/papercolor-theme'
 Plug 'rakr/vim-one'
 
 call plug#end()
@@ -410,12 +411,10 @@ vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 " Make K or help open in vertical split
 " nnoremap K :vsp <CR>:execute(expand(&keywordprg).' '.expand("<cword>"))<CR>
-autocmd FileType help wincmd L | vert resize 120
-autocmd FileType ExDoc wincmd L | vert resize 120
+autocmd FileType help  wincmd L | vert
+autocmd FileType ExDoc wincmd L | vert
 
 " Plugin Configurations
-" Relative Numbers
-let g:enable_numbers = 1
 " SuperTab
 let g:SuperTabDefaultCompletionType = "<c-n>"
 " Deoplete
@@ -479,7 +478,7 @@ let g:airline_left_sep            = ''
 let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
 let g:airline_theme               = 'one'
-let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar']
+let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar', 'hunks']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1
 let g:airline#extensions#tabline#left_sep        = ''
