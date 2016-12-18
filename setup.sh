@@ -29,4 +29,4 @@ ln -sf `pwd`/psqlrc ~/.psqlrc
 ln -sf ~/dotfiles/zshrc ~/.zshrc
 chsh -s /bin/zsh
 cd ~
-git clone https://github.com/tarjoilija/zgen.git .zgen
+git clone https://github.com/zplug/zplug .zplug
