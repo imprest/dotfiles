@@ -153,6 +153,7 @@ Plug 'vim-airline/vim-airline-themes'
 " Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'rakr/vim-one'
+Plug 'tomasr/molokai'
 
 call plug#end()
 
@@ -176,7 +177,8 @@ set termguicolors " Enable 24-bit colors in supported terminals
 " let g:hybrid_reduced_contrast   = 1
 set background=dark
 let g:one_allow_italics = 1
-colorscheme one
+let g:rehash256 = 1
+colorscheme molokai "one
 
 " ui options
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
@@ -469,6 +471,7 @@ if exists('g:plugs["tern_for_vim"]')
   autocmd FileType javascript setlocal omnifunc=tern#Complete
 endif
 " enable matchit (for matching tags with %)
+let g:loaded_matchparen = 1
 runtime macros/matchit.vim
 " Airline options
 let g:airline_powerline_fonts     = 1
@@ -477,7 +480,7 @@ let g:airline_skip_empty_sections = 1
 let g:airline_left_sep            = ''
 let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
-let g:airline_theme               = 'one'
+let g:airline_theme               = 'molokai'
 let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar', 'hunks']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1
