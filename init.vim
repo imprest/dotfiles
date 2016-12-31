@@ -10,39 +10,48 @@ call plug#begin('~/.config/nvim/plugged')
 
 " general
 Plug 'mhinz/vim-startify'
+Plug 'dietsche/vim-lastplace'
 
 " Autocompleteion
 Plug 'ervandew/supertab'
-function! DoRemote(arg)
-  UpdateRemotePlugins
-endfunction
-Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
-" Linter
+" Linter. Execute code checks, find mistakes, in the background
 Plug 'neomake/neomake'
+  " Run Neomake when I save any buffer
+  augroup localneomake
+    autocmd! BufWritePost * Neomake
+  augroup END
+  " Don't tell me to use smartquotes in markdown ok?
+  let g:neomake_markdown_enabled_makers = []
 
-let g:neomake_elixir_mix_maker = {
-  \ 'exe': 'mix',
-  \ 'args': ['compile', '%:p', '--warnings-as-errors'],
-  \ 'errorformat':
-    \ '** %s %f:%l: %m,' .
-    \ '%f:%l: warning: %m'
-  \ }
-let g:neomake_elixir_lint_maker = {
-  \ 'exe': 'mix',
-  \ 'args': ['credo', 'list', '%:p', '--one-line', '-i', 'readability'],
-  \ 'errorformat': '[%t] %. %f:%l:%c %m'
-  \ }
-let g:neomake_elixir_enabled_makers    = ['mix'] ", 'lint']
-let g:neomake_open_list                = 1
-let g:neomake_serialize                = 1
-let g:neomake_serialize_abort_on_error = 1
+  " Configure a nice credo setup, courtesy https://github.com/neomake/neomake/pull/300
+  let g:neomake_elixir_enabled_makers = ['mix', 'mycredo']
+  function! NeomakeCredoErrorType(entry)
+    if a:entry.type ==# 'F'      " Refactoring opportunities
+      let l:type = 'W'
+    elseif a:entry.type ==# 'D'  " Software design suggestions
+      let l:type = 'I'
+    elseif a:entry.type ==# 'W'  " Warnings
+      let l:type = 'W'
+    elseif a:entry.type ==# 'R'  " Readability suggestions
+      let l:type = 'I'
+    elseif a:entry.type ==# 'C'  " Convention violation
+      let l:type = 'W'
+    else
+      let l:type = 'M'           " Everything else is a message
+    endif
+    let a:entry.type = l:type
+  endfunction
 
-autocmd! BufWritePost *.ex Neomake
-autocmd! BufWritePost *.exs Neomake
-
+  let g:neomake_elixir_mycredo_maker = {
+        \ 'exe': 'mix',
+        \ 'args': ['credo', 'list', '%:p', '--format=oneline'],
+        \ 'errorformat': '[%t] %. %f:%l:%c %m,[%t] %. %f:%l %m',
+        \ 'postprocess': function('NeomakeCredoErrorType')
+        \ }
 
 " Project Management
 Plug 'airblade/vim-rooter'
@@ -54,15 +63,14 @@ Plug 'Raimondi/delimitMate'
 Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
 Plug 'junegunn/vim-peekaboo'
-Plug 'justinmk/vim-sneak'
-let g:sneak#streak = 1
 Plug 'mbbill/undotree',         { 'on': 'UndotreeToggle' }
 Plug 'nathanaelkane/vim-indent-guides' " `,ig` to toggle
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-unimpaired' " cos : set spelling cox : set cursor con : set number etc
+nnoremap coi :IndentLinesToggle
 Plug 'vim-scripts/camelcasemotion'
 Plug 'terryma/vim-expand-region'
 vmap v <Plug>(expand_region_expand)
@@ -78,8 +86,7 @@ Plug 'majutsushi/tagbar'
 Plug 'christoomey/vim-tmux-navigator'
 
 " Searching
-Plug 'junegunn/vim-oblique'
-Plug 'junegunn/vim-pseudocl'
+Plug 'osyo-manga/vim-anzu'
 Plug 'rking/ag.vim'
 Plug 'Chun-Yang/vim-action-ag'
 
@@ -108,6 +115,12 @@ Plug 'lambdatoast/elm.vim'
 nnoremap <leader>el :ElmEvalLine<CR>
 vnoremap <leader>es :<C-u>ElmEvalSelection<CR>
 nnoremap <leader>em :ElmMakeCurrentFile<CR>
+augroup elm
+  autocmd!
+  autocmd BufNewFile,BufRead *.elm setlocal tabstop=4
+  autocmd BufNewFile,BufRead *.elm setlocal shiftwidth=4
+  autocmd BufNewFile,BufRead *.elm setlocal softtabstop=4
+augroup END
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript'] }
@@ -124,7 +137,16 @@ Plug 'jimenezrick/vimerl'
 Plug 'slashmili/alchemist.vim'
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise', { 'for': ['elixir']}
-Plug 'ctags.vim'
+Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
+  let g:gutentags_cache_dir = '~/.tags_cache'
+Plug 'janko-m/vim-test'
+  nmap <silent> <leader>t :TestNearest<CR>
+  nmap <silent> <leader>T :TestFile<CR>
+  nmap <silent> <leader>a :TestSuite<CR>
+  nmap <silent> <leader>l :TestLast<CR>
+  nmap <silent> <leader>g :TestVisit<CR>
+  " run tests in neovim strategy
+  let g:test#strategy = 'neovim'
 
 " text objects
 Plug 'glts/vim-textobj-comment'
@@ -150,7 +172,8 @@ Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
 "Plug 'w0ng/vim-hybrid'
-" Plug 'kristijanhusak/vim-hybrid-material'
+"Plug 'kristijanhusak/vim-hybrid-material'
+"Plug 'ayu-theme/ayu-vim' " or other package manager
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'rakr/vim-one'
 Plug 'tomasr/molokai'
@@ -158,18 +181,18 @@ Plug 'tomasr/molokai'
 call plug#end()
 
 " Neovim Settings
-set cc=80
+"set cc=80
 set numberwidth=5
 set ruler
 set autoread
 set complete-=i
 set nrformats-=octal
 set laststatus=2
-" set winwidth=80
 set showtabline=2
 set cmdheight=1
 set tildeop " Make ~ toggle case for whole line
 set clipboard+=unnamedplus " Use system clipboard
+set iskeyword+=- " Makes foo-bar considered one word
 
 " Colors
 set termguicolors " Enable 24-bit colors in supported terminals
@@ -177,11 +200,13 @@ set termguicolors " Enable 24-bit colors in supported terminals
 " let g:hybrid_reduced_contrast   = 1
 set background=dark
 let g:one_allow_italics = 1
-let g:rehash256 = 1
+let g:rehash256 = 1   " Molokai theme option
+"let ayucolor="dark   " for dark version of theme
 colorscheme molokai "one
 
 " ui options
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+set title
 set showmatch
 set matchtime=2
 set number
@@ -234,7 +259,7 @@ set nofoldenable
 set fillchars=fold:\ , " get rid of '-' characters in folds
 
 " searching
-set ignorecase
+set ignorecase smartcase
 set smartcase
 let g:ag_working_path_mode="r"
 if executable('ag')
@@ -354,10 +379,10 @@ inoremap kj <esc>
 nnoremap <Right> :bnext<CR>
 nnoremap <Left>  :bprev<CR>
 " window keys
-nnoremap <M-Right> :vertical resize -1<CR>
+nnoremap <M-Left>  :vertical resize -1<CR>
 nnoremap <M-Up>    :resize -1<CR>
 nnoremap <M-Down>  :resize +1<CR>
-nnoremap <M-Left>  :vertical resize +1<CR>
+nnoremap <M-Right> :vertical resize +1<CR>
 nnoremap <Leader>s :split<CR>
 nnoremap <Leader>v <C-w>v<C-w>l
 nnoremap <Leader>x :call CloseWindowOrKillBuffer()<CR>
@@ -366,16 +391,12 @@ vnoremap < <gv
 vnoremap > >gv
 " make Y consistent with C & D
 nnoremap Y y$
-" toggle highlight search
-nnoremap <Leader>h :set hlsearch! hlsearch?<CR>
 " Map ctrl-movement keys to window switching
-map <silent> <C-h> <C-w>h
-if has('nvim')
-  nmap <bs> :<c-u>TmuxNavigateLeft<cr>
-endif
-map <silent> <C-j> <C-w>j
-map <silent> <C-k> <C-w>k
-map <silent> <C-l> <C-w>l
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+nnoremap <silent> <BS> :TmuxNavigateLeft<cr> " Hack for neovim tmux issue
 tnoremap <C-h> <C-\><C-n><C-w>h
 tnoremap <C-j> <C-\><C-n><C-w>j
 tnoremap <C-k> <C-\><C-n><C-w>k
@@ -386,8 +407,6 @@ nnoremap <Leader>c :below 10sp term://zsh<CR>
 nnoremap <Leader>R :s/\<<C-r><C-w>\>/
 " Sort selected lines
 vmap <Leader>s :sort<CR>
-" indent whole file according to syntax rules
-noremap <F10> gg=G<C-o><C-o>
 " start interactive EasyAlign in visual mode
 vmap <Enter> <Plug>(EasyAlign)
 " colorizer
@@ -397,13 +416,10 @@ autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
 " Tagbar
 nmap <F9> :TagbarToggle<CR>
 " Move cursor to middle after each search i.e. auto-center
-autocmd! User Oblique       normal! zz
-autocmd! User ObliqueStar   normal! zz
-autocmd! User ObliqueRepeat normal! zz
 nnoremap <silent> <C-o> <C-o>zz
 nnoremap <silent> <C-i> <C-i>zz
 " reselect last paste
-nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
+noremap gV `[v`]
 " find current word in quickfix
 nnoremap <Leader>fw :execute "vimgrep ".expand("<cword>")." %"<CR>:copen<cr>
 " find last search in quickfix
@@ -428,6 +444,7 @@ if !exists('g:deoplete#omni#input_patterns')
 endif
 " Completion
 set completeopt=longest,menu " preview
+set omnifunc=syntaxcomplete#Complete
 augroup omnifuncs
   autocmd!
   autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -463,7 +480,7 @@ noremap  <Leader>r :CtrlPMRUFiles<CR>
 nnoremap <Leader>l :CtrlPLine<CR>
 nnoremap <Leader>t :CtrlPBufTag<CR>
 nnoremap <Leader>T :CtrlPTag<CR>
-nnoremap <Leader>b :CtrlPBuffer<CR>
+nnoremap <Leader>bp :CtrlPBuffer<CR>
 " tern
 if exists('g:plugs["tern_for_vim"]')
   let g:tern_show_argument_hints = 'on_hold'
@@ -473,6 +490,13 @@ endif
 " enable matchit (for matching tags with %)
 let g:loaded_matchparen = 1
 runtime macros/matchit.vim
+" Anzu
+nmap n <Plug>(anzu-n)
+nmap N <Plug>(anzu-N)
+nmap * <Plug>(anzu-star)
+nmap # <Plug>(anzu-sharp)
+nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
+
 " Airline options
 let g:airline_powerline_fonts     = 1
 let g:airline_detect_paste        = 1
@@ -481,23 +505,12 @@ let g:airline_left_sep            = ''
 let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
 let g:airline_theme               = 'molokai'
-let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar', 'hunks']
+let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar', 'hunks', 'anzu', 'neomake', 'whitespace']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1
-let g:airline#extensions#tabline#left_sep        = ''
-let g:airline#extensions#tabline#left_alt_sep    = '┆'
-let g:airline#extensions#tabline#buffer_idx_mode = 1
+let g:airline#extensions#tabline#left_alt_sep    = '|'
 let g:airline#extensions#tabline#fnamemod        = ':t'
 let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree|zsh|*:zsh'
-nmap <leader>1 <Plug>AirlineSelectTab1
-nmap <leader>2 <Plug>AirlineSelectTab2
-nmap <leader>3 <Plug>AirlineSelectTab3
-nmap <leader>4 <Plug>AirlineSelectTab4
-nmap <leader>5 <Plug>AirlineSelectTab5
-nmap <leader>6 <Plug>AirlineSelectTab6
-nmap <leader>7 <Plug>AirlineSelectTab7
-nmap <leader>8 <Plug>AirlineSelectTab8
-nmap <leader>9 <Plug>AirlineSelectTab9
 call airline#parts#define_raw('linenr', '%l')
 "call airline#parts#define_accent('linenr', 'bold')
 let g:airline_section_z = airline#section#create(['%3p%% ',
@@ -517,7 +530,7 @@ let g:airline_mode_map = {
     \ }
 
 " IndentLine
-let g:indentLine_enabled = 1
+let g:indentLine_enabled = 0
 let g:indentLine_char    = "\u250A" " '┆'
 let g:indent_guides_start_level = 1
 let g:indent_guides_guide_size = 1
@@ -549,12 +562,6 @@ augroup vimrc
   " Trim whitespace onsave
   autocmd BufWritePre * %s/\s\+$//e
 
-  " Jump to last known position of cursor in file
-  autocmd BufReadPost *
-    \ if line("'\"") > 0 && line ("'\"") <= line("$") |
-    \   exe 'normal! g`"zvzz' |
-    \ endif
-
   " For terminal start in insert mode
   au BufEnter * if &buftype == 'terminal' | :startinsert | endif
 augroup END
@@ -569,5 +576,11 @@ augroup MyFileTypes
   autocmd filetype help nnoremap <buffer>q :q<CR>
 
   autocmd filetype qf setlocal wrap
-
 augroup END
+
+augroup markdown
+  au!
+  au FileType markdown setlocal textwidth=80
+  au FileType markdown setlocal formatoptions=tcrq
+augroup END
+
