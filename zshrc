@@ -58,7 +58,6 @@ zplug load #--verbose
 
 # Exports & settings
 KEYTIMEOUT=1 # 10ms for key sequences
-WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export LANG=en_GB.UTF-8

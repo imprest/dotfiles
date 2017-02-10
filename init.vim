@@ -171,10 +171,6 @@ Plug 'terryma/vim-smooth-scroll'
 Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
-"Plug 'w0ng/vim-hybrid'
-"Plug 'kristijanhusak/vim-hybrid-material'
-"Plug 'ayu-theme/ayu-vim' " or other package manager
-Plug 'NLKNguyen/papercolor-theme'
 Plug 'rakr/vim-one'
 Plug 'tomasr/molokai'
 
@@ -199,10 +195,10 @@ set termguicolors " Enable 24-bit colors in supported terminals
 " let g:hybrid_custom_term_colors = 1
 " let g:hybrid_reduced_contrast   = 1
 set background=dark
-let g:one_allow_italics = 1
-let g:rehash256 = 1   " Molokai theme option
+"let g:one_allow_italics = 1
+"let g:rehash256 = 1   " Molokai theme option
 "let ayucolor="dark   " for dark version of theme
-colorscheme molokai "one
+colorscheme molokai
 
 " ui options
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1

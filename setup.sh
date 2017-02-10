@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # packages
-sudo pacman -Syu zsh tmux gitg fzf \
+sudo pacman -Syu fish tmux gitg fzf \
   neovim python-neovim the_silver_searcher ctags \
   erlang elixir npm \
   noto-fonts-cjk noto-fonts-emoji \
@@ -25,8 +25,21 @@ ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
 
-# zsh
-ln -sf ~/dotfiles/zshrc ~/.zshrc
-chsh -s /bin/zsh
-cd ~
-git clone https://github.com/zplug/zplug .zplug
+# # zsh
+# ln -sf ~/dotfiles/zshrc ~/.zshrc
+# chsh -s /bin/zsh
+# cd ~
+# git clone https://github.com/zplug/zplug .zplug
+
+# fish and omf
+curl -L http://get.oh-my.fish | fish
+mkdir -p ~/.config/omf
+ln -sf ~/dotfiles/omf/bundle ~/.config/omf/
+ln -sf ~/dotfiles/omf/channel ~/.config/omf/
+ln -sf ~/dotfiles/omf/init.fish ~/.config/omf/
+ln -sf ~/dotfiles/omf/theme ~/.config/omf/
+
+echo "# Now for some manual stuff, sorry!"
+echo "## nvim"
+echo "To install the nvim plugins, open up vim and type ':PlugInstall'\n"
+

@@ -1,0 +1,5 @@
+package archlinux
+package balias
+package fzf
+theme default
+theme taktoa
