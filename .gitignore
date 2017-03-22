@@ -1,0 +1,9 @@
+atom/blob-store
+atom/compile-cache
+atom/packages
+atom/storage
+atom/git-time-machine
+atom/split-diff
+atom/.apm
+atom/.node-gyp
+atom/nohup.out

@@ -25,12 +25,6 @@ ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
 
-# # zsh
-# ln -sf ~/dotfiles/zshrc ~/.zshrc
-# chsh -s /bin/zsh
-# cd ~
-# git clone https://github.com/zplug/zplug .zplug
-
 # fish and omf
 curl -L http://get.oh-my.fish | fish
 mkdir -p ~/.config/omf
@@ -38,6 +32,9 @@ ln -sf ~/dotfiles/omf/bundle ~/.config/omf/
 ln -sf ~/dotfiles/omf/channel ~/.config/omf/
 ln -sf ~/dotfiles/omf/init.fish ~/.config/omf/
 ln -sf ~/dotfiles/omf/theme ~/.config/omf/
+
+# atom
+ln -sf ~/dotfiles/atom ~/.atom
 
 echo "# Now for some manual stuff, sorry!"
 echo "## nvim"

@@ -1,0 +1,47 @@
+"*":
+  "autocomplete-plus":
+    minimumWordLength: 2
+    useCoreMovementCommands: false
+  core:
+    autoHideMenuBar: true
+    automaticallyUpdate: false
+    disabledPackages: [
+      "metrics"
+      "package-generator"
+      "styleguide"
+      "welcome"
+      "background-tips"
+      "language-clojure"
+    ]
+    telemetryConsent: "no"
+  "disable-keybindings":
+    prefixKeys: [
+      "ctrl-k"
+    ]
+  editor:
+    fontFamily: "Fira Code Retina"
+    softWrap: true
+  "exception-reporting":
+    userId: "dcaa176c-4c9f-1c35-fd8d-5a5118044e0d"
+  "file-icons": {}
+  "linter-elixir-credo":
+    flags: "--strict"
+  "package-sync":
+    createOnChange: true
+    forceOverwrite: true
+  "quick-highlight":
+    decorate: "highlight"
+  "split-diff":
+    diffWords: true
+    ignoreWhitespace: true
+    leftEditorColor: "red"
+    rightEditorColor: "green"
+    syncHorizontalScroll: true
+  "vim-mode":
+    useClipboardAsDefaultRegister: true
+  "vim-mode-clipboard-plus":
+    useVimModePlus: true
+  "vim-mode-plus":
+    useClipboardAsDefaultRegister: true
+  welcome:
+    showOnStartup: false
