@@ -14,6 +14,7 @@
       "language-clojure"
     ]
     telemetryConsent: "no"
+    titleBar: "custom"
   "disable-keybindings":
     prefixKeys: [
       "ctrl-k"
@@ -21,11 +22,17 @@
   editor:
     fontFamily: "Fira Code Retina"
     softWrap: true
+  elmjutsu:
+    autocompleteEnabled: true
+    autocompleteSnippetsEnabled: true
+    cacheDirectory: "/tmp/elmjutsu8117CzXDTdRzl84Y"
   "exception-reporting":
     userId: "dcaa176c-4c9f-1c35-fd8d-5a5118044e0d"
   "file-icons": {}
   "linter-elixir-credo":
     flags: "--strict"
+  "linter-ui-default":
+    panelHeight: 235
   "package-sync":
     createOnChange: true
     forceOverwrite: true
