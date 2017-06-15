@@ -166,13 +166,13 @@ Plug 'lervag/vimtex'
 Plug 'Yggdroot/indentLine'
 Plug 'bling/vim-airline'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
-" Plug 'myusuf3/numbers.vim'
 Plug 'terryma/vim-smooth-scroll'
 Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
-Plug 'rakr/vim-one'
-Plug 'tomasr/molokai'
+" Plug 'rakr/vim-one'
+" Plug 'tomasr/molokai'
+Plug 'joshdick/onedark.vim'
 
 call plug#end()
 
@@ -192,13 +192,9 @@ set iskeyword+=- " Makes foo-bar considered one word
 
 " Colors
 set termguicolors " Enable 24-bit colors in supported terminals
-" let g:hybrid_custom_term_colors = 1
-" let g:hybrid_reduced_contrast   = 1
 set background=dark
-"let g:one_allow_italics = 1
-"let g:rehash256 = 1   " Molokai theme option
-"let ayucolor="dark   " for dark version of theme
-colorscheme molokai
+"let g:onedark_allow_italics = 1
+colorscheme onedark
 
 " ui options
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
@@ -500,7 +496,7 @@ let g:airline_skip_empty_sections = 1
 let g:airline_left_sep            = ''
 let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
-let g:airline_theme               = 'molokai'
+let g:airline_theme               = 'onedark'
 let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar', 'hunks', 'anzu', 'neomake', 'whitespace']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1

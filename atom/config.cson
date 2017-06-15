@@ -49,6 +49,7 @@
   "vim-mode-clipboard-plus":
     useVimModePlus: true
   "vim-mode-plus":
+    highlightSearch: false
     useClipboardAsDefaultRegister: true
   welcome:
     showOnStartup: false
