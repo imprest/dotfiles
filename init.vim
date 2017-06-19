@@ -19,39 +19,46 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 " Linter. Execute code checks, find mistakes, in the background
-Plug 'neomake/neomake'
-  " Run Neomake when I save any buffer
-  augroup localneomake
-    autocmd! BufWritePost * Neomake
-  augroup END
-  " Don't tell me to use smartquotes in markdown ok?
-  let g:neomake_markdown_enabled_makers = []
+Plug 'w0rp/ale'
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_enter = 0
+let g:ale_set_loclist = 0
+let g:ale_set_quickfix = 1
+let g:ale_open_list = 1
 
-  " Configure a nice credo setup, courtesy https://github.com/neomake/neomake/pull/300
-  let g:neomake_elixir_enabled_makers = ['mix', 'mycredo']
-  function! NeomakeCredoErrorType(entry)
-    if a:entry.type ==# 'F'      " Refactoring opportunities
-      let l:type = 'W'
-    elseif a:entry.type ==# 'D'  " Software design suggestions
-      let l:type = 'I'
-    elseif a:entry.type ==# 'W'  " Warnings
-      let l:type = 'W'
-    elseif a:entry.type ==# 'R'  " Readability suggestions
-      let l:type = 'I'
-    elseif a:entry.type ==# 'C'  " Convention violation
-      let l:type = 'W'
-    else
-      let l:type = 'M'           " Everything else is a message
-    endif
-    let a:entry.type = l:type
-  endfunction
+" Plug 'neomake/neomake'
+"   " Run Neomake when I save any buffer
+"   augroup localneomake
+"     autocmd! BufWritePost * Neomake
+"   augroup END
+"   " Don't tell me to use smartquotes in markdown ok?
+"   let g:neomake_markdown_enabled_makers = []
 
-  let g:neomake_elixir_mycredo_maker = {
-        \ 'exe': 'mix',
-        \ 'args': ['credo', 'list', '%:p', '--format=oneline'],
-        \ 'errorformat': '[%t] %. %f:%l:%c %m,[%t] %. %f:%l %m',
-        \ 'postprocess': function('NeomakeCredoErrorType')
-        \ }
+"   " Configure a nice credo setup, courtesy https://github.com/neomake/neomake/pull/300
+"   let g:neomake_elixir_enabled_makers = ['mix', 'mycredo']
+"   function! NeomakeCredoErrorType(entry)
+"     if a:entry.type ==# 'F'      " Refactoring opportunities
+"       let l:type = 'W'
+"     elseif a:entry.type ==# 'D'  " Software design suggestions
+"       let l:type = 'I'
+"     elseif a:entry.type ==# 'W'  " Warnings
+"       let l:type = 'W'
+"     elseif a:entry.type ==# 'R'  " Readability suggestions
+"       let l:type = 'I'
+"     elseif a:entry.type ==# 'C'  " Convention violation
+"       let l:type = 'W'
+"     else
+"       let l:type = 'M'           " Everything else is a message
+"     endif
+"     let a:entry.type = l:type
+"   endfunction
+
+"   let g:neomake_elixir_mycredo_maker = {
+"         \ 'exe': 'mix',
+"         \ 'args': ['credo', 'list', '%:p', '--format=oneline'],
+"         \ 'errorformat': '[%t] %. %f:%l:%c %m,[%t] %. %f:%l %m',
+"         \ 'postprocess': function('NeomakeCredoErrorType')
+"         \ }
 
 " Project Management
 Plug 'airblade/vim-rooter'
@@ -189,6 +196,7 @@ set cmdheight=1
 set tildeop " Make ~ toggle case for whole line
 set clipboard+=unnamedplus " Use system clipboard
 set iskeyword+=- " Makes foo-bar considered one word
+set mouse=a
 
 " Colors
 set termguicolors " Enable 24-bit colors in supported terminals
@@ -205,6 +213,10 @@ set number
 set lazyredraw
 set noshowmode
 set t_ut= " improve screen clearing by using the background colour
+" alternative approach for lines that are too long
+set colorcolumn=
+highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+match OverLength /\%81v.\+/
 
 " autocomplete list options
 set wildmode=longest,list,full " show similar and all options
@@ -282,7 +294,7 @@ let g:tagbar_type_elixir = {
       \ }
 
 " shell
-set shell=/usr/bin/zsh
+set shell=/usr/bin/bash
 set noshelltemp " use pipes
 
 " backup, undo and file management
@@ -394,7 +406,7 @@ tnoremap <C-j> <C-\><C-n><C-w>j
 tnoremap <C-k> <C-\><C-n><C-w>k
 tnoremap <C-l> <C-\><C-n><C-w>l
 " Open terminal below
-nnoremap <Leader>c :below 10sp term://zsh<CR>
+nnoremap <Leader>c :below 10sp term://fish<CR>
 " quickly replace string under cursor for line
 nnoremap <Leader>R :s/\<<C-r><C-w>\>/
 " Sort selected lines
@@ -497,12 +509,12 @@ let g:airline_left_sep            = ''
 let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
 let g:airline_theme               = 'onedark'
-let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar', 'hunks', 'anzu', 'neomake', 'whitespace']
+let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar', 'hunks', 'anzu', 'whitespace']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1
 let g:airline#extensions#tabline#left_alt_sep    = '|'
 let g:airline#extensions#tabline#fnamemod        = ':t'
-let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree|zsh|*:zsh'
+let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
 call airline#parts#define_raw('linenr', '%l')
 "call airline#parts#define_accent('linenr', 'bold')
 let g:airline_section_z = airline#section#create(['%3p%% ',
@@ -554,8 +566,8 @@ augroup vimrc
   " Trim whitespace onsave
   autocmd BufWritePre * %s/\s\+$//e
 
-  " For terminal start in insert mode
-  au BufEnter * if &buftype == 'terminal' | :startinsert | endif
+  " For newly started terminal; start in insert mode
+  autocmd TermOpen * :startinsert
 augroup END
 
 augroup MyFileTypes

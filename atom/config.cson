@@ -33,6 +33,7 @@
     flags: "--strict"
   "linter-ui-default":
     panelHeight: 235
+    showPanel: true
   "package-sync":
     createOnChange: true
     forceOverwrite: true

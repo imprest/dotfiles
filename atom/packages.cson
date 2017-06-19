@@ -10,6 +10,7 @@ packages: [
   "elmjutsu"
   "file-icons"
   "git-plus"
+  "html-to-elm"
   "intentions"
   "language-csv"
   "language-elixir"
