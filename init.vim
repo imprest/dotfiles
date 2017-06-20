@@ -21,68 +21,27 @@ Plug 'honza/vim-snippets'
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
 let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_enter = 0
-let g:ale_set_loclist = 0
-let g:ale_set_quickfix = 1
-let g:ale_open_list = 1
-
-" Plug 'neomake/neomake'
-"   " Run Neomake when I save any buffer
-"   augroup localneomake
-"     autocmd! BufWritePost * Neomake
-"   augroup END
-"   " Don't tell me to use smartquotes in markdown ok?
-"   let g:neomake_markdown_enabled_makers = []
-
-"   " Configure a nice credo setup, courtesy https://github.com/neomake/neomake/pull/300
-"   let g:neomake_elixir_enabled_makers = ['mix', 'mycredo']
-"   function! NeomakeCredoErrorType(entry)
-"     if a:entry.type ==# 'F'      " Refactoring opportunities
-"       let l:type = 'W'
-"     elseif a:entry.type ==# 'D'  " Software design suggestions
-"       let l:type = 'I'
-"     elseif a:entry.type ==# 'W'  " Warnings
-"       let l:type = 'W'
-"     elseif a:entry.type ==# 'R'  " Readability suggestions
-"       let l:type = 'I'
-"     elseif a:entry.type ==# 'C'  " Convention violation
-"       let l:type = 'W'
-"     else
-"       let l:type = 'M'           " Everything else is a message
-"     endif
-"     let a:entry.type = l:type
-"   endfunction
-
-"   let g:neomake_elixir_mycredo_maker = {
-"         \ 'exe': 'mix',
-"         \ 'args': ['credo', 'list', '%:p', '--format=oneline'],
-"         \ 'errorformat': '[%t] %. %f:%l:%c %m,[%t] %. %f:%l %m',
-"         \ 'postprocess': function('NeomakeCredoErrorType')
-"         \ }
+let g:ale_lint_on_enter        = 0
+let g:ale_set_loclist          = 0
+let g:ale_set_quickfix         = 1
+let g:ale_open_list            = 1
 
 " Project Management
 Plug 'airblade/vim-rooter'
-Plug 'scrooloose/nerdtree', { 'on':  ['NERDTreeToggle', 'NERDTreeFind'] }
+Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 
 " Editing
-Plug 'AndrewRadev/splitjoin.vim'
 Plug 'Raimondi/delimitMate'
 Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
 Plug 'junegunn/vim-peekaboo'
-Plug 'mbbill/undotree',         { 'on': 'UndotreeToggle' }
-Plug 'nathanaelkane/vim-indent-guides' " `,ig` to toggle
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-speeddating'
+Plug 'tpope/vim-speeddating' " <C-a> in numbers or dates <C-x> to do the opposite
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-unimpaired' " cos : set spelling cox : set cursor con : set number etc
-nnoremap coi :IndentLinesToggle
-Plug 'vim-scripts/camelcasemotion'
 Plug 'terryma/vim-expand-region'
 vmap v <Plug>(expand_region_expand)
 vmap <C-v> <Plug>(expand_region_shrink)
-" Plug 'dhruvasagar/vim-table-mode'
 " Plug 'sts10/vim-zipper'
 Plug 'chrisbra/unicode.vim'
 
@@ -90,7 +49,6 @@ Plug 'chrisbra/unicode.vim'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'justinmk/vim-gtfo'
 Plug 'majutsushi/tagbar'
-Plug 'christoomey/vim-tmux-navigator'
 
 " Searching
 Plug 'osyo-manga/vim-anzu'
@@ -103,19 +61,12 @@ Plug 'tpope/vim-fugitive'
 
 " Javascript
 Plug '1995eaton/vim-better-javascript-completion'
-Plug 'digitaltoad/vim-jade'
 Plug 'elzr/vim-json'
 Plug 'guileen/vim-node-dict'
 Plug 'marijnh/tern_for_vim', { 'do': 'npm install' }
 Plug 'moll/vim-node'
-Plug 'mxw/vim-jsx'
 Plug 'othree/javascript-libraries-syntax.vim'
 Plug 'othree/yajs.vim'
-
-" Typescript
-Plug 'jason0x43/vim-js-indent'
-Plug 'leafgarland/typescript-vim'
-Plug 'Quramy/tsuquyomi'
 
 " Elm
 Plug 'lambdatoast/elm.vim'
@@ -166,19 +117,14 @@ Plug 'wellle/targets.vim'
 " Markdown
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 
-" Latex
-Plug 'lervag/vimtex'
-
 " Eye candy
-Plug 'Yggdroot/indentLine'
+Plug 'Yggdroot/indentLine' " TODO: make `,ig` to toggle
 Plug 'bling/vim-airline'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
 Plug 'terryma/vim-smooth-scroll'
 Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
-" Plug 'rakr/vim-one'
-" Plug 'tomasr/molokai'
 Plug 'joshdick/onedark.vim'
 
 call plug#end()
