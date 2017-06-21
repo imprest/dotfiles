@@ -9,8 +9,11 @@ endif
 call plug#begin('~/.config/nvim/plugged')
 
 " general
-Plug 'mhinz/vim-startify'
 Plug 'dietsche/vim-lastplace'
+Plug 'mhinz/vim-startify'
+let g:startify_session_dir = '~/.data/sessions'
+let g:startify_change_to_vcs_root = 1
+let g:startify_show_sessions = 1
 
 " Autocompleteion
 Plug 'ervandew/supertab'
@@ -27,14 +30,17 @@ let g:ale_set_quickfix         = 1
 let g:ale_open_list            = 1
 
 " Project Management
-Plug 'airblade/vim-rooter'
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
+Plug 'airblade/vim-rooter'
+let g:rooter_silent_chdir = 1
+let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
 
 " Editing
 Plug 'Raimondi/delimitMate'
 Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
 Plug 'junegunn/vim-peekaboo'
+let g:peekaboo_window = 'vertical botright 50new'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating' " <C-a> in numbers or dates <C-x> to do the opposite
@@ -51,9 +57,14 @@ Plug 'justinmk/vim-gtfo'
 Plug 'majutsushi/tagbar'
 
 " Searching
-Plug 'osyo-manga/vim-anzu'
 Plug 'rking/ag.vim'
 Plug 'Chun-Yang/vim-action-ag'
+Plug 'osyo-manga/vim-anzu'
+nmap n <Plug>(anzu-n)
+nmap N <Plug>(anzu-N)
+nmap * <Plug>(anzu-star)
+nmap # <Plug>(anzu-sharp)
+nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
 
 " Git
 Plug 'junegunn/gv.vim'
@@ -63,27 +74,35 @@ Plug 'tpope/vim-fugitive'
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'elzr/vim-json'
 Plug 'guileen/vim-node-dict'
-Plug 'marijnh/tern_for_vim', { 'do': 'npm install' }
 Plug 'moll/vim-node'
 Plug 'othree/javascript-libraries-syntax.vim'
 Plug 'othree/yajs.vim'
+Plug 'marijnh/tern_for_vim', { 'do': 'npm install' }
+if exists('g:plugs["tern_for_vim"]')
+  let g:tern_show_argument_hints = 'on_hold'
+  let g:tern_show_signature_in_pum = 1
+  autocmd FileType javascript setlocal omnifunc=tern#Complete
+endif
 
 " Elm
-Plug 'lambdatoast/elm.vim'
-nnoremap <leader>el :ElmEvalLine<CR>
-vnoremap <leader>es :<C-u>ElmEvalSelection<CR>
-nnoremap <leader>em :ElmMakeCurrentFile<CR>
+Plug 'ElmCast/elm-vim'
+let g:elm_format_autosave = 1
+let g:elm_setup_keybindings = 0
+nnoremap <Leader>ek :ElmShowDocs
+nnoremap <Leader>ed :ElmBrowseDocs
 augroup elm
   autocmd!
-  autocmd BufNewFile,BufRead *.elm setlocal tabstop=4
-  autocmd BufNewFile,BufRead *.elm setlocal shiftwidth=4
-  autocmd BufNewFile,BufRead *.elm setlocal softtabstop=4
+  autocmd BufNewFile,BufRead *.elm setlocal tabstop     = 4
+  autocmd BufNewFile,BufRead *.elm setlocal shiftwidth  = 4
+  autocmd BufNewFile,BufRead *.elm setlocal softtabstop = 4
 augroup END
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript'] }
-Plug 'mattn/emmet-vim',     { 'for': ['html', 'javascript', 'css'] }
 Plug 'othree/html5.vim',    { 'for': ['html', 'javascript'] }
+Plug 'mattn/emmet-vim',     { 'for': ['html', 'javascript', 'css'] }
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
 
 " CSS
 Plug 'hail2u/vim-css3-syntax', { 'for': ['css', 'scss']}
@@ -118,11 +137,17 @@ Plug 'wellle/targets.vim'
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 
 " Eye candy
-Plug 'Yggdroot/indentLine' " TODO: make `,ig` to toggle
 Plug 'bling/vim-airline'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
 Plug 'terryma/vim-smooth-scroll'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'Yggdroot/indentLine'
+let g:indentLine_enabled = 0
+let g:indentLine_char    = "\u250A" " '┆'
+let g:indent_guides_start_level = 1
+let g:indent_guides_guide_size = 1
+let g:indent_guides_enable_on_vim_startup = 0
+let g:indent_guides_color_change_percent = 3
 
 " Colorschemes
 Plug 'joshdick/onedark.vim'
@@ -130,7 +155,6 @@ Plug 'joshdick/onedark.vim'
 call plug#end()
 
 " Neovim Settings
-"set cc=80
 set numberwidth=5
 set ruler
 set autoread
@@ -143,8 +167,6 @@ set tildeop " Make ~ toggle case for whole line
 set clipboard+=unnamedplus " Use system clipboard
 set iskeyword+=- " Makes foo-bar considered one word
 set mouse=a
-
-" Colors
 set termguicolors " Enable 24-bit colors in supported terminals
 set background=dark
 "let g:onedark_allow_italics = 1
@@ -165,7 +187,7 @@ highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 match OverLength /\%81v.\+/
 
 " autocomplete list options
-set wildmode=longest,list,full " show similar and all options
+set wildmode=list:full " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
 set timeoutlen=300 " mapping timeout
@@ -191,7 +213,6 @@ set list      " Toggle showing hidden characters i.e. space
 set listchars+=tab:»·,trail:•,extends:❯,precedes:❮,conceal:Δ,nbsp:+
 set conceallevel=1
 set concealcursor=i
-set breakindent " Wrap lines will be indented
 set linebreak   " Wrap long lines at a character
 let &showbreak="↪ "
 
@@ -296,9 +317,8 @@ let g:mapleader = ','
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>d :bdelete<CR>
 nnoremap <Leader><Leader> <c-^> " Swith between last two files
-" nnoremap ; :               " Use ; for commands X Conflicts with sneak
-nnoremap Q @q              " Use Q to execute default register
-nnoremap <C-s> :<C-u>w<CR> " Ctrl-S to save in most modes
+nnoremap Q @q                   " Use Q to execute default register
+nnoremap <C-s> :<C-u>w<CR>      " Ctrl-S to save in most modes
 vnoremap <C-s> :<C-u>w<CR>
 cnoremap <C-s> <C-u>w<CR>
 " Navigation made easy
@@ -329,10 +349,10 @@ inoremap kj <esc>
 nnoremap <Right> :bnext<CR>
 nnoremap <Left>  :bprev<CR>
 " window keys
-nnoremap <M-Left>  :vertical resize -1<CR>
-nnoremap <M-Up>    :resize -1<CR>
-nnoremap <M-Down>  :resize +1<CR>
-nnoremap <M-Right> :vertical resize +1<CR>
+nnoremap <M-Right>  :vertical resize -1<CR>
+nnoremap <M-Up>    :resize +1<CR>
+nnoremap <M-Down>  :resize -1<CR>
+nnoremap <M-Left> :vertical resize +1<CR>
 nnoremap <Leader>s :split<CR>
 nnoremap <Leader>v <C-w>v<C-w>l
 nnoremap <Leader>x :call CloseWindowOrKillBuffer()<CR>
@@ -341,12 +361,13 @@ vnoremap < <gv
 vnoremap > >gv
 " make Y consistent with C & D
 nnoremap Y y$
+" toggle highlight search
+nnoremap <BS> :set hlsearch! hlsearch?<CR>
 " Map ctrl-movement keys to window switching
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
-nnoremap <silent> <BS> :TmuxNavigateLeft<cr> " Hack for neovim tmux issue
 tnoremap <C-h> <C-\><C-n><C-w>h
 tnoremap <C-j> <C-\><C-n><C-w>j
 tnoremap <C-k> <C-\><C-n><C-w>k
@@ -361,8 +382,6 @@ vmap <Leader>s :sort<CR>
 vmap <Enter> <Plug>(EasyAlign)
 " colorizer
 nmap <F5> :ColorToggle<CR>
-" tern
-autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
 " Tagbar
 nmap <F9> :TagbarToggle<CR>
 " Move cursor to middle after each search i.e. auto-center
@@ -377,8 +396,10 @@ nnoremap <Leader>ff :execute 'vimgrep /'.@/.'/g %'<CR>:copen<cr>
 " Move visual block
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
+" enable matchit (for matching tags with %)
+let g:loaded_matchparen = 1
+runtime macros/matchit.vim
 " Make K or help open in vertical split
-" nnoremap K :vsp <CR>:execute(expand(&keywordprg).' '.expand("<cword>"))<CR>
 autocmd FileType help  wincmd L | vert
 autocmd FileType ExDoc wincmd L | vert
 
@@ -402,23 +423,7 @@ augroup omnifuncs
   autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
   autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
   autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-  autocmd FileType typescript setlocal completeopt-=menu
 augroup end
-" Rooter
-let g:rooter_silent_chdir = 1
-let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
-" Peekaboo
-let g:peekaboo_window = 'vertical botright 50new'
-
-"" Typescript
-" Disable leafgarland/typescript indenting and use jason0x43/vim-js-indent
-let g:typescript_indent_disable = 1
-" let g:tsuquyomi_completion_detail = 1
-
-" Vim-Startify
-let g:startify_session_dir = '~/.data/sessions'
-let g:startify_change_to_vcs_root = 1
-let g:startify_show_sessions = 1
 
 " CtrlP
 let g:ctrlp_reuse_window='startify'
@@ -430,22 +435,7 @@ noremap  <Leader>r :CtrlPMRUFiles<CR>
 nnoremap <Leader>l :CtrlPLine<CR>
 nnoremap <Leader>t :CtrlPBufTag<CR>
 nnoremap <Leader>T :CtrlPTag<CR>
-nnoremap <Leader>bp :CtrlPBuffer<CR>
-" tern
-if exists('g:plugs["tern_for_vim"]')
-  let g:tern_show_argument_hints = 'on_hold'
-  let g:tern_show_signature_in_pum = 1
-  autocmd FileType javascript setlocal omnifunc=tern#Complete
-endif
-" enable matchit (for matching tags with %)
-let g:loaded_matchparen = 1
-runtime macros/matchit.vim
-" Anzu
-nmap n <Plug>(anzu-n)
-nmap N <Plug>(anzu-N)
-nmap * <Plug>(anzu-star)
-nmap # <Plug>(anzu-sharp)
-nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
+nnoremap <Leader>b :CtrlPBuffer<CR>
 
 " Airline options
 let g:airline_powerline_fonts     = 1
@@ -462,7 +452,6 @@ let g:airline#extensions#tabline#left_alt_sep    = '|'
 let g:airline#extensions#tabline#fnamemod        = ':t'
 let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
 call airline#parts#define_raw('linenr', '%l')
-"call airline#parts#define_accent('linenr', 'bold')
 let g:airline_section_z = airline#section#create(['%3p%% ',
       \ g:airline_symbols.linenr .' ', 'linenr', ':%2c'])
 let g:airline_mode_map = {
@@ -479,14 +468,6 @@ let g:airline_mode_map = {
     \ '' : 'S',
     \ }
 
-" IndentLine
-let g:indentLine_enabled = 0
-let g:indentLine_char    = "\u250A" " '┆'
-let g:indent_guides_start_level = 1
-let g:indent_guides_guide_size = 1
-let g:indent_guides_enable_on_vim_startup = 0
-let g:indent_guides_color_change_percent = 3
-
 " NERDTree
 map <C-\> :NERDTreeToggle<CR>
 map <F2>  :NERDTreeToggle<CR>
@@ -501,9 +482,6 @@ augroup nerd_loader
         \|   execute 'autocmd! nerd_loader'
         \| endif
 augroup END
-"Emmet settings
-let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
 
 " Auto Commands
 augroup vimrc
