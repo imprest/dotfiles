@@ -18,8 +18,21 @@ let g:startify_show_sessions = 1
 " Autocompleteion
 Plug 'ervandew/supertab'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
+Plug 'Shougo/neosnippet'
+Plug 'Shougo/neosnippet-snippets'
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+xmap <C-k>     <Plug>(neosnippet_expand_target)
+" SuperTab like snippets behavior.
+" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+"imap <expr><TAB>
+" \ pumvisible() ? "\<C-n>" :
+" \ neosnippet#expandable_or_jumpable() ?
+" \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+set conceallevel=2 concealcursor=niv
 
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
@@ -30,10 +43,23 @@ let g:ale_set_quickfix         = 1
 let g:ale_open_list            = 1
 
 " Project Management
-Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'airblade/vim-rooter'
 let g:rooter_silent_chdir = 1
 let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
+Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
+map <C-\> :NERDTreeToggle<CR>
+map <F2>  :NERDTreeToggle<CR>
+map <F3>  :NERDTreeFind<CR>
+let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
+augroup nerd_loader
+  autocmd!
+  autocmd VimEnter * silent! autocmd! FileExplorer
+  autocmd BufEnter,BufNew *
+        \  if isdirectory(expand('<amatch>'))
+        \|   call plug#load('nerdtree')
+        \|   execute 'autocmd! nerd_loader'
+        \| endif
+augroup END
 
 " Editing
 Plug 'Raimondi/delimitMate'
@@ -48,13 +74,14 @@ Plug 'tpope/vim-surround'
 Plug 'terryma/vim-expand-region'
 vmap v <Plug>(expand_region_expand)
 vmap <C-v> <Plug>(expand_region_shrink)
-" Plug 'sts10/vim-zipper'
 Plug 'chrisbra/unicode.vim'
+" Plug 'sts10/vim-zipper'
 
 " Navigation
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'justinmk/vim-gtfo'
 Plug 'majutsushi/tagbar'
+Plug 'wesQ3/vim-windowswap' " <Leader>ww once to select window and again to swap window
 
 " Searching
 Plug 'rking/ag.vim'
@@ -92,9 +119,9 @@ nnoremap <Leader>ek :ElmShowDocs
 nnoremap <Leader>ed :ElmBrowseDocs
 augroup elm
   autocmd!
-  autocmd BufNewFile,BufRead *.elm setlocal tabstop     = 4
-  autocmd BufNewFile,BufRead *.elm setlocal shiftwidth  = 4
-  autocmd BufNewFile,BufRead *.elm setlocal softtabstop = 4
+  autocmd BufNewFile,BufRead *.elm setlocal tabstop     =4
+  autocmd BufNewFile,BufRead *.elm setlocal shiftwidth  =4
+  autocmd BufNewFile,BufRead *.elm setlocal softtabstop =4
 augroup END
 
 " HTML
@@ -211,8 +238,6 @@ set display+=lastline
 set nowrap
 set list      " Toggle showing hidden characters i.e. space
 set listchars+=tab:»·,trail:•,extends:❯,precedes:❮,conceal:Δ,nbsp:+
-set conceallevel=1
-set concealcursor=i
 set linebreak   " Wrap long lines at a character
 let &showbreak="↪ "
 
@@ -467,21 +492,6 @@ let g:airline_mode_map = {
     \ 'S'  : 'S',
     \ '' : 'S',
     \ }
-
-" NERDTree
-map <C-\> :NERDTreeToggle<CR>
-map <F2>  :NERDTreeToggle<CR>
-map <F3>  :NERDTreeFind<CR>
-let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
-augroup nerd_loader
-  autocmd!
-  autocmd VimEnter * silent! autocmd! FileExplorer
-  autocmd BufEnter,BufNew *
-        \  if isdirectory(expand('<amatch>'))
-        \|   call plug#load('nerdtree')
-        \|   execute 'autocmd! nerd_loader'
-        \| endif
-augroup END
 
 " Auto Commands
 augroup vimrc
