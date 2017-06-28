@@ -9,6 +9,7 @@ endif
 call plug#begin('~/.config/nvim/plugged')
 
 " general
+let g:mapleader = ','
 Plug 'dietsche/vim-lastplace'
 Plug 'mhinz/vim-startify'
 let g:startify_session_dir = '~/.data/sessions'
@@ -31,7 +32,7 @@ imap <C-k>     <Plug>(neosnippet_expand_or_jump)
 " \ neosnippet#expandable_or_jumpable() ?
 " \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+      \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 set conceallevel=2 concealcursor=niv
 
 " Linter. Execute code checks, find mistakes, in the background
@@ -62,26 +63,47 @@ augroup nerd_loader
 augroup END
 
 " Editing
-Plug 'Raimondi/delimitMate'
-Plug 'airblade/vim-gitgutter'
+Plug 'Raimondi/delimitMate'  " Automatically add closing quotes and braces
 Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
-Plug 'junegunn/vim-peekaboo'
+Plug 'junegunn/vim-peekaboo' " Show recently saved text in vim registers
 let g:peekaboo_window = 'vertical botright 50new'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-commentary'  " gc i.e. toggle commenting code
+Plug 'tpope/vim-repeat'      " allow added vim motion to be repeatable like vim-surround
 Plug 'tpope/vim-speeddating' " <C-a> in numbers or dates <C-x> to do the opposite
-Plug 'tpope/vim-surround'
+Plug 'tpope/vim-surround'    " cs i.e. enable change surrounding motion
 Plug 'terryma/vim-expand-region'
 vmap v <Plug>(expand_region_expand)
 vmap <C-v> <Plug>(expand_region_shrink)
 Plug 'chrisbra/unicode.vim'
-" Plug 'sts10/vim-zipper'
+" Plug 'sts10/vim-zipper' " for folding
 
 " Navigation
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'justinmk/vim-gtfo'
-Plug 'majutsushi/tagbar'
+Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
+Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
 Plug 'wesQ3/vim-windowswap' " <Leader>ww once to select window and again to swap window
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+let g:fzf_layout = { 'down': '~18%' }
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+      \ { 'fg':      ['fg', 'Normal'],
+      \ 'bg':      ['bg', 'Normal'],
+      \ 'hl':      ['fg', 'Comment'],
+      \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+      \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+      \ 'hl+':     ['fg', 'Statement'],
+      \ 'info':    ['fg', 'PreProc'],
+      \ 'prompt':  ['fg', 'Conditional'],
+      \ 'pointer': ['fg', 'Exception'],
+      \ 'marker':  ['fg', 'Keyword'],
+      \ 'spinner': ['fg', 'Label'],
+      \ 'header':  ['fg', 'Comment'] }
+nnoremap <c-p>     :GFiles<CR>
+noremap  <Leader>r :History<CR>
+nnoremap <Leader>l :Lines<CR>
+nnoremap <Leader>t :BTags<CR>
+nnoremap <Leader>T :Tags<CR>
+nnoremap <Leader>b :Buffers<CR>
 
 " Searching
 Plug 'rking/ag.vim'
@@ -94,6 +116,7 @@ nmap # <Plug>(anzu-sharp)
 nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
 
 " Git
+Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
 
@@ -142,15 +165,10 @@ Plug 'slashmili/alchemist.vim'
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise', { 'for': ['elixir']}
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
-  let g:gutentags_cache_dir = '~/.tags_cache'
+let g:gutentags_cache_dir = '~/.tags_cache'
 Plug 'janko-m/vim-test'
-  nmap <silent> <leader>t :TestNearest<CR>
-  nmap <silent> <leader>T :TestFile<CR>
-  nmap <silent> <leader>a :TestSuite<CR>
-  nmap <silent> <leader>l :TestLast<CR>
-  nmap <silent> <leader>g :TestVisit<CR>
-  " run tests in neovim strategy
-  let g:test#strategy = 'neovim'
+" run tests in neovim strategy
+let g:test#strategy = 'neovim'
 
 " text objects
 Plug 'glts/vim-textobj-comment'
@@ -337,7 +355,6 @@ function! CloseWindowOrKillBuffer()
 endfunction
 
 " Keyboard mappings
-let g:mapleader = ','
 " common actions
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>d :bdelete<CR>
@@ -374,10 +391,14 @@ inoremap kj <esc>
 nnoremap <Right> :bnext<CR>
 nnoremap <Left>  :bprev<CR>
 " window keys
-nnoremap <M-Right>  :vertical resize -1<CR>
+nnoremap <M-Right> :vertical resize -1<CR>
 nnoremap <M-Up>    :resize +1<CR>
 nnoremap <M-Down>  :resize -1<CR>
-nnoremap <M-Left> :vertical resize +1<CR>
+nnoremap <M-Left>  :vertical resize +1<CR>
+nnoremap <C-Right> :vertical resize -5<CR>
+nnoremap <C-Up>    :resize +5<CR>
+nnoremap <C-Down>  :resize -5<CR>
+nnoremap <C-Left>  :vertical resize +5<CR>
 nnoremap <Leader>s :split<CR>
 nnoremap <Leader>v <C-w>v<C-w>l
 nnoremap <Leader>x :call CloseWindowOrKillBuffer()<CR>
@@ -425,8 +446,8 @@ vnoremap K :m '<-2<CR>gv=gv
 let g:loaded_matchparen = 1
 runtime macros/matchit.vim
 " Make K or help open in vertical split
-autocmd FileType help  wincmd L | vert
-autocmd FileType ExDoc wincmd L | vert
+autocmd FileType help  wincmd L | vert res 80
+autocmd FileType ExDoc wincmd L | vert res 80
 
 " Plugin Configurations
 " SuperTab
@@ -450,18 +471,6 @@ augroup omnifuncs
   autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 augroup end
 
-" CtrlP
-let g:ctrlp_reuse_window='startify'
-let g:ctrlp_extensions=['funky']
-let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s' " Use ag
-let g:ctrlp_custom_ignore = { 'dir': '\v[\/]\.(git|hg|svn)$' }
-nnoremap <Leader>o :CtrlP<CR>
-noremap  <Leader>r :CtrlPMRUFiles<CR>
-nnoremap <Leader>l :CtrlPLine<CR>
-nnoremap <Leader>t :CtrlPBufTag<CR>
-nnoremap <Leader>T :CtrlPTag<CR>
-nnoremap <Leader>b :CtrlPBuffer<CR>
-
 " Airline options
 let g:airline_powerline_fonts     = 1
 let g:airline_detect_paste        = 1
@@ -470,7 +479,7 @@ let g:airline_left_sep            = ''
 let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
 let g:airline_theme               = 'onedark'
-let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'ctrlp', 'tagbar', 'hunks', 'anzu', 'whitespace']
+let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'tagbar', 'hunks', 'anzu', 'whitespace']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1
 let g:airline#extensions#tabline#left_alt_sep    = '|'
@@ -480,18 +489,18 @@ call airline#parts#define_raw('linenr', '%l')
 let g:airline_section_z = airline#section#create(['%3p%% ',
       \ g:airline_symbols.linenr .' ', 'linenr', ':%2c'])
 let g:airline_mode_map = {
-    \ '__' : '-',
-    \ 'n'  : 'N',
-    \ 'i'  : 'I',
-    \ 'R'  : 'R',
-    \ 'c'  : 'C',
-    \ 'v'  : 'V',
-    \ 'V'  : 'V',
-    \ '' : 'V',
-    \ 's'  : 'S',
-    \ 'S'  : 'S',
-    \ '' : 'S',
-    \ }
+      \ '__' : '-',
+      \ 'n'  : 'N',
+      \ 'i'  : 'I',
+      \ 'R'  : 'R',
+      \ 'c'  : 'C',
+      \ 'v'  : 'V',
+      \ 'V'  : 'V',
+      \ '' : 'V',
+      \ 's'  : 'S',
+      \ 'S'  : 'S',
+      \ '' : 'S',
+      \ }
 
 " Auto Commands
 augroup vimrc
