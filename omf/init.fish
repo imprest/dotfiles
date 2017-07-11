@@ -11,4 +11,4 @@ set fish_greeting ""
 balias pacU 'sudo yaourt -Syu'
 balias paci 'sudo yaourt -S'
 balias pacs 'yaourt -Ss'
-
+balias pacX 'pacman -R'
