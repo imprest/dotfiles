@@ -20,6 +20,7 @@ packages: [
   "linter-elixir-credo"
   "linter-elm-make"
   "linter-ui-default"
+  "minimap"
   "open-this"
   "package-sync"
   "phoenix-elixir-snippets"

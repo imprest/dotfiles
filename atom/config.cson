@@ -21,6 +21,7 @@
     ]
   editor:
     fontFamily: "Fira Code Retina"
+    fontSize: 12
     softWrap: true
   elmjutsu:
     autocompleteEnabled: true
@@ -32,7 +33,7 @@
   "linter-elixir-credo":
     flags: "--strict"
   "linter-ui-default":
-    panelHeight: 235
+    panelHeight: 223
     showPanel: true
   "package-sync":
     createOnChange: true

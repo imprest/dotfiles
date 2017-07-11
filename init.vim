@@ -18,6 +18,7 @@ let g:startify_show_sessions = 1
 
 " Autocompleteion
 Plug 'ervandew/supertab'
+let g:SuperTabDefaultCompletionType = "<c-n>"
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
@@ -37,7 +38,7 @@ set conceallevel=2 concealcursor=niv
 
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
-let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_delay           = 5000
 let g:ale_lint_on_enter        = 0
 let g:ale_set_loclist          = 0
 let g:ale_set_quickfix         = 1
@@ -138,6 +139,8 @@ endif
 Plug 'ElmCast/elm-vim'
 let g:elm_format_autosave = 1
 let g:elm_setup_keybindings = 0
+let g:elm_format_fail_silently = 1
+let g:elm_make_show_warnings = 1
 nnoremap <Leader>ek :ElmShowDocs
 nnoremap <Leader>ed :ElmBrowseDocs
 augroup elm
@@ -167,8 +170,7 @@ Plug 'tpope/vim-endwise', { 'for': ['elixir']}
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
 let g:gutentags_cache_dir = '~/.tags_cache'
 Plug 'janko-m/vim-test'
-" run tests in neovim strategy
-let g:test#strategy = 'neovim'
+let g:test#strategy = 'neovim' "run tests in neovim strategy
 
 " text objects
 Plug 'glts/vim-textobj-comment'
@@ -448,15 +450,17 @@ autocmd FileType help  wincmd L | vert res 80
 autocmd FileType ExDoc wincmd L | vert res 80
 
 " Plugin Configurations
-" SuperTab
-let g:SuperTabDefaultCompletionType = "<c-n>"
 " Deoplete
 let g:deoplete#enable_at_startup = 1
-let g:deoplete#disable_auto_complete = 0
+let g:deoplete#sources = {}
+let g:deoplete#sources._ = ['file', 'neosnippet']
+let g:deoplete#omni#functions = {}
+let g:deoplete#omni#input_patterns = {}
+let g:deoplete#sources.elm = ['omni'] + g:deoplete#sources._ " Elm support
+let g:deoplete#omni#functions.elm = ['elm#Complete']
+let g:deoplete#omni#input_patterns.elm = '[^ \t]+'
+let g:deoplete#disable_auto_complete = 1
 autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
-if !exists('g:deoplete#omni#input_patterns')
-  let g:deoplete#omni#input_patterns = {}
-endif
 " Completion
 set completeopt=longest,menu " preview
 set omnifunc=syntaxcomplete#Complete
