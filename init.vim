@@ -38,7 +38,7 @@ set conceallevel=2 concealcursor=niv
 
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
-let g:ale_lint_delay           = 5000
+let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter        = 0
 let g:ale_set_loclist          = 0
 let g:ale_set_quickfix         = 1
@@ -76,7 +76,11 @@ Plug 'terryma/vim-expand-region'
 vmap v <Plug>(expand_region_expand)
 vmap <C-v> <Plug>(expand_region_shrink)
 Plug 'chrisbra/unicode.vim'
+
+" Folding
 " Plug 'sts10/vim-zipper' " for folding
+set nofoldenable
+set fillchars=fold:\ , " get rid of '-' characters in folds
 
 " Navigation
 Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
@@ -88,17 +92,17 @@ let g:fzf_layout = { 'down': '~18%' }
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
       \ { 'fg':      ['fg', 'Normal'],
-      \ 'bg':      ['bg', 'Normal'],
-      \ 'hl':      ['fg', 'Comment'],
-      \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-      \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-      \ 'hl+':     ['fg', 'Statement'],
-      \ 'info':    ['fg', 'PreProc'],
-      \ 'prompt':  ['fg', 'Conditional'],
-      \ 'pointer': ['fg', 'Exception'],
-      \ 'marker':  ['fg', 'Keyword'],
-      \ 'spinner': ['fg', 'Label'],
-      \ 'header':  ['fg', 'Comment'] }
+      \   'bg':      ['bg', 'Normal'],
+      \   'hl':      ['fg', 'Comment'],
+      \   'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+      \   'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+      \   'hl+':     ['fg', 'Statement'],
+      \   'info':    ['fg', 'PreProc'],
+      \   'prompt':  ['fg', 'Conditional'],
+      \   'pointer': ['fg', 'Exception'],
+      \   'marker':  ['fg', 'Keyword'],
+      \   'spinner': ['fg', 'Label'],
+      \   'header':  ['fg', 'Comment'] }
 nnoremap <c-p>     :GFiles<CR>
 noremap  <Leader>r :History<CR>
 nnoremap <Leader>l :Lines<CR>
@@ -124,8 +128,6 @@ Plug 'tpope/vim-fugitive'
 " Javascript
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'elzr/vim-json'
-Plug 'guileen/vim-node-dict'
-Plug 'moll/vim-node'
 Plug 'othree/javascript-libraries-syntax.vim'
 Plug 'othree/yajs.vim'
 Plug 'marijnh/tern_for_vim', { 'do': 'npm install' }
@@ -136,15 +138,16 @@ if exists('g:plugs["tern_for_vim"]')
 endif
 
 " Elm
+Plug 'pbogut/deoplete-elm'
 Plug 'ElmCast/elm-vim'
 let g:elm_format_autosave = 1
 let g:elm_setup_keybindings = 0
 let g:elm_format_fail_silently = 1
 let g:elm_make_show_warnings = 1
-nnoremap <Leader>ek :ElmShowDocs
 nnoremap <Leader>ed :ElmBrowseDocs
 augroup elm
   autocmd!
+  autocmd BufNewFile,BufRead *.elm setlocal keywordprg=:ElmShowDocs
   autocmd BufNewFile,BufRead *.elm setlocal tabstop     =4
   autocmd BufNewFile,BufRead *.elm setlocal shiftwidth  =4
   autocmd BufNewFile,BufRead *.elm setlocal softtabstop =4
@@ -267,10 +270,6 @@ set softtabstop=2
 set shiftwidth=2
 set expandtab
 set smartindent
-
-" fold stuff
-set nofoldenable
-set fillchars=fold:\ , " get rid of '-' characters in folds
 
 " searching
 set ignorecase smartcase
@@ -452,14 +451,7 @@ autocmd FileType ExDoc wincmd L | vert res 80
 " Plugin Configurations
 " Deoplete
 let g:deoplete#enable_at_startup = 1
-let g:deoplete#sources = {}
-let g:deoplete#sources._ = ['file', 'neosnippet']
-let g:deoplete#omni#functions = {}
 let g:deoplete#omni#input_patterns = {}
-let g:deoplete#sources.elm = ['omni'] + g:deoplete#sources._ " Elm support
-let g:deoplete#omni#functions.elm = ['elm#Complete']
-let g:deoplete#omni#input_patterns.elm = '[^ \t]+'
-let g:deoplete#disable_auto_complete = 1
 autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 " Completion
 set completeopt=longest,menu " preview
