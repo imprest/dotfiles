@@ -20,6 +20,7 @@ let g:startify_show_sessions = 1
 Plug 'ervandew/supertab'
 let g:SuperTabDefaultCompletionType = "<c-n>"
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
 imap <C-k>     <Plug>(neosnippet_expand_or_jump)
@@ -28,10 +29,6 @@ xmap <C-k>     <Plug>(neosnippet_expand_target)
 " SuperTab like snippets behavior.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
 imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-"imap <expr><TAB>
-" \ pumvisible() ? "\<C-n>" :
-" \ neosnippet#expandable_or_jumpable() ?
-" \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
       \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 set conceallevel=2 concealcursor=niv
@@ -43,6 +40,7 @@ let g:ale_lint_on_enter        = 0
 let g:ale_set_loclist          = 0
 let g:ale_set_quickfix         = 1
 let g:ale_open_list            = 1
+let g:ale_linters              = {'elixir': ['mix', 'credo']}
 
 " Project Management
 Plug 'airblade/vim-rooter'
@@ -67,7 +65,6 @@ augroup END
 Plug 'Raimondi/delimitMate'  " Automatically add closing quotes and braces
 Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
 Plug 'junegunn/vim-peekaboo' " Show recently saved text in vim registers
-let g:peekaboo_window = 'vertical botright 50new'
 Plug 'tpope/vim-commentary'  " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'      " allow added vim motion to be repeatable like vim-surround
 Plug 'tpope/vim-speeddating' " <C-a> in numbers or dates <C-x> to do the opposite
@@ -88,7 +85,7 @@ Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
 Plug 'wesQ3/vim-windowswap' " <Leader>ww once to select window and again to swap window
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-let g:fzf_layout = { 'down': '~18%' }
+let g:fzf_layout = { 'down': '~10%' }
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
       \ { 'fg':      ['fg', 'Normal'],
@@ -174,6 +171,8 @@ Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
 let g:gutentags_cache_dir = '~/.tags_cache'
 Plug 'janko-m/vim-test'
 let g:test#strategy = 'neovim' "run tests in neovim strategy
+Plug 'Shougo/echodoc.vim'
+let g:echodoc#enable_at_startup=1
 
 " text objects
 Plug 'glts/vim-textobj-comment'
@@ -395,8 +394,8 @@ nnoremap <M-Up>    :resize +1<CR>
 nnoremap <M-Down>  :resize -1<CR>
 nnoremap <M-Left>  :vertical resize +1<CR>
 nnoremap <C-Right> :vertical resize -5<CR>
-nnoremap <C-Up>    :resize +5<CR>
-nnoremap <C-Down>  :resize -5<CR>
+nnoremap <C-Down>    :resize +5<CR>
+nnoremap <C-Up>  :resize -5<CR>
 nnoremap <C-Left>  :vertical resize +5<CR>
 nnoremap <Leader>s :split<CR>
 nnoremap <Leader>v <C-w>v<C-w>l
@@ -445,8 +444,17 @@ vnoremap K :m '<-2<CR>gv=gv
 let g:loaded_matchparen = 1
 runtime macros/matchit.vim
 " Make K or help open in vertical split
-autocmd FileType help  wincmd L | vert res 80
-autocmd FileType ExDoc wincmd L | vert res 80
+autocmd FileType help  wincmd L | vert res 80<CR>
+autocmd FileType elixir nnoremap <buffer> <s-k> :call OpenExDoc()<CR>
+" Opens alchemist exdoc
+function! OpenExDoc()
+  :call alchemist#exdoc() | wincmd L | vert res 80
+  setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+  \ modifiable nocursorline nofoldenable
+  if exists('&relativenumber')
+    setlocal norelativenumber
+  endif
+endfunction
 
 " Plugin Configurations
 " Deoplete
@@ -473,7 +481,7 @@ let g:airline_left_sep            = ''
 let g:airline_right_sep           = ''
 let g:airline_skip_empty_sections = 1
 let g:airline_theme               = 'onedark'
-let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'tagbar', 'hunks', 'anzu', 'whitespace']
+let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'tagbar', 'hunks', 'anzu', 'whitespace', 'ale']
 let g:airline#extensions#branch#enabled          = 1
 let g:airline#extensions#tabline#enabled         = 1
 let g:airline#extensions#tabline#left_alt_sep    = '|'
@@ -524,4 +532,6 @@ augroup markdown
   au FileType markdown setlocal textwidth=80
   au FileType markdown setlocal formatoptions=tcrq
 augroup END
+
+silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
 
