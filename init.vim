@@ -40,7 +40,7 @@ let g:ale_lint_on_enter        = 0
 let g:ale_set_loclist          = 0
 let g:ale_set_quickfix         = 1
 let g:ale_open_list            = 1
-let g:ale_linters              = {'elixir': ['mix', 'credo']}
+let g:ale_linters              = {'elixir': ['mix', 'credo'], 'typescript': ['tsserver']}
 
 " Project Management
 Plug 'airblade/vim-rooter'
@@ -122,6 +122,10 @@ Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
 
+" Typescript
+Plug 'mhartington/nvim-typescript'
+Plug 'HerringtonDarkholme/yats.vim'
+
 " Javascript
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'elzr/vim-json'
@@ -133,22 +137,6 @@ if exists('g:plugs["tern_for_vim"]')
   let g:tern_show_signature_in_pum = 1
   autocmd FileType javascript setlocal omnifunc=tern#Complete
 endif
-
-" Elm
-Plug 'pbogut/deoplete-elm'
-Plug 'ElmCast/elm-vim'
-let g:elm_format_autosave = 1
-let g:elm_setup_keybindings = 0
-let g:elm_format_fail_silently = 1
-let g:elm_make_show_warnings = 1
-nnoremap <Leader>ed :ElmBrowseDocs
-augroup elm
-  autocmd!
-  autocmd BufNewFile,BufRead *.elm setlocal keywordprg=:ElmShowDocs
-  autocmd BufNewFile,BufRead *.elm setlocal tabstop     =4
-  autocmd BufNewFile,BufRead *.elm setlocal shiftwidth  =4
-  autocmd BufNewFile,BufRead *.elm setlocal softtabstop =4
-augroup END
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript'] }
@@ -222,7 +210,6 @@ set background=dark
 colorscheme onedark
 
 " ui options
-let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 set title
 set showmatch
 set matchtime=2
