@@ -18,14 +18,14 @@
     ]
   editor:
     fontFamily: "Fira Code Retina"
-    fontSize: 12
+    fontSize: 11
     softWrap: true
   "exception-reporting":
     userId: "9b3c50a3-fe63-4dcb-8eeb-9aad8cb4f089"
   "linter-elixir-credo":
     flags: "--strict"
   "linter-ui-default":
-    panelHeight: 171
+    panelHeight: 143
     showPanel: true
   "package-sync":
     createOnChange: true
@@ -43,7 +43,6 @@
   "vim-mode-clipboard-plus":
     useVimModePlus: true
   "vim-mode-plus":
-    highlightSearch: false
     keymapBackslashToInnerCommentOrParagraphWhenToggleLineCommentsIsPending: true
     keymapSemicolonToConfirmOnFindInput: true
     keymapYToYankToLastCharacterOfLine: true
