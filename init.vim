@@ -35,12 +35,15 @@ set conceallevel=2 concealcursor=niv
 
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
+let g:ale_sign_error           = '✘'
+let g:ale_sign_warning         = '⚠'
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter        = 0
 let g:ale_set_loclist          = 0
 let g:ale_set_quickfix         = 1
 let g:ale_open_list            = 1
-let g:ale_linters              = {'elixir': ['mix', 'credo'], 'typescript': ['tsserver']}
+let g:ale_linters              = {'elixir': ['credo'], 'javascript': ['eslint']}
+let g:ale_fixers               = {'javascript': ['eslint']}
 
 " Project Management
 Plug 'airblade/vim-rooter'
@@ -122,11 +125,12 @@ Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
 
-" Typescript
-Plug 'mhartington/nvim-typescript'
-Plug 'HerringtonDarkholme/yats.vim'
+" " Typescript
+" Plug 'mhartington/nvim-typescript'
+" Plug 'HerringtonDarkholme/yats.vim'
 
-" Javascript
+" Vue & Javascript
+Plug 'posva/vim-vue'
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'elzr/vim-json'
 Plug 'othree/javascript-libraries-syntax.vim'
@@ -137,6 +141,7 @@ if exists('g:plugs["tern_for_vim"]')
   let g:tern_show_signature_in_pum = 1
   autocmd FileType javascript setlocal omnifunc=tern#Complete
 endif
+autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript'] }
@@ -206,7 +211,7 @@ set iskeyword+=- " Makes foo-bar considered one word
 set mouse=a
 set termguicolors " Enable 24-bit colors in supported terminals
 set background=dark
-"let g:onedark_allow_italics = 1
+let g:onedark_allow_italics = 1
 colorscheme onedark
 
 " ui options
