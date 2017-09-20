@@ -36,12 +36,11 @@ set conceallevel=2 concealcursor=niv
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
 let g:ale_sign_error           = '✘'
-let g:ale_sign_warning         = '⚠'
+let g:ale_sign_warning         = '!'
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter        = 0
 let g:ale_set_loclist          = 0
 let g:ale_set_quickfix         = 1
-let g:ale_open_list            = 1
 let g:ale_linters              = {'elixir': ['credo'], 'javascript': ['eslint']}
 let g:ale_fixers               = {'javascript': ['eslint']}
 
@@ -125,37 +124,26 @@ Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
 
-" " Typescript
-" Plug 'mhartington/nvim-typescript'
-" Plug 'HerringtonDarkholme/yats.vim'
-
 " Vue & Javascript
 Plug 'posva/vim-vue'
+Plug 'carlitux/deoplete-ternjs' ", { 'do': 'sudo npm install -g tern' }
+let g:deoplete#sources#ternjs#filetypes = ['vue']
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'elzr/vim-json'
 Plug 'othree/javascript-libraries-syntax.vim'
 Plug 'othree/yajs.vim'
-Plug 'marijnh/tern_for_vim', { 'do': 'npm install' }
-if exists('g:plugs["tern_for_vim"]')
-  let g:tern_show_argument_hints = 'on_hold'
-  let g:tern_show_signature_in_pum = 1
-  autocmd FileType javascript setlocal omnifunc=tern#Complete
-endif
-autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css
+" autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript'] }
-Plug 'othree/html5.vim',    { 'for': ['html', 'javascript'] }
-Plug 'mattn/emmet-vim',     { 'for': ['html', 'javascript', 'css'] }
-let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
+Plug 'othree/html5.vim',    { 'for': ['html', 'javascript']}
 
 " CSS
 Plug 'hail2u/vim-css3-syntax', { 'for': ['css', 'scss']}
 Plug 'othree/csscomplete.vim'
 
 " Elixir & Erlang
-Plug 'elixir-lang/vim-elixir', { 'for': ['eelixir', 'elixir']}
+Plug 'elixir-lang/vim-elixir'
 Plug 'jimenezrick/vimerl'
 Plug 'slashmili/alchemist.vim'
 Plug 'powerman/vim-plugin-AnsiEsc'
@@ -461,7 +449,6 @@ augroup omnifuncs
   autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
   autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
   autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-  autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
   autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 augroup end
 
