@@ -1,4 +1,4 @@
-set -xg PATH $HOME/Downloads/android-sdk-linux/tools $PATH
+# set -xg PATH $HOME/Downloads/android-sdk-linux/tools $PATH
 set -xg VISUAL nvim
 set -xg EDITOR nvim
 set -xg LANG en_GB.UTF-8
