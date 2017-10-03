@@ -12,56 +12,68 @@ call plug#begin('~/.config/nvim/plugged')
 let g:mapleader = ','
 Plug 'dietsche/vim-lastplace'
 Plug 'mhinz/vim-startify'
-let g:startify_session_dir = '~/.data/sessions'
-let g:startify_change_to_vcs_root = 1
-let g:startify_show_sessions = 1
+  let g:startify_session_dir = '~/.data/sessions'
+  let g:startify_change_to_vcs_root = 1
+  let g:startify_show_sessions = 1
 
 " Autocompleteion
 Plug 'ervandew/supertab'
-let g:SuperTabDefaultCompletionType = "<c-n>"
+  let g:SuperTabDefaultCompletionType = "<c-n>"
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+  inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+  let g:deoplete#enable_at_startup = 1
+  let g:deoplete#omni#input_patterns = {}
+  autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+  " Completion
+  set completeopt=longest,menu " preview
+  set omnifunc=syntaxcomplete#Complete
+  augroup omnifuncs
+    autocmd!
+    autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+    autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+    autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+  augroup end
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
-" SuperTab like snippets behavior.
-" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-      \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-set conceallevel=2 concealcursor=niv
+  imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+  smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+  xmap <C-k>     <Plug>(neosnippet_expand_target)
+  " SuperTab like snippets behavior.
+  " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+  imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+  smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+        \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+  set conceallevel=2 concealcursor=niv
 
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
-let g:ale_sign_error           = '✘'
-let g:ale_sign_warning         = '!'
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_enter        = 0
-let g:ale_set_loclist          = 0
-let g:ale_set_quickfix         = 1
-let g:ale_linters              = {'elixir': ['credo'], 'javascript': ['eslint']}
-let g:ale_fixers               = {'javascript': ['eslint']}
+  let g:ale_sign_error           = '✘'
+  let g:ale_sign_warning         = '!'
+  let g:ale_lint_on_text_changed = 'never'
+  let g:ale_lint_on_enter        = 0
+  let g:ale_linters              = {'elixir': ['credo'], 'javascript': ['eslint']}
+  let g:ale_fixers               = {'javascript': ['eslint']}
+  let g:ale_javascript_eslint_use_global = 1
 
 " Project Management
 Plug 'airblade/vim-rooter'
-let g:rooter_silent_chdir = 1
-let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
+  let g:rooter_silent_chdir = 1
+  let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
-map <C-\> :NERDTreeToggle<CR>
-map <F2>  :NERDTreeToggle<CR>
-map <F3>  :NERDTreeFind<CR>
-let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
-augroup nerd_loader
-  autocmd!
-  autocmd VimEnter * silent! autocmd! FileExplorer
-  autocmd BufEnter,BufNew *
-        \  if isdirectory(expand('<amatch>'))
-        \|   call plug#load('nerdtree')
-        \|   execute 'autocmd! nerd_loader'
-        \| endif
-augroup END
+  map <C-\> :NERDTreeToggle<CR>
+  map <F2>  :NERDTreeToggle<CR>
+  map <F3>  :NERDTreeFind<CR>
+  let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
+  augroup nerd_loader
+    autocmd!
+    autocmd VimEnter * silent! autocmd! FileExplorer
+    autocmd BufEnter,BufNew *
+          \  if isdirectory(expand('<amatch>'))
+          \|   call plug#load('nerdtree')
+          \|   execute 'autocmd! nerd_loader'
+          \| endif
+  augroup END
 
 " Editing
 Plug 'Raimondi/delimitMate'  " Automatically add closing quotes and braces
@@ -71,10 +83,10 @@ Plug 'tpope/vim-commentary'  " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'      " allow added vim motion to be repeatable like vim-surround
 Plug 'tpope/vim-speeddating' " <C-a> in numbers or dates <C-x> to do the opposite
 Plug 'tpope/vim-surround'    " cs i.e. enable change surrounding motion
-Plug 'terryma/vim-expand-region'
-vmap v <Plug>(expand_region_expand)
-vmap <C-v> <Plug>(expand_region_shrink)
-Plug 'chrisbra/unicode.vim'
+Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
+  vmap v <Plug>(expand_region_expand)
+  vmap <C-v> <Plug>(expand_region_shrink)
+Plug 'chrisbra/unicode.vim'  " :UnicodeTable to search and copy unicode chars
 
 " Folding
 " Plug 'sts10/vim-zipper' " for folding
@@ -84,40 +96,41 @@ set fillchars=fold:\ , " get rid of '-' characters in folds
 " Navigation
 Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
 Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
+  nmap <F9> :TagbarToggle<CR>
 Plug 'wesQ3/vim-windowswap' " <Leader>ww once to select window and again to swap window
+Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-let g:fzf_layout = { 'down': '~10%' }
-" Customize fzf colors to match your color scheme
-let g:fzf_colors =
-      \ { 'fg':      ['fg', 'Normal'],
-      \   'bg':      ['bg', 'Normal'],
-      \   'hl':      ['fg', 'Comment'],
-      \   'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-      \   'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-      \   'hl+':     ['fg', 'Statement'],
-      \   'info':    ['fg', 'PreProc'],
-      \   'prompt':  ['fg', 'Conditional'],
-      \   'pointer': ['fg', 'Exception'],
-      \   'marker':  ['fg', 'Keyword'],
-      \   'spinner': ['fg', 'Label'],
-      \   'header':  ['fg', 'Comment'] }
-nnoremap <c-p>     :GFiles<CR>
-noremap  <Leader>r :History<CR>
-nnoremap <Leader>l :Lines<CR>
-nnoremap <Leader>t :BTags<CR>
-nnoremap <Leader>T :Tags<CR>
-nnoremap <Leader>b :Buffers<CR>
+  let g:fzf_layout = { 'down': '~21%' }
+  let g:fzf_colors =
+        \ { 'fg':      ['fg', 'Normal'],
+        \   'bg':      ['bg', 'Normal'],
+        \   'hl':      ['fg', 'Comment'],
+        \   'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+        \   'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+        \   'hl+':     ['fg', 'Statement'],
+        \   'info':    ['fg', 'PreProc'],
+        \   'prompt':  ['fg', 'Conditional'],
+        \   'pointer': ['fg', 'Exception'],
+        \   'marker':  ['fg', 'Keyword'],
+        \   'spinner': ['fg', 'Label'],
+        \   'header':  ['fg', 'Comment'] }
+  nnoremap <c-p>      :GFiles<CR>
+  nnoremap <Leader>p  :Files<CR>
+  noremap  <Leader>r  :History<CR>
+  nnoremap <Leader>bt :BTags<CR>
+  nnoremap <Leader>T  :Tags<CR>
+  nnoremap <Leader>b  :Buffers<CR>
 
 " Searching
 Plug 'rking/ag.vim'
 Plug 'Chun-Yang/vim-action-ag'
 Plug 'osyo-manga/vim-anzu'
-nmap n <Plug>(anzu-n)
-nmap N <Plug>(anzu-N)
-nmap * <Plug>(anzu-star)
-nmap # <Plug>(anzu-sharp)
-nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
+  nmap n <Plug>(anzu-n)
+  nmap N <Plug>(anzu-N)
+  nmap * <Plug>(anzu-star)
+  nmap # <Plug>(anzu-sharp)
+  nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
 
 " Git
 Plug 'airblade/vim-gitgutter'
@@ -127,19 +140,18 @@ Plug 'tpope/vim-fugitive'
 " Vue & Javascript
 Plug 'posva/vim-vue'
 Plug 'carlitux/deoplete-ternjs' ", { 'do': 'sudo npm install -g tern' }
-let g:deoplete#sources#ternjs#filetypes = ['vue']
+  let g:deoplete#sources#ternjs#filetypes = ['vue']
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'elzr/vim-json'
 Plug 'othree/javascript-libraries-syntax.vim'
 Plug 'othree/yajs.vim'
-" autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript.css
 
 " HTML
-Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript'] }
-Plug 'othree/html5.vim',    { 'for': ['html', 'javascript']}
+Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
+Plug 'othree/html5.vim',    { 'for': ['html', 'javascript', 'vue']}
 
 " CSS
-Plug 'hail2u/vim-css3-syntax', { 'for': ['css', 'scss']}
+Plug 'hail2u/vim-css3-syntax', { 'for': ['css', 'scss', 'vue']}
 Plug 'othree/csscomplete.vim'
 
 " Elixir & Erlang
@@ -147,13 +159,20 @@ Plug 'elixir-lang/vim-elixir'
 Plug 'jimenezrick/vimerl'
 Plug 'slashmili/alchemist.vim'
 Plug 'powerman/vim-plugin-AnsiEsc'
-Plug 'tpope/vim-endwise', { 'for': ['elixir']}
+Plug 'tpope/vim-endwise'
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
-let g:gutentags_cache_dir = '~/.tags_cache'
+  let g:gutentags_cache_dir = '~/.tags_cache'
 Plug 'janko-m/vim-test'
-let g:test#strategy = 'neovim' "run tests in neovim strategy
-Plug 'Shougo/echodoc.vim'
-let g:echodoc#enable_at_startup=1
+  let g:test#strategy = 'neovim' "run tests in neovim strategy
+Plug 'kassio/neoterm'
+  set shell=/usr/bin/fish
+  set noshelltemp " use pipes
+  let g:neoterm_position = 'horizontal'
+  let g:neoterm_automap_keys = ',tt'
+  nnoremap <silent> ,th :call neoterm#close()<CR>
+  nnoremap <silent> ,tl :call neoterm#clear()<CR>
+  nnoremap <silent> ,tc :call neoterm#kill()<CR>
+  nnoremap <Leader>c :below 10sp term://fish<CR>
 
 " text objects
 Plug 'glts/vim-textobj-comment'
@@ -167,17 +186,48 @@ Plug 'wellle/targets.vim'
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 
 " Eye candy
-Plug 'bling/vim-airline'
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
-Plug 'terryma/vim-smooth-scroll'
-Plug 'vim-airline/vim-airline-themes'
+  nmap <F5> :ColorToggle<CR>
+Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
+  nnoremap <C-e> <C-u>
+  nnoremap <C-u> <C-e>
+  noremap <silent> <c-e> :call smooth_scroll#up(&scroll, 15, 2)<CR>
+  noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 15, 2)<CR>
+  noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
+  noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
 Plug 'Yggdroot/indentLine'
-let g:indentLine_enabled = 0
-let g:indentLine_char    = "\u250A" " '┆'
-let g:indent_guides_start_level = 1
-let g:indent_guides_guide_size = 1
-let g:indent_guides_enable_on_vim_startup = 0
-let g:indent_guides_color_change_percent = 3
+  let g:indentLine_enabled = 1
+  let g:indentLine_char    = "\u250A" " '┆'
+  let g:indent_guides_start_level = 1
+  let g:indent_guides_guide_size = 1
+  let g:indent_guides_enable_on_vim_startup = 0
+  let g:indent_guides_color_change_percent = 3
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+  let g:airline_powerline_fonts     = 1
+  let g:airline_detect_paste        = 1
+  let g:airline_skip_empty_sections = 1
+  let g:airline_left_sep            = ''
+  let g:airline_right_sep           = ''
+  let g:airline_skip_empty_sections = 1
+  let g:airline_theme               = 'onedark'
+  let g:airline#extensions#branch#enabled          = 1
+  let g:airline#extensions#tabline#enabled         = 1
+  let g:airline#extensions#tabline#left_alt_sep    = '|'
+  let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
+  let g:airline_mode_map = {
+        \ '__' : '-',
+        \ 'n'  : 'N',
+        \ 'i'  : 'I',
+        \ 'R'  : 'R',
+        \ 'c'  : 'C',
+        \ 'v'  : 'V',
+        \ 'V'  : 'V',
+        \ '' : 'V',
+        \ 's'  : 'S',
+        \ 'S'  : 'S',
+        \ '' : 'S',
+        \ }
 
 " Colorschemes
 Plug 'joshdick/onedark.vim'
@@ -201,6 +251,13 @@ set termguicolors " Enable 24-bit colors in supported terminals
 set background=dark
 let g:onedark_allow_italics = 1
 colorscheme onedark
+
+" tab stuff
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+set expandtab
+set smartindent
 
 " ui options
 set title
@@ -236,19 +293,11 @@ set scrolloff=7
 set sidescrolloff=5
 set display+=lastline
 
-" whitespace & hidden characters
-set nowrap
+" whitespace, hidden characters & line breaks
 set list      " Toggle showing hidden characters i.e. space
+set linebreak " Wrap long lines at a character
 set listchars+=tab:»·,trail:•,extends:❯,precedes:❮,conceal:Δ,nbsp:+
-set linebreak   " Wrap long lines at a character
 let &showbreak="↪ "
-
-" tab stuff
-set tabstop=2
-set softtabstop=2
-set shiftwidth=2
-set expandtab
-set smartindent
 
 " searching
 set ignorecase smartcase
@@ -280,10 +329,6 @@ let g:tagbar_type_elixir = {
       \ 'r:records'
       \ ]
       \ }
-
-" shell
-set shell=/usr/bin/bash
-set noshelltemp " use pipes
 
 " backup, undo and file management
 set backup
@@ -334,7 +379,6 @@ endfunction
 
 " Keyboard mappings
 " common actions
-nnoremap <Leader>q :q<CR>
 nnoremap <Leader>d :bdelete<CR>
 nnoremap <Leader><Leader> <c-^> " Swith between last two files
 nnoremap Q @q                   " Use Q to execute default register
@@ -355,13 +399,6 @@ noremap <silent> <Home> g<Home>
 noremap <silent> <End>  g<End>
 inoremap <silent> <Home> <C-o>g<Home>
 inoremap <silent> <End> <C-o>g<End>
-" smooth scrolling
-nnoremap <C-e> <C-u>
-nnoremap <C-u> <C-e>
-noremap <silent> <c-e> :call smooth_scroll#up(&scroll, 15, 2)<CR>
-noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 15, 2)<CR>
-noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
-noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
 " smash escape
 inoremap jk <esc>
 inoremap kj <esc>
@@ -396,18 +433,12 @@ tnoremap <C-h> <C-\><C-n><C-w>h
 tnoremap <C-j> <C-\><C-n><C-w>j
 tnoremap <C-k> <C-\><C-n><C-w>k
 tnoremap <C-l> <C-\><C-n><C-w>l
-" Open terminal below
-nnoremap <Leader>c :below 10sp term://fish<CR>
 " quickly replace string under cursor for line
 nnoremap <Leader>R :s/\<<C-r><C-w>\>/
 " Sort selected lines
 vmap <Leader>s :sort<CR>
 " start interactive EasyAlign in visual mode
 vmap <Enter> <Plug>(EasyAlign)
-" colorizer
-nmap <F5> :ColorToggle<CR>
-" Tagbar
-nmap <F9> :TagbarToggle<CR>
 " Move cursor to middle after each search i.e. auto-center
 nnoremap <silent> <C-o> <C-o>zz
 nnoremap <silent> <C-i> <C-i>zz
@@ -435,53 +466,6 @@ function! OpenExDoc()
     setlocal norelativenumber
   endif
 endfunction
-
-" Plugin Configurations
-" Deoplete
-let g:deoplete#enable_at_startup = 1
-let g:deoplete#omni#input_patterns = {}
-autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
-" Completion
-set completeopt=longest,menu " preview
-set omnifunc=syntaxcomplete#Complete
-augroup omnifuncs
-  autocmd!
-  autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-  autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-  autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-  autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-augroup end
-
-" Airline options
-let g:airline_powerline_fonts     = 1
-let g:airline_detect_paste        = 1
-let g:airline_skip_empty_sections = 1
-let g:airline_left_sep            = ''
-let g:airline_right_sep           = ''
-let g:airline_skip_empty_sections = 1
-let g:airline_theme               = 'onedark'
-let g:airline_extensions = ['branch', 'tabline', 'quickfix', 'tagbar', 'hunks', 'anzu', 'whitespace', 'ale']
-let g:airline#extensions#branch#enabled          = 1
-let g:airline#extensions#tabline#enabled         = 1
-let g:airline#extensions#tabline#left_alt_sep    = '|'
-let g:airline#extensions#tabline#fnamemod        = ':t'
-let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
-call airline#parts#define_raw('linenr', '%l')
-let g:airline_section_z = airline#section#create(['%3p%% ',
-      \ g:airline_symbols.linenr .' ', 'linenr', ':%2c'])
-let g:airline_mode_map = {
-      \ '__' : '-',
-      \ 'n'  : 'N',
-      \ 'i'  : 'I',
-      \ 'R'  : 'R',
-      \ 'c'  : 'C',
-      \ 'v'  : 'V',
-      \ 'V'  : 'V',
-      \ '' : 'V',
-      \ 's'  : 'S',
-      \ 'S'  : 'S',
-      \ '' : 'S',
-      \ }
 
 " Auto Commands
 augroup vimrc
