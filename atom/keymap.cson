@@ -1,15 +1,10 @@
 'atom-workspace':
   # focus btn editor and terminal
   'alt-k': 'editor:focus-main'
-  'alt-j': 'platformio-ide-terminal'
+  'alt-j': 'platformio-ide-terminal:focus'
   # cursor-history package
   'ctrl-i': 'cursor-history:next'
   'ctrl-o': 'cursor-history:prev'
-
-'atom-workspace:not([mini])':
-  # recent-finder package
-  ', r': 'recent-finder:toggle'
-  ', b': 'fuzzy-finder:toggle-buffer-finder'
 
 # Make mini pop navigation consistant
 'atom-text-editor[mini]':
@@ -52,6 +47,9 @@
 
 # Normal Mode
 'atom-text-editor.vim-mode-plus.normal-mode':
+  # recent-finder package
+  ', r': 'recent-finder:toggle'
+  ', b': 'fuzzy-finder:toggle-buffer-finder'
   # open-this package
   'g f'     : 'open-this:here'
   'ctrl-w f': 'open-this:split-down'
