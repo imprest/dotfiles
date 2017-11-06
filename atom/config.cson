@@ -10,6 +10,7 @@
       "welcome"
       "background-tips"
       "language-clojure"
+      "linter"
     ]
     telemetryConsent: "limited"
   "disable-keybindings":
@@ -25,7 +26,7 @@
   "linter-elixir-credo":
     flags: "--strict"
   "linter-ui-default":
-    panelHeight: 171
+    panelHeight: 278
   "package-sync":
     createOnChange: true
     forceOverwrite: true
