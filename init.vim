@@ -16,7 +16,7 @@ Plug 'mhinz/vim-startify'
   let g:startify_change_to_vcs_root = 1
   let g:startify_show_sessions = 1
 
-" Autocompleteion
+" Autocompletion
 Plug 'ervandew/supertab'
   let g:SuperTabDefaultCompletionType = "<c-n>"
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -77,6 +77,7 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 
 " Editing
 Plug 'Raimondi/delimitMate'  " Automatically add closing quotes and braces
+  au FileType vue let b:delimitMate_matchpairs = "(:),[:],{:}" " disable <> in vue
 Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
 Plug 'junegunn/vim-peekaboo' " Show recently saved text in vim registers
 Plug 'tpope/vim-commentary'  " gc i.e. toggle commenting code
@@ -149,6 +150,8 @@ Plug 'othree/yajs.vim'
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
 Plug 'othree/html5.vim',    { 'for': ['html', 'javascript', 'vue']}
+Plug 'alvan/vim-closetag'
+  let g:closetag_filenames = '*.html, *.xhtml, *.vue'
 
 " CSS
 Plug 'hail2u/vim-css3-syntax', { 'for': ['css', 'scss', 'vue']}
