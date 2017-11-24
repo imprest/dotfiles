@@ -145,6 +145,8 @@ Plug 'carlitux/deoplete-ternjs' ", { 'do': 'sudo npm install -g tern' }
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'elzr/vim-json'
 Plug 'othree/javascript-libraries-syntax.vim'
+  let g:used_javascript_libs = 'vue'
+  autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
 Plug 'othree/yajs.vim'
 
 " HTML
