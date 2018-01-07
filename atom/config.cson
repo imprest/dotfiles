@@ -26,7 +26,7 @@
   "linter-elixir-credo":
     flags: "--strict"
   "linter-ui-default":
-    panelHeight: 143
+    panelHeight: 278
   "package-sync":
     createOnChange: true
     forceOverwrite: true

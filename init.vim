@@ -19,32 +19,11 @@ Plug 'mhinz/vim-startify'
 " Autocompletion
 Plug 'ervandew/supertab'
   let g:SuperTabDefaultCompletionType = "<c-n>"
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-  inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-  let g:deoplete#enable_at_startup = 1
-  let g:deoplete#omni#input_patterns = {}
-  autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
-  " Completion
-  set completeopt=longest,menu " preview
-  set omnifunc=syntaxcomplete#Complete
-  augroup omnifuncs
-    autocmd!
-    autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-    autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-  augroup end
-Plug 'Shougo/neosnippet'
-Plug 'Shougo/neosnippet-snippets'
-  imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-  smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-  xmap <C-k>     <Plug>(neosnippet_expand_target)
-  " SuperTab like snippets behavior.
-  " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-  imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-  smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-        \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-  set conceallevel=2 concealcursor=niv
+Plug 'roxma/nvim-completion-manager'
+  set shortmess+=c " Supress annoying completion messages
+  let g:cm_complete_popup_delay = 1
+  let g:cm_refresh_length = [[1,2],[7,1]]
+Plug 'sirver/UltiSnips'
 
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
@@ -52,8 +31,8 @@ Plug 'w0rp/ale'
   let g:ale_sign_warning         = '!'
   let g:ale_lint_on_text_changed = 'never'
   let g:ale_lint_on_enter        = 0
-  let g:ale_linters              = {'elixir': ['credo'], 'javascript': ['eslint']}
-  let g:ale_fixers               = {'javascript': ['eslint']}
+  let g:ale_linters              = {'elixir': ['credo'], 'javascript': ['eslint'], 'R': ['lintr']}
+  let g:ale_fixers               = {'javascript': ['eslint'], 'R': ['lintr']}
   let g:ale_javascript_eslint_use_global = 1
 
 " Project Management
@@ -91,8 +70,11 @@ Plug 'chrisbra/unicode.vim'  " :UnicodeTable to search and copy unicode chars
 
 " Folding
 " Plug 'sts10/vim-zipper' " for folding
-set nofoldenable
+set foldenable
 set fillchars=fold:\ , " get rid of '-' characters in folds
+set foldlevelstart=9 " Show most folds by default
+set foldnestmax=5 " You're writing bad code if you need to up this one
+set foldmethod=indent " Fold based on indentation
 
 " Navigation
 Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
@@ -138,16 +120,32 @@ Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
 
+" LSP
+Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+
+" R note: install r tcl install.packages('tidyverse') install.packages('lintr')
+Plug 'jalvesaq/Nvim-R' " \rf start \rq quit \re \rh help \o print inline
+  nmap ,  <Plug>RDSendLine
+  vmap ,  <Plug>RDSendSelection
+  vmap ,e <Plug>RESendSelection
+  nmap ,p <Plug>RPrintObj
+  let g:rout_follow_colorscheme = 1 " R output is highlighted
+  let g:Rout_more_colors = 1        " R commands in R output are highlighted
+  let g:R_start_libs = 'base, stats, graphics, grDevices, utils, methods, tidyverse, shiny'
+  augroup R_Resize
+    autocmd!
+    autocmd VimResized * let R_rconsole_width = winwidth(0) / 2
+  augroup END
+Plug 'gaalcaras/ncm-R' " autocompletion for R via nvim-completion-manager
+
 " Vue & Javascript
 Plug 'posva/vim-vue'
-Plug 'carlitux/deoplete-ternjs' ", { 'do': 'sudo npm install -g tern' }
-  let g:deoplete#sources#ternjs#filetypes = ['vue']
-Plug '1995eaton/vim-better-javascript-completion'
+Plug 'isRuslan/vim-es6'
+Plug 'roxma/nvim-cm-tern'
 Plug 'elzr/vim-json'
 Plug 'othree/javascript-libraries-syntax.vim'
   let g:used_javascript_libs = 'vue'
   autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
-Plug 'othree/yajs.vim'
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
@@ -168,7 +166,7 @@ Plug 'tpope/vim-endwise'
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
   let g:gutentags_cache_dir = '~/.tags_cache'
 Plug 'janko-m/vim-test'
-  let g:test#strategy = 'neovim' "run tests in neovim strategy
+  let g:test#strategy = 'neovim' " run tests in neovim strategy
 Plug 'kassio/neoterm'
   set shell=/usr/bin/fish
   set noshelltemp " use pipes
@@ -236,6 +234,7 @@ Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
 Plug 'joshdick/onedark.vim'
+Plug 'rakr/vim-two-firewatch'
 
 call plug#end()
 
@@ -254,8 +253,8 @@ set iskeyword+=- " Makes foo-bar considered one word
 set mouse=a
 set termguicolors " Enable 24-bit colors in supported terminals
 set background=dark
-let g:onedark_allow_italics = 1
-colorscheme onedark
+let g:two_firewatch_italics = 1
+colorscheme onedark " two-firewatch
 
 " tab stuff
 set tabstop=2
@@ -274,7 +273,7 @@ set noshowmode
 set t_ut= " improve screen clearing by using the background colour
 " alternative approach for lines that are too long
 set colorcolumn=
-highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+highlight OverLength ctermbg=red ctermfg=white guibg=yellow
 match OverLength /\%81v.\+/
 
 " autocomplete list options
@@ -500,6 +499,4 @@ augroup markdown
   au FileType markdown setlocal textwidth=80
   au FileType markdown setlocal formatoptions=tcrq
 augroup END
-
-silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
 
