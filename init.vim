@@ -9,21 +9,67 @@ endif
 call plug#begin('~/.config/nvim/plugged')
 
 " general
-let g:mapleader = ','
+let g:mapleader = ' '
 Plug 'dietsche/vim-lastplace'
 Plug 'mhinz/vim-startify'
   let g:startify_session_dir = '~/.data/sessions'
   let g:startify_change_to_vcs_root = 1
   let g:startify_show_sessions = 1
 
+" Languages
+Plug 'sheerun/vim-polyglot'
+
+" Vue & Javascript
+Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
+  let g:used_javascript_libs = 'vue'
+  autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
+
+" HTML
+Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
+Plug 'alvan/vim-closetag'
+  let g:closetag_filenames = '*.html, *.xhtml, *.vue'
+Plug 'mattn/emmet-vim'
+  imap <c-e> <c-y>,
+
+" Elixir & Erlang
+Plug 'slashmili/alchemist.vim'
+  let g:alchemist#elixir_erlang_src = "/usr/lib/elixir"
+Plug 'powerman/vim-plugin-AnsiEsc'
+Plug 'tpope/vim-endwise'
+Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
+  let g:gutentags_cache_dir = '~/.tags_cache'
+  let g:gutentags_ctags_exclude=["node_modules","plugged","tmp","temp","log","vendor","**/db/migrate/*","bower_components","dist","build","coverage","spec","public","app/assets","*.json"]
+  nnoremap <CR> <C-]> " Enter is go to definition (ctags)
+  autocmd FileType qf nnoremap <buffer> <CR> <CR> " In quickfix,  <CR> to jump to error under the cursor
+  autocmd FileType vim nnoremap <buffer> <CR> <CR> " same for vim type windows
+  let g:alchemist_tag_map = '<CR>'
+  let g:alchemist_tag_stack_map = '<C-T>'
+Plug 'janko-m/vim-test'
+  let g:test#strategy = 'neovim' " run tests in neovim strategy
+Plug 'kassio/neoterm'
+  set shell=/usr/bin/fish
+  set noshelltemp " use pipes
+  let g:neoterm_position = 'horizontal'
+  let g:neoterm_automap_keys = ',tt'
+  nnoremap <silent> ,th :call neoterm#close()<CR>
+  nnoremap <silent> ,tl :call neoterm#clear()<CR>
+  nnoremap <silent> ,tc :call neoterm#kill()<CR>
+  nnoremap <Leader>c :below 10sp term://fish<CR>
+
 " Autocompletion
-Plug 'ervandew/supertab'
-  let g:SuperTabDefaultCompletionType = "<c-n>"
-Plug 'roxma/nvim-completion-manager'
-  set shortmess+=c " Supress annoying completion messages
-  let g:cm_complete_popup_delay = 1
-  let g:cm_refresh_length = [[1,2],[7,1]]
-Plug 'sirver/UltiSnips'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+  let g:deoplete#enable_at_startup = 1
+  set completeopt+=menuone
+  set completeopt-=preview
+  set shortmess+=c
+  let g:deoplete#auto_complete_delay = 150
+  let g:deoplete#auto_refresh_delay = 1000
+  let g:deoplete#enable_camel_case = 1
+  "" set tab complete
+  inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+  "" <C-h>, <BS>: close popup and delete backword char.
+  inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
+  inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
 
 " Linter. Execute code checks, find mistakes, in the background
 Plug 'w0rp/ale'
@@ -31,7 +77,7 @@ Plug 'w0rp/ale'
   let g:ale_sign_warning         = '!'
   let g:ale_lint_on_text_changed = 'never'
   let g:ale_lint_on_enter        = 0
-  let g:ale_linters              = {'elixir': ['credo'], 'javascript': ['eslint'], 'R': ['lintr']}
+  let g:ale_linters              = {'elixir': ['credo'], 'R': ['lintr']}
   let g:ale_fixers               = {'javascript': ['eslint'], 'R': ['lintr']}
   let g:ale_javascript_eslint_use_global = 1
 
@@ -57,21 +103,22 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 " Editing
 Plug 'Raimondi/delimitMate'  " Automatically add closing quotes and braces
   au FileType vue let b:delimitMate_matchpairs = "(:),[:],{:}" " disable <> in vue
-Plug 'junegunn/vim-easy-align', { 'on': ['<Plug>(EasyAlign)', 'EasyAlign']}
+Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vim-peekaboo' " Show recently saved text in vim registers
 Plug 'tpope/vim-commentary'  " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'      " allow added vim motion to be repeatable like vim-surround
 Plug 'tpope/vim-speeddating' " <C-a> in numbers or dates <C-x> to do the opposite
-Plug 'tpope/vim-surround'    " cs i.e. enable change surrounding motion
+Plug 'machakann/vim-sandwich' " surround motion ie cs'( or <C-v>sa( or sr
 Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
 Plug 'chrisbra/unicode.vim'  " :UnicodeTable to search and copy unicode chars
+Plug 'AndrewRadev/splitjoin.vim' " gS 1 liner to multiple lines gJ for reverse
 
 " Folding
 " Plug 'sts10/vim-zipper' " for folding
 set foldenable
-set fillchars=fold:\ , " get rid of '-' characters in folds
+set fillchars=diff:⣿,vert:│,fold:· " Subtitute characters shown in certain modes
 set foldlevelstart=9 " Show most folds by default
 set foldnestmax=5 " You're writing bad code if you need to up this one
 set foldmethod=indent " Fold based on indentation
@@ -82,6 +129,8 @@ Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
   nmap <F9> :TagbarToggle<CR>
 Plug 'wesQ3/vim-windowswap' " <Leader>ww once to select window and again to swap window
 Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
+  let g:loaded_netrwPlugin = 1 " unload netrw, we use dirvish
+Plug 'justinmk/vim-dirvish' " Better than netrw
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
   let g:fzf_layout = { 'down': '~21%' }
@@ -120,63 +169,6 @@ Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
 
-" LSP
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
-
-" R note: install r tcl install.packages('tidyverse') install.packages('lintr')
-Plug 'jalvesaq/Nvim-R' " \rf start \rq quit \re \rh help \o print inline
-  nmap ,  <Plug>RDSendLine
-  vmap ,  <Plug>RDSendSelection
-  vmap ,e <Plug>RESendSelection
-  nmap ,p <Plug>RPrintObj
-  let g:rout_follow_colorscheme = 1 " R output is highlighted
-  let g:Rout_more_colors = 1        " R commands in R output are highlighted
-  let g:R_start_libs = 'base, stats, graphics, grDevices, utils, methods, tidyverse, shiny'
-  augroup R_Resize
-    autocmd!
-    autocmd VimResized * let R_rconsole_width = winwidth(0) / 2
-  augroup END
-Plug 'gaalcaras/ncm-R' " autocompletion for R via nvim-completion-manager
-
-" Vue & Javascript
-Plug 'posva/vim-vue'
-Plug 'isRuslan/vim-es6'
-Plug 'roxma/nvim-cm-tern'
-Plug 'elzr/vim-json'
-Plug 'othree/javascript-libraries-syntax.vim'
-  let g:used_javascript_libs = 'vue'
-  autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
-
-" HTML
-Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
-Plug 'othree/html5.vim',    { 'for': ['html', 'javascript', 'vue']}
-Plug 'alvan/vim-closetag'
-  let g:closetag_filenames = '*.html, *.xhtml, *.vue'
-
-" CSS
-Plug 'hail2u/vim-css3-syntax', { 'for': ['css', 'scss', 'vue']}
-Plug 'othree/csscomplete.vim'
-
-" Elixir & Erlang
-Plug 'elixir-lang/vim-elixir'
-Plug 'jimenezrick/vimerl'
-Plug 'slashmili/alchemist.vim'
-Plug 'powerman/vim-plugin-AnsiEsc'
-Plug 'tpope/vim-endwise'
-Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
-  let g:gutentags_cache_dir = '~/.tags_cache'
-Plug 'janko-m/vim-test'
-  let g:test#strategy = 'neovim' " run tests in neovim strategy
-Plug 'kassio/neoterm'
-  set shell=/usr/bin/fish
-  set noshelltemp " use pipes
-  let g:neoterm_position = 'horizontal'
-  let g:neoterm_automap_keys = ',tt'
-  nnoremap <silent> ,th :call neoterm#close()<CR>
-  nnoremap <silent> ,tl :call neoterm#clear()<CR>
-  nnoremap <silent> ,tc :call neoterm#kill()<CR>
-  nnoremap <Leader>c :below 10sp term://fish<CR>
-
 " text objects
 Plug 'glts/vim-textobj-comment'
 Plug 'kana/vim-textobj-fold'
@@ -184,9 +176,6 @@ Plug 'kana/vim-textobj-function'
 Plug 'kana/vim-textobj-indent'
 Plug 'kana/vim-textobj-user'
 Plug 'wellle/targets.vim'
-
-" Markdown
-Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 
 " Eye candy
 Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
@@ -199,6 +188,8 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
   noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
 Plug 'Yggdroot/indentLine'
+  let g:indentLine_faster = 1
+  let g:indentLine_setConceal = 0
   let g:indentLine_enabled = 1
   let g:indentLine_char    = "\u250A" " '┆'
   let g:indent_guides_start_level = 1
@@ -226,7 +217,7 @@ Plug 'vim-airline/vim-airline-themes'
         \ 'c'  : 'C',
         \ 'v'  : 'V',
         \ 'V'  : 'V',
-        \ '' : 'V',
+        \ '' : 'V',
         \ 's'  : 'S',
         \ 'S'  : 'S',
         \ '' : 'S',
@@ -234,9 +225,9 @@ Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
 Plug 'joshdick/onedark.vim'
-Plug 'rakr/vim-two-firewatch'
 
 call plug#end()
+silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
 
 " Neovim Settings
 set numberwidth=5
@@ -246,46 +237,45 @@ set complete-=i
 set nrformats-=octal
 set laststatus=2
 set showtabline=2
-set cmdheight=1
+set cmdheight=1 " command line height
 set tildeop " Make ~ toggle case for whole line
 set clipboard+=unnamedplus " Use system clipboard
 set iskeyword+=- " Makes foo-bar considered one word
 set mouse=a
 set termguicolors " Enable 24-bit colors in supported terminals
 set background=dark
-let g:two_firewatch_italics = 1
-colorscheme onedark " two-firewatch
+colorscheme onedark
 
 " tab stuff
-set tabstop=2
-set softtabstop=2
-set shiftwidth=2
-set expandtab
+set expandtab shiftwidth=2 softtabstop=-1
+set shiftround
 set smartindent
 
 " ui options
 set title
-set showmatch
-set matchtime=2
+set showmatch matchtime=2 " show matching brackets/braces (2*1/10 sec)
 set number
 set lazyredraw
 set noshowmode
 set t_ut= " improve screen clearing by using the background colour
-" alternative approach for lines that are too long
-set colorcolumn=
-highlight OverLength ctermbg=red ctermfg=white guibg=yellow
+set diffopt+=iwhite " Add ignorance of whitespace to diff
+set diffopt+=vertical " Always diff vertically
+set synmaxcol=200 " Boost performance of rendering long lines
+set inccommand=nosplit " live substitution preview
+set colorcolumn= " alternative approach for lines that are too long
+highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 match OverLength /\%81v.\+/
 
 " autocomplete list options
-set wildmode=list:full " show similar and all options
+set wildmode=list:longest,full " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
+set shortmess+=aAI " shorten messages
 set timeoutlen=300 " mapping timeout
 set ttimeoutlen=10 " keycode timeout
 
 " Split window behaviour
-set splitbelow
-set splitright
+set splitbelow splitright
 
 " disable error sounds
 set noerrorbells
@@ -293,15 +283,21 @@ set novisualbell
 set t_vb=
 
 " scroll options
-set scrolloff=7
-set sidescrolloff=5
+set scrolloff=5
+set sidescrolloff=7
+set sidescroll=1
 set display+=lastline
+set nostartofline " don't jump to the start of line when scrolling
 
 " whitespace, hidden characters & line breaks
-set list      " Toggle showing hidden characters i.e. space
+" set list      " Toggle showing hidden characters i.e. space
 set linebreak " Wrap long lines at a character
-set listchars+=tab:»·,trail:•,extends:❯,precedes:❮,conceal:Δ,nbsp:+
+set listchars+=tab:——,trail:·,eol:$,space:· ",extends:❯,precedes:❮,conceal:Δ,nbsp:+
 let &showbreak="↪ "
+set breakindent " when wrapping, indent the lines
+set breakindentopt=sbr
+set nowrap
+set formatoptions+=rno1l
 
 " searching
 set ignorecase smartcase
@@ -492,11 +488,5 @@ augroup MyFileTypes
   autocmd filetype help nnoremap <buffer>q :q<CR>
 
   autocmd filetype qf setlocal wrap
-augroup END
-
-augroup markdown
-  au!
-  au FileType markdown setlocal textwidth=80
-  au FileType markdown setlocal formatoptions=tcrq
 augroup END
 
