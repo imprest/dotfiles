@@ -5,18 +5,18 @@ sudo pacman -Syu fish tmux gitg fzf \
   neovim python-neovim the_silver_searcher ctags \
   erlang elixir npm \
   noto-fonts-cjk noto-fonts-emoji \
-  postgresql pgadmin3 \
+  postgresql pgadmin4 \
   thunderbird thunderbird-i18n-en-gb clamav simple-scan gnucash freerdp gimp
 
 # yaourt packages
-yaourt -S gitsh
+yaourt -S pspg visual-studio-code-bin
 
 # git
 git config --global user.email "hardikvaria@gmail.com"
 git config --global user.name  "Hardik Varia"
 
 # tmux
-ln -sf ~/dotfiles/tmux.conf ~/.tmux.conf
+# ln -sf ~/dotfiles/tmux.conf ~/.tmux.conf
 
 # neovim
 mkdir -p ~/.config/nvim
@@ -34,7 +34,7 @@ ln -sf ~/dotfiles/omf/init.fish ~/.config/omf/
 ln -sf ~/dotfiles/omf/theme ~/.config/omf/
 
 # atom
-ln -sf ~/dotfiles/atom ~/.atom
+# ln -sf ~/dotfiles/atom ~/.atom
 
 echo "# Now for some manual stuff, sorry!"
 echo "## nvim"
