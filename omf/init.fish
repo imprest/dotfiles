@@ -1,4 +1,5 @@
 # set -xg PATH $HOME/Downloads/android-sdk-linux/tools $PATH
+set -xg PATH $HOME/.yarn/bin $PATH
 set -xg VISUAL nvim
 set -xg EDITOR nvim
 set -xg LANG en_GB.UTF-8
@@ -13,3 +14,7 @@ balias pacU 'sudo yaourt -Syu'
 balias paci 'sudo yaourt -S'
 balias pacs 'yaourt -Ss'
 balias pacX 'sudo pacman -R'
+balias dnfU 'sudo dnf update'
+balias dnfi 'sudo dnf install'
+balias dnfX 'sudo dnf remove'
+balias dnfs 'dnf search'

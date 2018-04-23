@@ -8,13 +8,13 @@ endif
 
 call plug#begin('~/.config/nvim/plugged')
 
-" general
-let g:mapleader = ' '
+" General
+let g:mapleader = ','
 Plug 'dietsche/vim-lastplace'
 Plug 'mhinz/vim-startify'
-  let g:startify_session_dir = '~/.data/sessions'
+  let g:startify_session_dir        = '~/.data/sessions'
   let g:startify_change_to_vcs_root = 1
-  let g:startify_show_sessions = 1
+  let g:startify_show_sessions      = 1
 
 " Languages
 Plug 'sheerun/vim-polyglot'
@@ -23,63 +23,98 @@ Plug 'sheerun/vim-polyglot'
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   let g:used_javascript_libs = 'vue'
   autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
+Plug 'prettier/vim-prettier', { 'for': ['javascript', 'vue'] }
+  autocmd FileType javascript set formatprg=prettier\ --stdin
+  autocmd BufWritePre *.js,*.vue :normal gggqG
+Plug 'wokalski/autocomplete-flow'
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
 Plug 'alvan/vim-closetag'
   let g:closetag_filenames = '*.html, *.xhtml, *.vue'
-Plug 'mattn/emmet-vim'
+Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue'] }
   imap <c-e> <c-y>,
 
 " Elixir & Erlang
 Plug 'slashmili/alchemist.vim'
   let g:alchemist#elixir_erlang_src = "/usr/lib/elixir"
+Plug 'mhinz/vim-mix-format'
+  let g:mix_format_on_save       = 1
+  let g:mix_format_silent_errors = '--check-equivalent'
+Plug 'neomake/neomake'
+  "let g:neomake_elixir_enabled_makers = ['credo']
+  let g:neomake_javascript_enabled_makers = ['eslint']
+  let g:neomake_error_sign         = {'text': '✘'}
+  " let g:neomake_warning_sign       = {'text': '!'}
+  let g:neomake_echo_current_error = 0
+  let g:neomake_open_list          = 2
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise'
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
   let g:gutentags_cache_dir = '~/.tags_cache'
   let g:gutentags_ctags_exclude=["node_modules","plugged","tmp","temp","log","vendor","**/db/migrate/*","bower_components","dist","build","coverage","spec","public","app/assets","*.json"]
-  nnoremap <CR> <C-]> " Enter is go to definition (ctags)
-  autocmd FileType qf nnoremap <buffer> <CR> <CR> " In quickfix,  <CR> to jump to error under the cursor
-  autocmd FileType vim nnoremap <buffer> <CR> <CR> " same for vim type windows
+  " Enter is go to definition (ctags)
+  nnoremap <CR> <C-]>
+  " In quickfix,  <CR> to jump to error under the cursor
+  autocmd FileType qf  nnoremap <buffer> <CR> <CR>
+  " same for vim type windows
+  autocmd FileType vim nnoremap <buffer> <CR> <CR>
   let g:alchemist_tag_map = '<CR>'
   let g:alchemist_tag_stack_map = '<C-T>'
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
-Plug 'kassio/neoterm'
-  set shell=/usr/bin/fish
-  set noshelltemp " use pipes
-  let g:neoterm_position = 'horizontal'
-  let g:neoterm_automap_keys = ',tt'
-  nnoremap <silent> ,th :call neoterm#close()<CR>
-  nnoremap <silent> ,tl :call neoterm#clear()<CR>
-  nnoremap <silent> ,tc :call neoterm#kill()<CR>
-  nnoremap <Leader>c :below 10sp term://fish<CR>
+Plug 'BurningEther/iron.nvim', { 'do': ':UpdateRemotePlugins' }
+  let g:iron_map_defaults = 0 " deactivate default mappings
+  let g:iron_repl_open_cmd = 'below 10sp | set nonumber'
+  augroup ironmapping
+    autocmd!
+    autocmd Filetype elixir nnoremap <localleader>r :IronRepl<cr>
+    autocmd Filetype elixir vmap <buffer> <localleader>t <Plug>(iron-send-motion)
+    autocmd Filetype elixir nmap <buffer> <localleader>p <Plug>(iron-repeat-cmd)
+  augroup END
+
+
+" Shell
+set shell=/usr/bin/fish
+set noshelltemp " use pipes
+nnoremap <Leader>c :below 10sp term://fish<CR>
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'Shougo/neosnippet'
+Plug 'Shougo/neosnippet-snippets'
   let g:deoplete#enable_at_startup = 1
-  set completeopt+=menuone
-  set completeopt-=preview
-  set shortmess+=c
-  let g:deoplete#auto_complete_delay = 150
-  let g:deoplete#auto_refresh_delay = 1000
   let g:deoplete#enable_camel_case = 1
-  "" set tab complete
-  inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-  "" <C-h>, <BS>: close popup and delete backword char.
+  set completeopt+=menuone
+  set shortmess+=c
+  " <C-h>, <BS>: close popup and delete backword char.
   inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
   inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
+  " <C-i> to expand selected snippet in popup menu
+  imap <C-i> <Plug>(neosnippet_expand_or_jump)
+  smap <C-i> <Plug>(neosnippet_expand_or_jump)
+  xmap <C-i> <Plug>(neosnippet_expand_target)
+  " set tab complete to work like SuperTab
+  imap <expr><TAB> neosnippet#expandable_or_jumpable()?"\<Plug>(neosnippet_expand_or_jump)":(pumvisible()?"\<C-n>":"\<TAB>")
+  smap <expr><TAB> neosnippet#expandable_or_jumpable()?"\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
+  imap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
+  smap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
+  " For conceal markers.
+  if has('conceal')
+    set conceallevel=1 concealcursor=niv
+    set listchars+=conceal:Δ
+  endif
 
-" Linter. Execute code checks, find mistakes, in the background
-Plug 'w0rp/ale'
-  let g:ale_sign_error           = '✘'
-  let g:ale_sign_warning         = '!'
-  let g:ale_lint_on_text_changed = 'never'
-  let g:ale_lint_on_enter        = 0
-  let g:ale_linters              = {'elixir': ['credo'], 'R': ['lintr']}
-  let g:ale_fixers               = {'javascript': ['eslint'], 'R': ['lintr']}
-  let g:ale_javascript_eslint_use_global = 1
+" " ReasonReact
+" Plug 'reasonml-editor/vim-reason-plus'
+" Plug 'autozimu/LanguageClient-neovim', {
+"     \ 'branch': 'next',
+"     \ 'do': 'bash install.sh',
+"     \ }
+"   let g:LanguageClient_serverCommands = {
+"     \ 'reason': ['ocaml-language-server', '--stdio'],
+"     \ 'ocaml': ['ocaml-language-server', '--stdio'],
+"     \ }
 
 " Project Management
 Plug 'airblade/vim-rooter'
@@ -101,36 +136,55 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
   augroup END
 
 " Editing
-Plug 'Raimondi/delimitMate'  " Automatically add closing quotes and braces
+Plug 'Raimondi/delimitMate'      " Automatically add closing quotes and braces
   au FileType vue let b:delimitMate_matchpairs = "(:),[:],{:}" " disable <> in vue
 Plug 'junegunn/vim-easy-align'
-Plug 'junegunn/vim-peekaboo' " Show recently saved text in vim registers
-Plug 'tpope/vim-commentary'  " gc i.e. toggle commenting code
-Plug 'tpope/vim-repeat'      " allow added vim motion to be repeatable like vim-surround
-Plug 'tpope/vim-speeddating' " <C-a> in numbers or dates <C-x> to do the opposite
-Plug 'machakann/vim-sandwich' " surround motion ie cs'( or <C-v>sa( or sr
+Plug 'junegunn/vim-peekaboo'     " Show recently saved text in vim registers
+Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
+Plug 'tpope/vim-repeat'          " allow added vim motion to be repeatable like vim-surround
+Plug 'machakann/vim-sandwich'    " surround motion ie cs'( or <C-v>sa( or sr
 Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
-Plug 'chrisbra/unicode.vim'  " :UnicodeTable to search and copy unicode chars
-Plug 'AndrewRadev/splitjoin.vim' " gS 1 liner to multiple lines gJ for reverse
+Plug 'chrisbra/unicode.vim'      " :UnicodeTable to search and copy unicode chars
 
 " Folding
 " Plug 'sts10/vim-zipper' " for folding
 set foldenable
 set fillchars=diff:⣿,vert:│,fold:· " Subtitute characters shown in certain modes
-set foldlevelstart=9 " Show most folds by default
-set foldnestmax=5 " You're writing bad code if you need to up this one
-set foldmethod=indent " Fold based on indentation
+set foldlevelstart=9               " Show most folds by default
+set foldnestmax=5                  " You're writing bad code if you need to up this one
+set foldmethod=syntax              " Fold based on syntax
+set foldopen+=jump
+let g:xml_sytax_folding = 1
+nnoremap zr zr:echo &foldlevel<CR>
+nnoremap zm zm:echo &foldlevel<CR>
+nnoremap zR zR:echo &foldlevel<CR>
+nnoremap zM zM:echo &foldlevel<CR>
+
 
 " Navigation
+Plug 'easymotion/vim-easymotion'
+  let g:EasyMotion_do_mapping        = 0
+  let g:EasyMotion_do_shade          = 1
+  let g:EasyMotion_inc_highlight     = 0
+  let g:EasyMotion_landing_highlight = 0
+  let g:EasyMotion_off_screen_search = 0
+  let g:EasyMotion_smartcase         = 0
+  let g:EasyMotion_startofline       = 0
+  let g:EasyMotion_use_smartsign_us  = 1
+  let g:EasyMotion_use_upper         = 0
+  let g:EasyMotion_skipfoldedline    = 0
+  map <silent><space> <plug>(easymotion-s2)
 Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
 Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
   nmap <F9> :TagbarToggle<CR>
-Plug 'wesQ3/vim-windowswap' " <Leader>ww once to select window and again to swap window
+  let g:tagbar_width     = 40
+  let g:tagbar_autoclose =  0
+  let g:tagbar_autofocus =  1
+  let g:tagbar_compact   =  1
+Plug 'wesQ3/vim-windowswap'        " <Leader>ww once to select window and again to swap window
 Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
-  let g:loaded_netrwPlugin = 1 " unload netrw, we use dirvish
-Plug 'justinmk/vim-dirvish' " Better than netrw
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
   let g:fzf_layout = { 'down': '~21%' }
@@ -156,12 +210,18 @@ Plug 'junegunn/fzf.vim'
 
 " Searching
 Plug 'rking/ag.vim'
+  let g:ag_working_path_mode="r"
+  if executable('ag')
+    let g:ackprg = "ag --nogroup --column --smart-case --follow"
+    set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+    set grepformat=%f:%l:%c:%m
+  endif
 Plug 'Chun-Yang/vim-action-ag'
 Plug 'osyo-manga/vim-anzu'
-  nmap n <Plug>(anzu-n)
-  nmap N <Plug>(anzu-N)
-  nmap * <Plug>(anzu-star)
-  nmap # <Plug>(anzu-sharp)
+  nmap n <Plug>(anzu-n)zz
+  nmap N <Plug>(anzu-N)zz
+  nmap * <Plug>(anzu-star)zz
+  nmap # <Plug>(anzu-sharp)zz
   nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
 
 " Git
@@ -188,26 +248,27 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
   noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
 Plug 'Yggdroot/indentLine'
-  let g:indentLine_faster = 1
-  let g:indentLine_setConceal = 0
-  let g:indentLine_enabled = 1
-  let g:indentLine_char    = "\u250A" " '┆'
-  let g:indent_guides_start_level = 1
-  let g:indent_guides_guide_size = 1
+  let g:indentLine_faster                   = 1
+  let g:indentLine_setConceal               = 0
+  let g:indentLine_enabled                  = 1
+  let g:indentLine_char                     = "\u250A" " '┆'
+  let g:indent_guides_start_level           = 1
+  let g:indent_guides_guide_size            = 1
   let g:indent_guides_enable_on_vim_startup = 0
-  let g:indent_guides_color_change_percent = 3
+  let g:indentLine_setColors                = 0
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-  let g:airline_powerline_fonts     = 1
-  let g:airline_detect_paste        = 1
-  let g:airline_skip_empty_sections = 1
-  let g:airline_left_sep            = ''
-  let g:airline_right_sep           = ''
-  let g:airline_skip_empty_sections = 1
-  let g:airline_theme               = 'onedark'
+  let g:airline_powerline_fonts                    = 1
+  let g:airline_detect_paste                       = 1
+  let g:airline_skip_empty_sections                = 1
+  let g:airline_left_sep                           = ''
+  let g:airline_right_sep                          = ''
+  let g:airline_skip_empty_sections                = 1
   let g:airline#extensions#branch#enabled          = 1
+  let g:airline#extensions#neomake#enabled         = 1
   let g:airline#extensions#tabline#enabled         = 1
   let g:airline#extensions#tabline#left_alt_sep    = '|'
+  let g:airline#extensions#tabline#buffer_idx_mode = 1
   let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
   let g:airline_mode_map = {
         \ '__' : '-',
@@ -217,14 +278,27 @@ Plug 'vim-airline/vim-airline-themes'
         \ 'c'  : 'C',
         \ 'v'  : 'V',
         \ 'V'  : 'V',
-        \ '' : 'V',
+        \ ''   : 'V',
         \ 's'  : 'S',
         \ 'S'  : 'S',
         \ '' : 'S',
         \ }
+  nmap <A-1> <Plug>AirlineSelectTab1
+  nmap <A-2> <Plug>AirlineSelectTab2
+  nmap <A-3> <Plug>AirlineSelectTab3
+  nmap <A-4> <Plug>AirlineSelectTab4
+  nmap <A-5> <Plug>AirlineSelectTab5
+  nmap <A-6> <Plug>AirlineSelectTab6
+  nmap <A-7> <Plug>AirlineSelectTab7
+  nmap <A-8> <Plug>AirlineSelectTab8
+  nmap <A-9> <Plug>AirlineSelectTab9
+
+" Latex
+" Plug 'donRaphaco/neotex'
+"   let g:tex_flavour = 'latex'
 
 " Colorschemes
-Plug 'joshdick/onedark.vim'
+Plug 'trevordmiller/nova-vim'
 
 call plug#end()
 silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
@@ -237,14 +311,15 @@ set complete-=i
 set nrformats-=octal
 set laststatus=2
 set showtabline=2
-set cmdheight=1 " command line height
-set tildeop " Make ~ toggle case for whole line
+set cmdheight=1            " command line height
+set tildeop                " Make ~ toggle case for whole line
 set clipboard+=unnamedplus " Use system clipboard
-set iskeyword+=- " Makes foo-bar considered one word
+set iskeyword+=-           " Makes foo-bar considered one word
 set mouse=a
-set termguicolors " Enable 24-bit colors in supported terminals
+set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
-colorscheme onedark
+colorscheme nova
+let g:airline_theme = 'nova'
 
 " tab stuff
 set expandtab shiftwidth=2 softtabstop=-1
@@ -257,12 +332,12 @@ set showmatch matchtime=2 " show matching brackets/braces (2*1/10 sec)
 set number
 set lazyredraw
 set noshowmode
-set t_ut= " improve screen clearing by using the background colour
-set diffopt+=iwhite " Add ignorance of whitespace to diff
-set diffopt+=vertical " Always diff vertically
-set synmaxcol=200 " Boost performance of rendering long lines
-set inccommand=nosplit " live substitution preview
-set colorcolumn= " alternative approach for lines that are too long
+set t_ut=                 " improve screen clearing by using the background colour
+set diffopt+=iwhite       " Add ignorance of whitespace to diff
+set diffopt+=vertical     " Always diff vertically
+set synmaxcol=200         " Boost performance of rendering long lines
+set inccommand=nosplit    " live substitution preview
+set colorcolumn=          " alternative approach for lines that are too long
 highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 match OverLength /\%81v.\+/
 
@@ -270,9 +345,9 @@ match OverLength /\%81v.\+/
 set wildmode=list:longest,full " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
-set shortmess+=aAI " shorten messages
-set timeoutlen=300 " mapping timeout
-set ttimeoutlen=10 " keycode timeout
+set shortmess+=aoOTI " shorten messages
+set timeoutlen=300   " mapping timeout
+set ttimeoutlen=10   " keycode timeout
 
 " Split window behaviour
 set splitbelow splitright
@@ -283,9 +358,9 @@ set novisualbell
 set t_vb=
 
 " scroll options
-set scrolloff=5
+set scrolloff=4
 set sidescrolloff=7
-set sidescroll=1
+set sidescroll=5
 set display+=lastline
 set nostartofline " don't jump to the start of line when scrolling
 
@@ -302,12 +377,6 @@ set formatoptions+=rno1l
 " searching
 set ignorecase smartcase
 set smartcase
-let g:ag_working_path_mode="r"
-if executable('ag')
-  let g:ackprg = "ag --nogroup --column --smart-case --follow"
-  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
-  set grepformat=%f:%l:%c:%m
-endif
 
 " tags
 set tags=tags;/
@@ -386,19 +455,27 @@ nnoremap <C-s> :<C-u>w<CR>      " Ctrl-S to save in most modes
 vnoremap <C-s> :<C-u>w<CR>
 cnoremap <C-s> <C-u>w<CR>
 " Navigation made easy
-noremap H ^
-noremap L g_
-noremap F %
+noremap  H ^
+noremap  L g_
+noremap  F %
 vnoremap L g_
+" Change cursor position in insert mode
+inoremap <C-h> <left>
+inoremap <C-j> <up>
+inoremap <C-k> <down>
+inoremap <C-l> <right>
+inoremap <C-u> <C-g>u<C-u> " Del from start of line to cursor position
+inoremap <C-b> <S-Left>
+inoremap <C-w> <S-Right>
 " Navigation between display lines
-noremap <silent> <Up>   gk
-noremap <silent> <Down> gj
-noremap <silent> k gk
-noremap <silent> j gj
-noremap <silent> <Home> g<Home>
-noremap <silent> <End>  g<End>
+noremap  <silent> <Up>   gk
+noremap  <silent> <Down> gj
+noremap  <silent> k      gk
+noremap  <silent> j      gj
+noremap  <silent> <Home> g<Home>
+noremap  <silent> <End>  g<End>
 inoremap <silent> <Home> <C-o>g<Home>
-inoremap <silent> <End> <C-o>g<End>
+inoremap <silent> <End>  <C-o>g<End>
 " smash escape
 inoremap jk <esc>
 inoremap kj <esc>
@@ -406,14 +483,14 @@ inoremap kj <esc>
 nnoremap <Right> :bnext<CR>
 nnoremap <Left>  :bprev<CR>
 " window keys
-nnoremap <M-Right> :vertical resize -1<CR>
 nnoremap <M-Up>    :resize +1<CR>
 nnoremap <M-Down>  :resize -1<CR>
 nnoremap <M-Left>  :vertical resize +1<CR>
-nnoremap <C-Right> :vertical resize -5<CR>
-nnoremap <C-Down>    :resize +5<CR>
-nnoremap <C-Up>  :resize -5<CR>
+nnoremap <M-Right> :vertical resize -1<CR>
+nnoremap <C-Up>    :resize -5<CR>
+nnoremap <C-Down>  :resize +5<CR>
 nnoremap <C-Left>  :vertical resize +5<CR>
+nnoremap <C-Right> :vertical resize -5<CR>
 nnoremap <Leader>s :split<CR>
 nnoremap <Leader>v <C-w>v<C-w>l
 nnoremap <Leader>x :call CloseWindowOrKillBuffer()<CR>
@@ -440,6 +517,8 @@ vmap <Leader>s :sort<CR>
 " start interactive EasyAlign in visual mode
 vmap <Enter> <Plug>(EasyAlign)
 " Move cursor to middle after each search i.e. auto-center
+nnoremap <silent> g* g*zz
+nnoremap <silent> g# g#zz
 nnoremap <silent> <C-o> <C-o>zz
 nnoremap <silent> <C-i> <C-i>zz
 " reselect last paste
@@ -454,14 +533,16 @@ vnoremap K :m '<-2<CR>gv=gv
 " enable matchit (for matching tags with %)
 let g:loaded_matchparen = 1
 runtime macros/matchit.vim
+" Saner cmd line history
+cnoremap <c-n> <down>
+cnoremap <c-p> <up>
 " Make K or help open in vertical split
 autocmd FileType help  wincmd L | vert res 80<CR>
 autocmd FileType elixir nnoremap <buffer> <s-k> :call OpenExDoc()<CR>
 " Opens alchemist exdoc
 function! OpenExDoc()
   :call alchemist#exdoc() | wincmd L | vert res 80
-  setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
-  \ modifiable nocursorline nofoldenable
+  setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap modifiable nocursorline nofoldenable
   if exists('&relativenumber')
     setlocal norelativenumber
   endif
@@ -476,11 +557,14 @@ augroup vimrc
 
   " For newly started terminal; start in insert mode
   autocmd TermOpen * :startinsert
+  autocmd BufEnter,BufNew term://* set nonumber
 augroup END
 
 augroup MyFileTypes
   au!
+  au FileType css,scss setlocal foldmethod=marker foldmarker={,}
   au filetype vim setlocal fdm=indent keywordprg=:help
+  au FileType vim setlocal fdm=indent keywordprg=:help
 
   " Help System Speedups
   autocmd filetype help nnoremap <buffer><cr> <c-]>
