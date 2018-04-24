@@ -26,7 +26,6 @@ Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
 Plug 'prettier/vim-prettier', { 'for': ['javascript', 'vue'] }
   autocmd FileType javascript set formatprg=prettier\ --stdin
   autocmd BufWritePre *.js,*.vue :normal gggqG
-Plug 'wokalski/autocomplete-flow'
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
@@ -149,7 +148,6 @@ Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
 Plug 'chrisbra/unicode.vim'      " :UnicodeTable to search and copy unicode chars
 
 " Folding
-" Plug 'sts10/vim-zipper' " for folding
 set foldenable
 set fillchars=diff:⣿,vert:│,fold:· " Subtitute characters shown in certain modes
 set foldlevelstart=9               " Show most folds by default
@@ -161,7 +159,6 @@ nnoremap zr zr:echo &foldlevel<CR>
 nnoremap zm zm:echo &foldlevel<CR>
 nnoremap zR zR:echo &foldlevel<CR>
 nnoremap zM zM:echo &foldlevel<CR>
-
 
 " Navigation
 Plug 'easymotion/vim-easymotion'
