@@ -8,6 +8,7 @@ set -xg PGDATABASE 'mgp' # frequently used database
 set -xg ERL_AFLAGS "-kernel shell_history enabled"
 
 set fish_greeting ""
+set fish_normal_color '7FC1CA'
 
 # Awesome balias
 balias pacU 'sudo yaourt -Syu'

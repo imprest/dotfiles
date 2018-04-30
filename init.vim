@@ -41,12 +41,16 @@ Plug 'mhinz/vim-mix-format'
   let g:mix_format_on_save       = 1
   let g:mix_format_silent_errors = '--check-equivalent'
 Plug 'neomake/neomake'
-  "let g:neomake_elixir_enabled_makers = ['credo']
+  let g:neomake_elixir_enabled_makers = ['mix'] ",credo']
   let g:neomake_javascript_enabled_makers = ['eslint']
   let g:neomake_error_sign         = {'text': '✘'}
-  " let g:neomake_warning_sign       = {'text': '!'}
+  let g:neomake_warning_sign       = {'text': '!'}
   let g:neomake_echo_current_error = 0
   let g:neomake_open_list          = 2
+  " Run Noemake for the following buffers
+  augroup neomake
+    autocmd! BufWritePre *.ex,*.exs Neomake
+  augroup END
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise'
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
@@ -135,8 +139,11 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
   augroup END
 
 " Editing
-Plug 'Raimondi/delimitMate'      " Automatically add closing quotes and braces
-  au FileType vue let b:delimitMate_matchpairs = "(:),[:],{:}" " disable <> in vue
+" Plug 'Raimondi/delimitMate'      " Automatically add closing quotes and braces
+"   au FileType vue let b:delimitMate_matchpairs = "(:),[:],{:}" " disable <> in vue
+Plug 'jiangmiao/auto-pairs'      " Insert or delete brackets, parens, quotes in pairs
+  let g:AutoPairsMultilineClose = 0
+  au FileType vim let b:AutoPairs = {'(':')','[':']','{':'}',"'":"'",'`':'`'}
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vim-peekaboo'     " Show recently saved text in vim registers
 Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
@@ -513,11 +520,6 @@ nnoremap <Leader>R :s/\<<C-r><C-w>\>/
 vmap <Leader>s :sort<CR>
 " start interactive EasyAlign in visual mode
 vmap <Enter> <Plug>(EasyAlign)
-" Move cursor to middle after each search i.e. auto-center
-nnoremap <silent> g* g*zz
-nnoremap <silent> g# g#zz
-nnoremap <silent> <C-o> <C-o>zz
-nnoremap <silent> <C-i> <C-i>zz
 " reselect last paste
 noremap gV `[v`]
 " find current word in quickfix
