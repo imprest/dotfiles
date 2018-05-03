@@ -25,6 +25,6 @@
 
 \setenv LESS '-iMFXSx4R'
 \setenv EDITOR nvim
-\setenv PAGER 'pspg -X -s 13 --no-mouse -F'
+\setenv PAGER 'pspg -X -s 3 --no-mouse -F'
 
 \unset QUIET
