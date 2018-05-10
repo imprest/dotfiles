@@ -23,9 +23,6 @@ Plug 'sheerun/vim-polyglot'
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   let g:used_javascript_libs = 'vue'
   autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
-Plug 'prettier/vim-prettier', { 'for': ['javascript', 'vue'] }
-  autocmd FileType javascript set formatprg=prettier\ --stdin
-  autocmd BufWritePre *.js,*.vue :normal gggqG
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
@@ -107,17 +104,6 @@ Plug 'Shougo/neosnippet-snippets'
     set conceallevel=1 concealcursor=niv
     set listchars+=conceal:Δ
   endif
-
-" " ReasonReact
-" Plug 'reasonml-editor/vim-reason-plus'
-" Plug 'autozimu/LanguageClient-neovim', {
-"     \ 'branch': 'next',
-"     \ 'do': 'bash install.sh',
-"     \ }
-"   let g:LanguageClient_serverCommands = {
-"     \ 'reason': ['ocaml-language-server', '--stdio'],
-"     \ 'ocaml': ['ocaml-language-server', '--stdio'],
-"     \ }
 
 " Project Management
 Plug 'airblade/vim-rooter'
