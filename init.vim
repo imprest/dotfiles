@@ -50,17 +50,17 @@ Plug 'neomake/neomake'
   augroup END
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise'
-Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
-  let g:gutentags_cache_dir = '~/.tags_cache'
-  let g:gutentags_ctags_exclude=["node_modules","plugged","tmp","temp","log","vendor","**/db/migrate/*","bower_components","dist","build","coverage","spec","public","app/assets","*.json"]
-  " Enter is go to definition (ctags)
-  nnoremap <CR> <C-]>
-  " In quickfix,  <CR> to jump to error under the cursor
-  autocmd FileType qf  nnoremap <buffer> <CR> <CR>
-  " same for vim type windows
-  autocmd FileType vim nnoremap <buffer> <CR> <CR>
-  let g:alchemist_tag_map = '<CR>'
-  let g:alchemist_tag_stack_map = '<C-T>'
+" Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
+"   let g:gutentags_cache_dir = '~/.tags_cache'
+"   let g:gutentags_ctags_exclude=["node_modules","plugged","tmp","temp","log","vendor","**/db/migrate/*","bower_components","dist","build","coverage","spec","public","app/assets","*.json"]
+"   " Enter is go to definition (ctags)
+"   nnoremap <CR> <C-]>
+"   " In quickfix,  <CR> to jump to error under the cursor
+"   autocmd FileType qf  nnoremap <buffer> <CR> <CR>
+"   " same for vim type windows
+"   autocmd FileType vim nnoremap <buffer> <CR> <CR>
+"   let g:alchemist_tag_map = '<CR>'
+"   let g:alchemist_tag_stack_map = '<C-T>'
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
 Plug 'BurningEther/iron.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -78,6 +78,7 @@ Plug 'BurningEther/iron.nvim', { 'do': ':UpdateRemotePlugins' }
 set shell=/usr/bin/fish
 set noshelltemp " use pipes
 nnoremap <Leader>c :below 10sp term://fish<CR>
+nnoremap <Leader>cv :vsplit term://fish<CR>
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -220,11 +221,6 @@ Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-fugitive'
 
 " text objects
-Plug 'glts/vim-textobj-comment'
-Plug 'kana/vim-textobj-fold'
-Plug 'kana/vim-textobj-function'
-Plug 'kana/vim-textobj-indent'
-Plug 'kana/vim-textobj-user'
 Plug 'wellle/targets.vim'
 
 " Eye candy
@@ -256,10 +252,10 @@ Plug 'vim-airline/vim-airline-themes'
   let g:airline_skip_empty_sections                = 1
   let g:airline#extensions#branch#enabled          = 1
   let g:airline#extensions#neomake#enabled         = 1
-  let g:airline#extensions#tabline#enabled         = 1
-  let g:airline#extensions#tabline#left_alt_sep    = '|'
-  let g:airline#extensions#tabline#buffer_idx_mode = 1
-  let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
+  " let g:airline#extensions#tabline#enabled         = 1
+  " let g:airline#extensions#tabline#left_alt_sep    = '|'
+  " let g:airline#extensions#tabline#buffer_idx_mode = 1
+  " let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
   let g:airline_mode_map = {
         \ '__' : '-',
         \ 'n'  : 'N',
@@ -273,15 +269,6 @@ Plug 'vim-airline/vim-airline-themes'
         \ 'S'  : 'S',
         \ '' : 'S',
         \ }
-  nmap <A-1> <Plug>AirlineSelectTab1
-  nmap <A-2> <Plug>AirlineSelectTab2
-  nmap <A-3> <Plug>AirlineSelectTab3
-  nmap <A-4> <Plug>AirlineSelectTab4
-  nmap <A-5> <Plug>AirlineSelectTab5
-  nmap <A-6> <Plug>AirlineSelectTab6
-  nmap <A-7> <Plug>AirlineSelectTab7
-  nmap <A-8> <Plug>AirlineSelectTab8
-  nmap <A-9> <Plug>AirlineSelectTab9
 
 " Latex
 " Plug 'donRaphaco/neotex'
@@ -300,7 +287,7 @@ set autoread
 set complete-=i
 set nrformats-=octal
 set laststatus=2
-set showtabline=2
+" set showtabline=2
 set cmdheight=1            " command line height
 set tildeop                " Make ~ toggle case for whole line
 set clipboard+=unnamedplus " Use system clipboard
@@ -320,7 +307,6 @@ set smartindent
 set title
 set showmatch matchtime=2 " show matching brackets/braces (2*1/10 sec)
 set number
-set lazyredraw
 set noshowmode
 set t_ut=                 " improve screen clearing by using the background colour
 set diffopt+=iwhite       " Add ignorance of whitespace to diff
@@ -332,6 +318,7 @@ highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 match OverLength /\%81v.\+/
 
 " autocomplete list options
+set wildmenu
 set wildmode=list:longest,full " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
@@ -361,7 +348,7 @@ set listchars+=tab:——,trail:·,eol:$,space:· ",extends:❯,precedes:❮,con
 let &showbreak="↪ "
 set breakindent " when wrapping, indent the lines
 set breakindentopt=sbr
-set nowrap
+set wrap
 set formatoptions+=rno1l
 
 " searching
