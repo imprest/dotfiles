@@ -12,10 +12,10 @@ set fish_greeting ""
 set fish_normal_color '7FC1CA'
 
 # Awesome balias
-balias pacU 'sudo yaourt -Syu'
-balias paci 'sudo yaourt -S'
-balias pacs 'yaourt -Ss'
-balias pacX 'sudo pacman -R'
+balias pacU 'aurman -Syu'
+balias paci 'aurman -S'
+balias pacs 'aurman -Ss'
+balias pacX 'aurman -R'
 balias dnfU 'sudo dnf update'
 balias dnfi 'sudo dnf install'
 balias dnfX 'sudo dnf remove'

@@ -236,46 +236,58 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
 Plug 'Yggdroot/indentLine'
   let g:indentLine_faster                   = 1
   let g:indentLine_setConceal               = 0
-  let g:indentLine_enabled                  = 1
+  let g:indentLine_enabled                  = 0
   let g:indentLine_char                     = "\u250A" " '┆'
   let g:indent_guides_start_level           = 1
   let g:indent_guides_guide_size            = 1
   let g:indent_guides_enable_on_vim_startup = 0
   let g:indentLine_setColors                = 0
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-  let g:airline_powerline_fonts                    = 1
-  let g:airline_detect_paste                       = 1
-  let g:airline_skip_empty_sections                = 1
-  let g:airline_left_sep                           = ''
-  let g:airline_right_sep                          = ''
-  let g:airline_skip_empty_sections                = 1
-  let g:airline#extensions#branch#enabled          = 1
-  let g:airline#extensions#neomake#enabled         = 1
-  " let g:airline#extensions#tabline#enabled         = 1
-  " let g:airline#extensions#tabline#left_alt_sep    = '|'
-  " let g:airline#extensions#tabline#buffer_idx_mode = 1
-  " let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
-  let g:airline_mode_map = {
-        \ '__' : '-',
-        \ 'n'  : 'N',
-        \ 'i'  : 'I',
-        \ 'R'  : 'R',
-        \ 'c'  : 'C',
-        \ 'v'  : 'V',
-        \ 'V'  : 'V',
-        \ ''   : 'V',
-        \ 's'  : 'S',
-        \ 'S'  : 'S',
-        \ '' : 'S',
-        \ }
+
+Plug 'itchyny/lightline.vim'
+let g:lightline = {
+  \ 'colorscheme': 'palenight',
+  \ 'active': {
+  \   'left': [ [ 'mode', 'paste' ],
+  \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+  \ },
+  \ 'component_function': {
+  \   'gitbranch': 'fugitive#head'
+  \ },
+  \ }
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
+"   let g:airline_powerline_fonts                    = 1
+"   let g:airline_detect_paste                       = 1
+"   let g:airline_skip_empty_sections                = 1
+"   let g:airline_left_sep                           = ''
+"   let g:airline_right_sep                          = ''
+"   let g:airline_skip_empty_sections                = 1
+"   let g:airline#extensions#branch#enabled          = 1
+"   let g:airline#extensions#neomake#enabled         = 1
+"   " let g:airline#extensions#tabline#enabled         = 1
+"   " let g:airline#extensions#tabline#left_alt_sep    = '|'
+"   " let g:airline#extensions#tabline#buffer_idx_mode = 1
+"   " let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
+"   let g:airline_mode_map = {
+"         \ '__' : '-',
+"         \ 'n'  : 'N',
+"         \ 'i'  : 'I',
+"         \ 'R'  : 'R',
+"         \ 'c'  : 'C',
+"         \ 'v'  : 'V',
+"         \ 'V'  : 'V',
+"         \ ''   : 'V',
+"         \ 's'  : 'S',
+"         \ 'S'  : 'S',
+"         \ '' : 'S',
+"         \ }
 
 " Latex
 " Plug 'donRaphaco/neotex'
 "   let g:tex_flavour = 'latex'
 
 " Colorschemes
-Plug 'trevordmiller/nova-vim'
+Plug 'drewtempelmeyer/palenight.vim'
 
 call plug#end()
 silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
@@ -295,8 +307,7 @@ set iskeyword+=-           " Makes foo-bar considered one word
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
-colorscheme nova
-let g:airline_theme = 'nova'
+colorscheme palenight
 
 " tab stuff
 set expandtab shiftwidth=2 softtabstop=-1
@@ -319,7 +330,7 @@ match OverLength /\%81v.\+/
 
 " autocomplete list options
 set wildmenu
-set wildmode=list:longest,full " show similar and all options
+set wildmode=list:longest,list:full " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
 set shortmess+=aoOTI " shorten messages
@@ -377,7 +388,9 @@ let g:tagbar_type_elixir = {
       \ }
 
 " backup, undo and file management
-set backup
+set nobackup
+set nowritebackup
+set noswapfile
 let g:data_dir = $HOME . '/.data/'
 let g:backup_dir = g:data_dir . 'backup'
 let g:swap_dir = g:data_dir . 'swap'
@@ -401,7 +414,6 @@ unlet g:undo_dir
 set undodir=$HOME/.data/undofile
 set backupdir=$HOME/.data/backup
 set directory=$HOME/.data/swap
-set noswapfile
 set undofile
 set undolevels=1000
 set undoreload=1000
