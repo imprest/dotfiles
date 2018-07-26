@@ -17,14 +17,14 @@
 \pset border 2
 \pset null ¤
 \pset linestyle 'unicode'
-\pset unicode_border_linestyle single
-\pset unicode_column_linestyle single
-\pset unicode_header_linestyle double
+\pset unicode_border_linestyle dashed
+\pset unicode_column_linestyle dashed
+\pset unicode_header_linestyle single
 
 \set intervalstyle to 'postgres_verbose';
 
 \setenv LESS '-iMFXSx4R'
 \setenv EDITOR nvim
-\setenv PAGER 'pspg -X -s 3 --no-mouse -F'
+-- \setenv PAGER 'pspg -X -s 3 --no-mouse -F'
 
 \unset QUIET

@@ -1,22 +1,43 @@
 #!/bin/bash
 
-# packages
-sudo pacman -Syu fish tmux gitg fzf \
-  neovim python-neovim the_silver_searcher ctags \
-  erlang elixir npm \
-  noto-fonts-cjk noto-fonts-emoji \
-  postgresql pgadmin4 \
-  thunderbird thunderbird-i18n-en-gb clamav simple-scan gnucash freerdp gimp
+# Download and install manjaro kde edition
 
-# yaourt packages
-yaourt -S pspg visual-studio-code-bin
+# Disable not needed services
+sudo systemctl disable avahi-daemon
+
+# select fastest mirrors
+sudo pacman-mirrors -f 0
+
+# run mhwd for nvidia drivers
+# i.e. disable via bubblebee and acpi_rev_override=1 in /etc/default/grub
+# GRUB_CMDLINE_LINUX_DEFAULT="quiet nouveau.modeset=0 acpi_rev_override=1"
+# sudo update-grub
+#
+# Add the following lines to new file -> /etc/modprobe.d/blacklist.conf
+# blacklist nouveau
+# options nouveau modeset=0
+#
+# check via
+# cat /proc/acpi/bbswitch
+# dmesg | grep bbswitch
+# sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
+
+# remove following packages
+sudo pacman -Rns konversation inkscape cantata skanlite kget \
+  gnome-icon-theme oxygen oxygen-kde4 oxygen-icons gnome-themes-extra
+
+# packages
+sudo pacman -Syu plasma-wayland-session \
+  neovim python-neovim fzf the_silver_searcher \
+  yay erlang elixir postgresql otf-fira-code \
+  weechat
+
+# yay packages
+yay -S dbview
 
 # git
 git config --global user.email "hardikvaria@gmail.com"
 git config --global user.name  "Hardik Varia"
-
-# tmux
-# ln -sf ~/dotfiles/tmux.conf ~/.tmux.conf
 
 # neovim
 mkdir -p ~/.config/nvim
@@ -25,16 +46,10 @@ ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
 
-# fish and omf
-curl -L http://get.oh-my.fish | fish
-mkdir -p ~/.config/omf
-ln -sf ~/dotfiles/omf/bundle ~/.config/omf/
-ln -sf ~/dotfiles/omf/channel ~/.config/omf/
-ln -sf ~/dotfiles/omf/init.fish ~/.config/omf/
-ln -sf ~/dotfiles/omf/theme ~/.config/omf/
-
-# atom
-# ln -sf ~/dotfiles/atom ~/.atom
+# zsh and zplug
+curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+ln -sf ~/dotfiles/zshrc ~/.zshrc
+chsh -s /usr/bin/zsh
 
 echo "# Now for some manual stuff, sorry!"
 echo "## nvim"

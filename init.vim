@@ -6,6 +6,8 @@ if empty(glob('~/.config/nvim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall | source $MYVIMRC
 endif
 
+let g:python3_host_prog = '/usr/bin/python3'
+
 call plug#begin('~/.config/nvim/plugged')
 
 " General
@@ -75,10 +77,10 @@ Plug 'BurningEther/iron.nvim', { 'do': ':UpdateRemotePlugins' }
 
 
 " Shell
-set shell=/usr/bin/fish
+set shell=/usr/bin/zsh
 set noshelltemp " use pipes
-nnoremap <Leader>c :below 10sp term://fish<CR>
-nnoremap <Leader>cv :vsplit term://fish<CR>
+nnoremap <Leader>c :below 10sp term://zsh<CR>
+nnoremap <Leader>cv :vsplit term://zsh<CR>
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
