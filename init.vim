@@ -21,6 +21,14 @@ Plug 'mhinz/vim-startify'
 " Languages
 Plug 'sheerun/vim-polyglot'
 
+" Rust
+Plug 'rust-lang/rust.vim', {'for': 'rust'}
+Plug 'sebastianmarkow/deoplete-rust', {'for': 'rust'}
+  let g:rustfmt_autosave=1
+  let g:deoplete#sources#rust#racer_binary='/usr/bin/racer'
+  let g:deoplete#sources#rust#rust_source_path='~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src'
+  let g:deoplete#sources#rust#duplication=0
+
 " Vue & Javascript
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   let g:used_javascript_libs = 'vue'
@@ -128,13 +136,13 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
   augroup END
 
 " Editing
-" Plug 'Raimondi/delimitMate'      " Automatically add closing quotes and braces
-"   au FileType vue let b:delimitMate_matchpairs = "(:),[:],{:}" " disable <> in vue
-Plug 'jiangmiao/auto-pairs'      " Insert or delete brackets, parens, quotes in pairs
-  let g:AutoPairsMultilineClose = 0
-  au FileType vim let b:AutoPairs = {'(':')','[':']','{':'}',"'":"'",'`':'`'}
+Plug 'jiangmiao/auto-pairs' " Insert or delete brackets, parens, quotes in pairs
+let g:AutoPairsMapCR=0      " no funny stuff on carriage return
+let g:AutoPairsMultilineClose = 0
+au FileType vim let b:AutoPairs = {'(':')','[':']','{':'}',"'":"'",'`':'`'}
+au FileType rust let b:AutoPairs={'(': ')', '[': ']', '{': '}', "|": "|", '"': '"', '`': '`'}
+au FileType tex,markdown let b:AutoPairs={'(': ')', '[': ']', '{': '}', '"': '"', '`': '`', '$': '$'}
 Plug 'junegunn/vim-easy-align'
-Plug 'junegunn/vim-peekaboo'     " Show recently saved text in vim registers
 Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'          " allow added vim motion to be repeatable like vim-surround
 Plug 'machakann/vim-sandwich'    " surround motion ie cs'( or <C-v>sa( or sr
@@ -246,43 +254,110 @@ Plug 'Yggdroot/indentLine'
   let g:indentLine_setColors                = 0
 
 Plug 'itchyny/lightline.vim'
-let g:lightline = {
-  \ 'colorscheme': 'palenight',
-  \ 'active': {
-  \   'left': [ [ 'mode', 'paste' ],
-  \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
-  \ },
-  \ 'component_function': {
-  \   'gitbranch': 'fugitive#head'
-  \ },
-  \ }
-" Plug 'vim-airline/vim-airline'
-" Plug 'vim-airline/vim-airline-themes'
-"   let g:airline_powerline_fonts                    = 1
-"   let g:airline_detect_paste                       = 1
-"   let g:airline_skip_empty_sections                = 1
-"   let g:airline_left_sep                           = ''
-"   let g:airline_right_sep                          = ''
-"   let g:airline_skip_empty_sections                = 1
-"   let g:airline#extensions#branch#enabled          = 1
-"   let g:airline#extensions#neomake#enabled         = 1
-"   " let g:airline#extensions#tabline#enabled         = 1
-"   " let g:airline#extensions#tabline#left_alt_sep    = '|'
-"   " let g:airline#extensions#tabline#buffer_idx_mode = 1
-"   " let airline#extensions#tabline#ignore_bufadd_pat = '\c\vgundo|undotree|vimfiler|tagbar|nerd_tree'
-"   let g:airline_mode_map = {
-"         \ '__' : '-',
-"         \ 'n'  : 'N',
-"         \ 'i'  : 'I',
-"         \ 'R'  : 'R',
-"         \ 'c'  : 'C',
-"         \ 'v'  : 'V',
-"         \ 'V'  : 'V',
-"         \ ''   : 'V',
-"         \ 's'  : 'S',
-"         \ 'S'  : 'S',
-"         \ '' : 'S',
-"         \ }
+let g:responsive_width_mid=70
+let g:responsive_width_small=50
+let g:omit_fileencoding='utf-8'
+let g:omit_fileformat='unix'
+let g:lightline={
+    \ 'colorscheme': 'palenight',
+    \ 'active': {
+    \     'left': [
+    \         ['mode'],
+    \         ['fugitive', 'neomake'],
+    \         ['filename', 'readonly', 'modified']
+    \     ],
+    \     'right': [
+    \         ['percent', 'windownr'],
+    \         ['lineno'],
+    \         ['filetype', 'fileformat', 'fileencoding']
+    \     ]
+    \ },
+    \ 'inactive': {
+    \     'left': [
+    \         ['filename']
+    \     ],
+    \     'right': [
+    \         ['windownr']
+    \     ]
+    \ },
+    \ 'component_function': {
+    \     'fileencoding': 'LightLineFileencoding',
+    \     'fileformat':   'LightLineFileformat',
+    \     'filetype':     'LightLineFiletype',
+    \     'fugitive':     'LightLineFugitive',
+    \     'neomake':      'LightLineNeomake',
+    \     'lineno':       'LightLineLineno',
+    \     'mode':         'LightLineMode',
+    \     'percent':      'LightLinePercent',
+    \     'readonly':     'LightLineReadonly',
+    \     'windownr':     'LightLineWindownr',
+    \ },
+    \ 'separator': { 'left': '', 'right': '' },
+    \ 'subseparator': { 'left': '|', 'right': '|' },
+    \ }
+
+
+function! LightLineMode()
+    return winwidth(0) > g:responsive_width_small ? lightline#mode() : ''
+endfunction
+
+function! LightLineFugitive()
+    if winwidth(0) > g:responsive_width_mid && exists('*fugitive#head')
+        let l:head=fugitive#head()
+        return l:head !=# '' ? ' '.l:head : ''
+    endif
+    return ''
+endfunction
+
+function! LightLineNeomake()
+    if winwidth(0) > g:responsive_width_mid && exists('*neomake#statusline#LoclistStatus')
+        let l:status=neomake#statusline#LoclistStatus()
+        return l:status
+    endif
+    return ''
+endfunction
+
+function! LightLineWindownr()
+    return winnr('$') > 1 ? printf('⧉ %d', winnr()) : ''
+endfunction
+
+function! LightLineReadonly()
+    return winwidth(0) > g:responsive_width_mid ?
+        \ (&filetype !~? 'help' && &readonly ? '' : '') : ''
+endfunction
+
+function! LightLineModified()
+    return winwidth(0) > g:responsive_width_mid ?
+        \ (&filetype !~? 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-') : ''
+endfunction
+
+function! LightLineFiletype()
+    return winwidth(0) > g:responsive_width_mid ?
+        \ (&filetype !=# '' ? &filetype : 'no ft') : ''
+endfunction
+
+function! LightLineFileformat()
+    return winwidth(0) > g:responsive_width_mid ?
+        \ (&fileformat !=# g:omit_fileformat ? &fileformat : '') : ''
+endfunction
+
+function! LightLineLineno()
+    return winwidth(0) > g:responsive_width_small ?
+        \ printf(' %d:%-2d', line('.'), col('.')) : ''
+endfunction
+
+function! LightLinePercent()
+    return winwidth(0) > g:responsive_width_mid ?
+        \ printf('%2d%%', line('.') * 100 / line('$')) : ''
+endfunction
+
+function! LightLineFileencoding()
+    return winwidth(0) > g:responsive_width_mid ?
+        \ (&fileencoding !=# '' ?
+        \ (&fileencoding !=# g:omit_fileencoding ? &fileencoding : '') :
+        \ (&encoding !=# g:omit_fileencoding ? &encoding : '')) : ''
+endfunction
+
 
 " Latex
 " Plug 'donRaphaco/neotex'
@@ -301,10 +376,9 @@ set autoread
 set complete-=i
 set nrformats-=octal
 set laststatus=2
-" set showtabline=2
 set cmdheight=1            " command line height
 set tildeop                " Make ~ toggle case for whole line
-set clipboard+=unnamedplus " Use system clipboard
+" set clipboard+=unnamedplus " Use system clipboard
 set iskeyword+=-           " Makes foo-bar considered one word
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
@@ -361,7 +435,7 @@ set listchars+=tab:——,trail:·,eol:$,space:· ",extends:❯,precedes:❮,con
 let &showbreak="↪ "
 set breakindent " when wrapping, indent the lines
 set breakindentopt=sbr
-set wrap
+set nowrap
 set formatoptions+=rno1l
 
 " searching

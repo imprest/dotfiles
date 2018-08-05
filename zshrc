@@ -8,9 +8,10 @@ source ~/.zplug/init.zsh
 zplug "k4rthik/git-cal"
 zplug "arzzen/calc.plugin.zsh"
 zplug "supercrabtree/k"
-zplug "plugins/mix", from:oh-my-zsh
+zplug "lib/completion", from:oh-my-zsh
 zplug "plugins/colored-man-pages", from:oh-my-zsh
 zplug "modules/pacman", from:prezto
+zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-history-substring-search"
 zplug "themes/sorin", from:oh-my-zsh, as:theme
@@ -43,8 +44,6 @@ SAVEHIST=4096
 setopt hist_ignore_dups  # ignore duplication command history list
 setopt hist_ignore_space # ignore when commands starts with space
 setopt share_history     # share command history data
-setopt auto_menu         # auto menu complete
-setopt list_packed       # compacked complete list display
 
 # Exports
 export VISUAL=nvim
@@ -59,4 +58,4 @@ export PATH=$HOME/.yarn/bin:$PATH
 bindkey -e                             # emacs like keybind (e.x. Ctrl-a, Ctrl-e)
 bindkey '^ ' autosuggest-accept        # Autosuggestion
 bindkey '^u' backward-kill-line        # Like bash
-bindkey '^[[Z]]' reverse-menu-complete # Shift-Tab
+bindkey '^[[Z' reverse-menu-complete # Shift-Tab
