@@ -52,7 +52,7 @@ export LANG=en_GB.UTF-8
 export LESS='--tabs=4 --no-init --LONG-PROMPT --ignore-case --quit-if-one-screen --RAW-CONTROL-CHARS'
 export ERL_AFLAGS='-kernel shell_history enabled'
 export PGDATABASE='mgp_dev' # frequently used database
-export PATH=$HOME/.yarn/bin:$PATH
+export PATH=$HOME/.yarn/bin:$PATH # $HOME/.cargo/bin:$PATH
 
 # Keybindings
 bindkey -e                             # emacs like keybind (e.x. Ctrl-a, Ctrl-e)

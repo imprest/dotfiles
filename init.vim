@@ -21,14 +21,6 @@ Plug 'mhinz/vim-startify'
 " Languages
 Plug 'sheerun/vim-polyglot'
 
-" Rust
-Plug 'rust-lang/rust.vim', {'for': 'rust'}
-Plug 'sebastianmarkow/deoplete-rust', {'for': 'rust'}
-  let g:rustfmt_autosave=1
-  let g:deoplete#sources#rust#racer_binary='/usr/bin/racer'
-  let g:deoplete#sources#rust#rust_source_path='~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src'
-  let g:deoplete#sources#rust#duplication=0
-
 " Vue & Javascript
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   let g:used_javascript_libs = 'vue'
@@ -599,6 +591,7 @@ cnoremap <c-p> <up>
 " Make K or help open in vertical split
 autocmd FileType help  wincmd L | vert res 80<CR>
 autocmd FileType elixir nnoremap <buffer> <s-k> :call OpenExDoc()<CR>
+autocmd FileType elixir nnoremap <buffer> <leader>d :call alchemist#exdef()<CR>
 " Opens alchemist exdoc
 function! OpenExDoc()
   :call alchemist#exdoc() | wincmd L | vert res 80
