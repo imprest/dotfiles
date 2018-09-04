@@ -25,6 +25,7 @@ Plug 'sheerun/vim-polyglot'
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   let g:used_javascript_libs = 'vue'
   autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
+  autocmd FileType vue syntax sync fromstart
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
@@ -52,17 +53,17 @@ Plug 'neomake/neomake'
   augroup END
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise'
-" Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
-"   let g:gutentags_cache_dir = '~/.tags_cache'
-"   let g:gutentags_ctags_exclude=["node_modules","plugged","tmp","temp","log","vendor","**/db/migrate/*","bower_components","dist","build","coverage","spec","public","app/assets","*.json"]
-"   " Enter is go to definition (ctags)
-"   nnoremap <CR> <C-]>
-"   " In quickfix,  <CR> to jump to error under the cursor
-"   autocmd FileType qf  nnoremap <buffer> <CR> <CR>
-"   " same for vim type windows
-"   autocmd FileType vim nnoremap <buffer> <CR> <CR>
-"   let g:alchemist_tag_map = '<CR>'
-"   let g:alchemist_tag_stack_map = '<C-T>'
+Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
+  let g:gutentags_cache_dir = '~/.tags_cache'
+  let g:gutentags_ctags_exclude=["node_modules","plugged","tmp","temp","log","vendor","**/db/migrate/*","bower_components","dist","build","coverage","spec","public","app/assets","*.json"]
+  " Enter is go to definition (ctags)
+  nnoremap <CR> <C-]>
+  " In quickfix,  <CR> to jump to error under the cursor
+  autocmd FileType qf  nnoremap <buffer> <CR> <CR>
+  " same for vim type windows
+  autocmd FileType vim nnoremap <buffer> <CR> <CR>
+  let g:alchemist_tag_map = '<CR>'
+  let g:alchemist_tag_stack_map = '<C-T>'
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
 Plug 'BurningEther/iron.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -157,18 +158,6 @@ nnoremap zR zR:echo &foldlevel<CR>
 nnoremap zM zM:echo &foldlevel<CR>
 
 " Navigation
-Plug 'easymotion/vim-easymotion'
-  let g:EasyMotion_do_mapping        = 0
-  let g:EasyMotion_do_shade          = 1
-  let g:EasyMotion_inc_highlight     = 0
-  let g:EasyMotion_landing_highlight = 0
-  let g:EasyMotion_off_screen_search = 0
-  let g:EasyMotion_smartcase         = 0
-  let g:EasyMotion_startofline       = 0
-  let g:EasyMotion_use_smartsign_us  = 1
-  let g:EasyMotion_use_upper         = 0
-  let g:EasyMotion_skipfoldedline    = 0
-  map <silent><space> <plug>(easymotion-s2)
 Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
 Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
   nmap <F9> :TagbarToggle<CR>
@@ -359,7 +348,7 @@ endfunction
 Plug 'drewtempelmeyer/palenight.vim'
 
 call plug#end()
-silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
+" silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
 
 " Neovim Settings
 set numberwidth=5
@@ -372,6 +361,7 @@ set cmdheight=1            " command line height
 set tildeop                " Make ~ toggle case for whole line
 " set clipboard+=unnamedplus " Use system clipboard
 set iskeyword+=-           " Makes foo-bar considered one word
+set cursorline
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark

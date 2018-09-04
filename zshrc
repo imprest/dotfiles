@@ -6,7 +6,6 @@ fi
 source ~/.zplug/init.zsh
 
 zplug "k4rthik/git-cal"
-zplug "arzzen/calc.plugin.zsh"
 zplug "supercrabtree/k"
 zplug "lib/completion", from:oh-my-zsh
 zplug "plugins/colored-man-pages", from:oh-my-zsh

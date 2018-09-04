@@ -17,8 +17,6 @@
 \pset border 2
 \pset null ¤
 \pset linestyle 'unicode'
-\pset unicode_border_linestyle dashed
-\pset unicode_column_linestyle dashed
 \pset unicode_header_linestyle single
 
 \set intervalstyle to 'postgres_verbose';
