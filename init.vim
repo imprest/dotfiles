@@ -90,7 +90,7 @@ Plug 'Shougo/neosnippet-snippets'
   let g:deoplete#enable_at_startup = 1
   let g:deoplete#enable_camel_case = 1
   set completeopt+=menuone
-  set shortmess+=c
+  set shortmess+=c " suppress 'match x of y', 'The only match' and 'Pattern not found' messages
   " <C-h>, <BS>: close popup and delete backword char.
   inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
   inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
@@ -138,7 +138,7 @@ au FileType tex,markdown let b:AutoPairs={'(': ')', '[': ']', '{': '}', '"': '"'
 Plug 'junegunn/vim-easy-align'
 Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'          " allow added vim motion to be repeatable like vim-surround
-Plug 'machakann/vim-sandwich'    " surround motion ie cs'( or <C-v>sa( or sr
+Plug 'machakann/vim-sandwich'    " surround motion ie saiw( foo -> (foo) | sd( for del | sdr({ (foo) -> {foo}
 Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
@@ -208,8 +208,7 @@ Plug 'osyo-manga/vim-anzu'
 
 " Git
 Plug 'airblade/vim-gitgutter'
-Plug 'junegunn/gv.vim'
-Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive' " Gdiff Gstatus (then select add via  -) Gwrite Gedit
 
 " text objects
 Plug 'wellle/targets.vim'
@@ -240,7 +239,7 @@ let g:responsive_width_small=50
 let g:omit_fileencoding='utf-8'
 let g:omit_fileformat='unix'
 let g:lightline={
-    \ 'colorscheme': 'palenight',
+    \ 'colorscheme': 'ayu',
     \ 'active': {
     \     'left': [
     \         ['mode'],
@@ -271,7 +270,6 @@ let g:lightline={
     \     'mode':         'LightLineMode',
     \     'percent':      'LightLinePercent',
     \     'readonly':     'LightLineReadonly',
-    \     'windownr':     'LightLineWindownr',
     \ },
     \ 'separator': { 'left': '', 'right': '' },
     \ 'subseparator': { 'left': '|', 'right': '|' },
@@ -296,10 +294,6 @@ function! LightLineNeomake()
         return l:status
     endif
     return ''
-endfunction
-
-function! LightLineWindownr()
-    return winnr('$') > 1 ? printf('⧉ %d', winnr()) : ''
 endfunction
 
 function! LightLineReadonly()
@@ -345,7 +339,8 @@ endfunction
 "   let g:tex_flavour = 'latex'
 
 " Colorschemes
-Plug 'drewtempelmeyer/palenight.vim'
+" Plug 'drewtempelmeyer/palenight.vim'
+Plug 'ayu-theme/ayu-vim'
 
 call plug#end()
 " silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
@@ -365,10 +360,12 @@ set cursorline
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
-colorscheme palenight
+" let g:palenight_terminal_italics = 1
+let ayucolor = "mirage"
+colorscheme ayu
 
 " tab stuff
-set expandtab shiftwidth=2 softtabstop=-1
+set expandtab shiftwidth=2 softtabstop=2
 set shiftround
 set smartindent
 
@@ -412,12 +409,12 @@ set nostartofline " don't jump to the start of line when scrolling
 
 " whitespace, hidden characters & line breaks
 " set list      " Toggle showing hidden characters i.e. space
-set linebreak " Wrap long lines at a character
+set linebreak   " Wrap long lines at a character
 set listchars+=tab:——,trail:·,eol:$,space:· ",extends:❯,precedes:❮,conceal:Δ,nbsp:+
 let &showbreak="↪ "
 set breakindent " when wrapping, indent the lines
 set breakindentopt=sbr
-set nowrap
+set wrap
 set formatoptions+=rno1l
 
 " searching
