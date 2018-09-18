@@ -52,6 +52,7 @@ export LESS='--tabs=4 --no-init --LONG-PROMPT --ignore-case --quit-if-one-screen
 export ERL_AFLAGS='-kernel shell_history enabled'
 export PGDATABASE='mgp_dev' # frequently used database
 export PATH=$HOME/.yarn/bin:$PATH # $HOME/.cargo/bin:$PATH
+export FZF_DEFAULT_COMMAND='rg --files --follow'
 
 # Keybindings
 bindkey -e                             # emacs like keybind (e.x. Ctrl-a, Ctrl-e)

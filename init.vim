@@ -88,6 +88,7 @@ Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
   let g:deoplete#enable_at_startup = 1
+  let g:enable_smart_case          = 1
   let g:deoplete#enable_camel_case = 1
   set completeopt+=menuone
   set shortmess+=c " suppress 'match x of y', 'The only match' and 'Pattern not found' messages
@@ -105,8 +106,7 @@ Plug 'Shougo/neosnippet-snippets'
   smap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
   " For conceal markers.
   if has('conceal')
-    set conceallevel=1 concealcursor=niv
-    set listchars+=conceal:Δ
+    set conceallevel=2
   endif
 
 " Project Management
@@ -183,28 +183,26 @@ Plug 'junegunn/fzf.vim'
         \   'marker':  ['fg', 'Keyword'],
         \   'spinner': ['fg', 'Label'],
         \   'header':  ['fg', 'Comment'] }
-  nnoremap <c-p>      :GFiles<CR>
-  nnoremap <Leader>p  :Files<CR>
+  nnoremap <c-p>      :Files<CR>
   noremap  <Leader>r  :History<CR>
   nnoremap <Leader>bt :BTags<CR>
   nnoremap <Leader>T  :Tags<CR>
   nnoremap <Leader>b  :Buffers<CR>
 
 " Searching
-Plug 'rking/ag.vim'
-  let g:ag_working_path_mode="r"
-  if executable('ag')
-    let g:ackprg = "ag --nogroup --column --smart-case --follow"
-    set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
-    set grepformat=%f:%l:%c:%m
+Plug 'mileszs/ack.vim' " :Ack <word to search>
+  if executable('rg')
+    let g:ackprg = "rg --column --smart-case --follow"
+    set grepprg=rg\ --vimgrep
   endif
-Plug 'Chun-Yang/vim-action-ag'
 Plug 'osyo-manga/vim-anzu'
   nmap n <Plug>(anzu-n)zz
   nmap N <Plug>(anzu-N)zz
   nmap * <Plug>(anzu-star)zz
   nmap # <Plug>(anzu-sharp)zz
   nmap <Esc><Esc> <Plug>(anzu-clear-search-status)
+  nnoremap <silent> <C-o> <C-o>zz
+  nnoremap <silent> <C-i> <C-i>zz
 
 " Git
 Plug 'airblade/vim-gitgutter'
@@ -232,7 +230,23 @@ Plug 'Yggdroot/indentLine'
   let g:indent_guides_guide_size            = 1
   let g:indent_guides_enable_on_vim_startup = 0
   let g:indentLine_setColors                = 0
-
+Plug 'ap/vim-buftabline'
+  let g:buftabline_numbers = 2
+  let g:buftabline_indicators = 1
+  nmap <leader>1 <Plug>BufTabLine.Go(1)
+  nmap <leader>2 <Plug>BufTabLine.Go(2)
+  nmap <leader>3 <Plug>BufTabLine.Go(3)
+  nmap <leader>4 <Plug>BufTabLine.Go(4)
+  nmap <leader>5 <Plug>BufTabLine.Go(5)
+  nmap <leader>6 <Plug>BufTabLine.Go(6)
+  nmap <leader>7 <Plug>BufTabLine.Go(7)
+  nmap <leader>8 <Plug>BufTabLine.Go(8)
+  nmap <leader>9 <Plug>BufTabLine.Go(9)
+  nmap <leader>0 <Plug>BufTabLine.Go(10)
+  hi default link BufTabLineCurrent Lightline
+  hi default link BufTabLineActive Directory
+  hi default link BufTabLineHidden Directory
+  hi default link BufTabLineFill Directory
 Plug 'itchyny/lightline.vim'
 let g:responsive_width_mid=70
 let g:responsive_width_small=50
@@ -274,7 +288,6 @@ let g:lightline={
     \ 'separator': { 'left': '', 'right': '' },
     \ 'subseparator': { 'left': '|', 'right': '|' },
     \ }
-
 
 function! LightLineMode()
     return winwidth(0) > g:responsive_width_small ? lightline#mode() : ''
@@ -343,7 +356,6 @@ endfunction
 Plug 'ayu-theme/ayu-vim'
 
 call plug#end()
-" silent call deoplete#custom#set('_', 'matchers', ['matcher_full_fuzzy'])
 
 " Neovim Settings
 set numberwidth=5
@@ -401,7 +413,7 @@ set novisualbell
 set t_vb=
 
 " scroll options
-set scrolloff=4
+set scrolloff=3
 set sidescrolloff=7
 set sidescroll=5
 set display+=lastline
@@ -598,6 +610,7 @@ augroup vimrc
   " For newly started terminal; start in insert mode
   autocmd TermOpen * :startinsert
   autocmd BufEnter,BufNew term://* set nonumber
+  autocmd BufEnter,BufNew term://* :startinsert
 augroup END
 
 augroup MyFileTypes

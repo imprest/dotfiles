@@ -28,12 +28,13 @@ sudo pacman -Rns konversation inkscape cantata skanlite kget \
 
 # packages
 sudo pacman -Syu plasma-wayland-session \
-  neovim python-neovim fzf the_silver_searcher \
-  yay erlang elixir postgresql otf-fira-code \
+  neovim python-neovim fzf ripgrep \
+  yay erlang elixir inotify-tools postgresql \
   weechat
 
 # yay packages
-yay -S dbview
+yay -S otf-fantasque-sans-mono # size 12 in konsole
+# yay -S dbview
 
 # git
 git config --global user.email "hardikvaria@gmail.com"
