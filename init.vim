@@ -28,10 +28,10 @@ Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   autocmd FileType vue syntax sync fromstart
 
 " HTML
-Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue'] }
+Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
 Plug 'alvan/vim-closetag'
-  let g:closetag_filenames = '*.html, *.xhtml, *.vue'
-Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue'] }
+  let g:closetag_filenames = '*.html, *.xhtml, *.vue, *.eex'
+Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
   imap <c-e> <c-y>,
 
 " Elixir & Erlang
