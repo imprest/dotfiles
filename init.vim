@@ -22,8 +22,10 @@ Plug 'mhinz/vim-startify'
 Plug 'sheerun/vim-polyglot'
 
 " Vue & Javascript
+Plug 'othree/yajs.vim' " Improved syntax highlighting and indentation
+Plug 'othree/jspc.vim' " Deoplete source for javascript
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
-  let g:used_javascript_libs = 'vue'
+  let g:used_javascript_libs = 'vue, d3'
   autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
   autocmd FileType vue syntax sync fromstart
 
@@ -114,9 +116,11 @@ Plug 'airblade/vim-rooter'
   let g:rooter_silent_chdir = 1
   let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
+Plug 'Xuyuanp/nerdtree-git-plugin'
   map <C-\> :NERDTreeToggle<CR>
   map <F2>  :NERDTreeToggle<CR>
   map <F3>  :NERDTreeFind<CR>
+  let g:NERDTreeMinimalUI=1
   let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
   augroup nerd_loader
     autocmd!
@@ -146,7 +150,7 @@ Plug 'chrisbra/unicode.vim'      " :UnicodeTable to search and copy unicode char
 
 " Folding
 set foldenable
-set fillchars=diff:⣿,vert:│,fold:· " Subtitute characters shown in certain modes
+set fillchars=diff:⣿,vert:.,fold:· " Subtitute characters shown in certain modes
 set foldlevelstart=9               " Show most folds by default
 set foldnestmax=5                  " You're writing bad code if you need to up this one
 set foldmethod=syntax              " Fold based on syntax
@@ -183,6 +187,9 @@ Plug 'junegunn/fzf.vim'
         \   'marker':  ['fg', 'Keyword'],
         \   'spinner': ['fg', 'Label'],
         \   'header':  ['fg', 'Comment'] }
+  autocmd! FileType fzf
+  autocmd  FileType fzf set laststatus=0 noshowmode noruler
+        \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
   nnoremap <c-p>      :Files<CR>
   noremap  <Leader>r  :History<CR>
   nnoremap <Leader>bt :BTags<CR>
@@ -253,7 +260,7 @@ let g:responsive_width_small=50
 let g:omit_fileencoding='utf-8'
 let g:omit_fileformat='unix'
 let g:lightline={
-    \ 'colorscheme': 'ayu',
+    \ 'colorscheme': 'ayu-theme',
     \ 'active': {
     \     'left': [
     \         ['mode'],
@@ -279,7 +286,6 @@ let g:lightline={
     \     'fileformat':   'LightLineFileformat',
     \     'filetype':     'LightLineFiletype',
     \     'fugitive':     'LightLineFugitive',
-    \     'neomake':      'LightLineNeomake',
     \     'lineno':       'LightLineLineno',
     \     'mode':         'LightLineMode',
     \     'percent':      'LightLinePercent',
@@ -288,7 +294,7 @@ let g:lightline={
     \ 'separator': { 'left': '', 'right': '' },
     \ 'subseparator': { 'left': '|', 'right': '|' },
     \ }
-
+    "\    'neomake':      'LightLineNeomake',
 function! LightLineMode()
     return winwidth(0) > g:responsive_width_small ? lightline#mode() : ''
 endfunction
@@ -346,16 +352,17 @@ function! LightLineFileencoding()
         \ (&encoding !=# g:omit_fileencoding ? &encoding : '')) : ''
 endfunction
 
-
 " Latex
 " Plug 'donRaphaco/neotex'
 "   let g:tex_flavour = 'latex'
 
 " Colorschemes
-" Plug 'drewtempelmeyer/palenight.vim'
 Plug 'ayu-theme/ayu-vim'
 
 call plug#end()
+
+" Set various Omni completion sources; has to be done after call plug#end()
+call deoplete#custom#source('omni', 'functions', { 'javascript': ['jspc#omni'] })
 
 " Neovim Settings
 set numberwidth=5
@@ -372,9 +379,10 @@ set cursorline
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
-" let g:palenight_terminal_italics = 1
 let ayucolor = "mirage"
 colorscheme ayu
+hi NERDTreeFile ctermfg=225 guifg=Number
+hi NERDTreeDir ctermfg=225 guifg=#FFAE57
 
 " tab stuff
 set expandtab shiftwidth=2 softtabstop=2
@@ -626,4 +634,3 @@ augroup MyFileTypes
 
   autocmd filetype qf setlocal wrap
 augroup END
-

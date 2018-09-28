@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Download and install manjaro kde edition
+# Download and install manjaro gnome edition
 
 # Disable not needed services
 sudo systemctl disable avahi-daemon
@@ -27,10 +27,10 @@ sudo pacman -Rns konversation inkscape cantata skanlite kget \
   gnome-icon-theme oxygen oxygen-kde4 oxygen-icons gnome-themes-extra
 
 # packages
-sudo pacman -Syu plasma-wayland-session \
-  neovim python-neovim fzf ripgrep \
-  yay erlang elixir inotify-tools postgresql \
-  weechat
+sudo pacman -Syu zsh neovim python-neovim fzf ripgrep ctags \
+  yay erlang elixir inotify-tools postgresql
+# optional
+# weechat
 
 # yay packages
 yay -S otf-fantasque-sans-mono # size 12 in konsole
@@ -43,6 +43,8 @@ git config --global user.name  "Hardik Varia"
 # neovim
 mkdir -p ~/.config/nvim
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
+nvim +PlugInstal +qall
+nvim +UpdateRemotePlugins +qall
 
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
@@ -51,8 +53,4 @@ ln -sf `pwd`/psqlrc ~/.psqlrc
 curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
 ln -sf ~/dotfiles/zshrc ~/.zshrc
 chsh -s /usr/bin/zsh
-
-echo "# Now for some manual stuff, sorry!"
-echo "## nvim"
-echo "To install the nvim plugins, open up vim and type ':PlugInstall'\n"
 
