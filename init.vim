@@ -260,7 +260,7 @@ let g:responsive_width_small=50
 let g:omit_fileencoding='utf-8'
 let g:omit_fileformat='unix'
 let g:lightline={
-    \ 'colorscheme': 'ayu-theme',
+    \ 'colorscheme': 'default',
     \ 'active': {
     \     'left': [
     \         ['mode'],
