@@ -42,17 +42,6 @@ Plug 'slashmili/alchemist.vim'
 Plug 'mhinz/vim-mix-format'
   let g:mix_format_on_save       = 1
   let g:mix_format_silent_errors = '--check-equivalent'
-Plug 'neomake/neomake'
-  let g:neomake_elixir_enabled_makers = ['mix'] ",credo']
-  let g:neomake_javascript_enabled_makers = ['eslint']
-  let g:neomake_error_sign         = {'text': '✘'}
-  let g:neomake_warning_sign       = {'text': '!'}
-  let g:neomake_echo_current_error = 0
-  let g:neomake_open_list          = 2
-  " Run Noemake for the following buffers
-  augroup neomake
-    autocmd! BufWritePre *.ex,*.exs Neomake
-  augroup END
 Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise'
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
@@ -68,16 +57,17 @@ Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
   let g:alchemist_tag_stack_map = '<C-T>'
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
-Plug 'BurningEther/iron.nvim', { 'do': ':UpdateRemotePlugins' }
-  let g:iron_map_defaults = 0 " deactivate default mappings
-  let g:iron_repl_open_cmd = 'below 10sp | set nonumber'
-  augroup ironmapping
-    autocmd!
-    autocmd Filetype elixir nnoremap <localleader>r :IronRepl<cr>
-    autocmd Filetype elixir vmap <buffer> <localleader>t <Plug>(iron-send-motion)
-    autocmd Filetype elixir nmap <buffer> <localleader>p <Plug>(iron-repeat-cmd)
-  augroup END
 
+" Linting
+Plug 'w0rp/ale'
+  let g:ale_linters = { 'elixir' : ['mix'], 'javascript' : ['eslint'] }
+  let g:ale_lint_on_text_changed = 0
+  let g:ale_lint_on_save  = 1
+  let g:ale_lint_on_enter = 1
+  let g:ale_fix_on_save   = 1
+  let g:lightline#ale#indicator_checking = "."
+  let g:lightline#ale#indicator_ok = ""
+  let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 
 " Shell
 set shell=/usr/bin/zsh
@@ -255,22 +245,35 @@ Plug 'ap/vim-buftabline'
   hi default link BufTabLineHidden Directory
   hi default link BufTabLineFill Directory
 Plug 'itchyny/lightline.vim'
+Plug 'maximbaz/lightline-ale'
 let g:responsive_width_mid=70
 let g:responsive_width_small=50
 let g:omit_fileencoding='utf-8'
 let g:omit_fileformat='unix'
 let g:lightline={
     \ 'colorscheme': 'default',
+    \ 'component_expand': {
+    \     'linter_checking': 'lightline#ale#checking',
+    \     'linter_warnings': 'lightline#ale#warnings',
+    \     'linter_errors': 'lightline#ale#errors',
+    \     'linter_ok': 'lightline#ale#ok',
+    \ },
+    \ 'component_type': {
+    \     'linter_checking': 'left',
+    \     'linter_warnings': 'warning',
+    \     'linter_errors': 'error',
+    \     'linter_ok': 'left',
+    \ },
     \ 'active': {
     \     'left': [
     \         ['mode'],
-    \         ['fugitive', 'neomake'],
+    \         ['fugitive'],
     \         ['filename', 'readonly', 'modified']
     \     ],
     \     'right': [
     \         ['percent', 'windownr'],
     \         ['lineno'],
-    \         ['filetype', 'fileformat', 'fileencoding']
+    \         ['filetype', 'fileformat', 'fileencoding', 'linter_checking', 'linter_warnings', 'linter_ok']
     \     ]
     \ },
     \ 'inactive': {
@@ -286,6 +289,7 @@ let g:lightline={
     \     'fileformat':   'LightLineFileformat',
     \     'filetype':     'LightLineFiletype',
     \     'fugitive':     'LightLineFugitive',
+    \     'ale':          'LinterStatus',
     \     'lineno':       'LightLineLineno',
     \     'mode':         'LightLineMode',
     \     'percent':      'LightLinePercent',
@@ -294,7 +298,6 @@ let g:lightline={
     \ 'separator': { 'left': '', 'right': '' },
     \ 'subseparator': { 'left': '|', 'right': '|' },
     \ }
-    "\    'neomake':      'LightLineNeomake',
 function! LightLineMode()
     return winwidth(0) > g:responsive_width_small ? lightline#mode() : ''
 endfunction
@@ -303,14 +306,6 @@ function! LightLineFugitive()
     if winwidth(0) > g:responsive_width_mid && exists('*fugitive#head')
         let l:head=fugitive#head()
         return l:head !=# '' ? ' '.l:head : ''
-    endif
-    return ''
-endfunction
-
-function! LightLineNeomake()
-    if winwidth(0) > g:responsive_width_mid && exists('*neomake#statusline#LoclistStatus')
-        let l:status=neomake#statusline#LoclistStatus()
-        return l:status
     endif
     return ''
 endfunction
