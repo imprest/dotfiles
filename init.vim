@@ -55,19 +55,46 @@ Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
   autocmd FileType vim nnoremap <buffer> <CR> <CR>
   let g:alchemist_tag_map = '<CR>'
   let g:alchemist_tag_stack_map = '<C-T>'
+  " tagbar elixir support
+  let g:tagbar_type_elixir = {
+        \ 'ctagstype' : 'elixir',
+        \ 'kinds' : [
+        \ 'f:functions',
+        \ 'functions:functions',
+        \ 'c:callbacks',
+        \ 'd:delegates',
+        \ 'e:exceptions',
+        \ 'i:implementations',
+        \ 'a:macros',
+        \ 'o:operators',
+        \ 'm:modules',
+        \ 'p:protocols',
+        \ 'r:records'
+        \ ]
+        \ }
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
 
 " Linting
 Plug 'w0rp/ale'
   let g:ale_linters = { 'elixir' : ['mix'], 'javascript' : ['eslint'] }
+  let g:ale_fixers  = { 'javascript' : ['eslint'] }
   let g:ale_lint_on_text_changed = 0
   let g:ale_lint_on_save  = 1
   let g:ale_lint_on_enter = 1
   let g:ale_fix_on_save   = 1
+  let g:ale_sign_column_always = 1
+  let g:ale_sign_error    = '✖'
+  let g:ale_sign_warning  = '!'
   let g:lightline#ale#indicator_checking = "."
   let g:lightline#ale#indicator_ok = ""
   let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+  hi default link ALEErrorSign WarningMsg
+  hi default link ALEWarningSign WarningMsg
+  nmap <silent> [W <Plug>(ale_first)
+  nmap <silent> [w <Plug>(ale_previous)
+  nmap <silent> ]W <Plug>(ale_next)
+  nmap <silent> ]W <Plug>(ale_last)
 
 " Shell
 set shell=/usr/bin/zsh
@@ -439,23 +466,6 @@ set smartcase
 " tags
 set tags=tags;/
 set showfulltag
-" tagbar elixir support
-let g:tagbar_type_elixir = {
-      \ 'ctagstype' : 'elixir',
-      \ 'kinds' : [
-      \ 'f:functions',
-      \ 'functions:functions',
-      \ 'c:callbacks',
-      \ 'd:delegates',
-      \ 'e:exceptions',
-      \ 'i:implementations',
-      \ 'a:macros',
-      \ 'o:operators',
-      \ 'm:modules',
-      \ 'p:protocols',
-      \ 'r:records'
-      \ ]
-      \ }
 
 " backup, undo and file management
 set nobackup

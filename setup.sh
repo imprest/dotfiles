@@ -27,7 +27,7 @@ sudo pacman -Rns konversation inkscape cantata skanlite kget \
   gnome-icon-theme oxygen oxygen-kde4 oxygen-icons gnome-themes-extra
 
 # packages
-sudo pacman -Syu zsh neovim python-neovim fzf ripgrep ctags \
+sudo pacman -Syu zsh neovim python-neovim fzf ripgrep ctags npm \
   yay erlang elixir inotify-tools postgresql
 # optional
 # weechat
@@ -43,6 +43,7 @@ git config --global user.name  "Hardik Varia"
 # neovim
 mkdir -p ~/.config/nvim
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
+ln -sf ~/dotfiles/ctags ~/.ctags
 nvim +PlugInstal +qall
 nvim +UpdateRemotePlugins +qall
 
@@ -54,3 +55,5 @@ curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/instal
 ln -sf ~/dotfiles/zshrc ~/.zshrc
 chsh -s /usr/bin/zsh
 
+# node global packages
+sudo npm install -g @vue/cli eslint neovim eslint-prettier config-prettier eslint-plugin-prettier
