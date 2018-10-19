@@ -13,10 +13,10 @@ call plug#begin('~/.config/nvim/plugged')
 " General
 let g:mapleader = ','
 Plug 'dietsche/vim-lastplace'
-Plug 'mhinz/vim-startify'
-  let g:startify_session_dir        = '~/.data/sessions'
-  let g:startify_change_to_vcs_root = 1
-  let g:startify_show_sessions      = 1
+" Plug 'mhinz/vim-startify'
+"   let g:startify_session_dir        = '~/.data/sessions'
+"   let g:startify_change_to_vcs_root = 1
+"   let g:startify_show_sessions      = 1
 
 " Languages
 Plug 'sheerun/vim-polyglot'
@@ -42,7 +42,7 @@ Plug 'slashmili/alchemist.vim'
 Plug 'mhinz/vim-mix-format'
   let g:mix_format_on_save       = 1
   let g:mix_format_silent_errors = '--check-equivalent'
-Plug 'powerman/vim-plugin-AnsiEsc'
+" Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise'
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
   let g:gutentags_cache_dir = '~/.tags_cache'
@@ -84,7 +84,7 @@ Plug 'w0rp/ale'
   let g:ale_lint_on_enter = 1
   let g:ale_fix_on_save   = 1
   let g:ale_sign_column_always = 1
-  let g:ale_sign_error    = '✖'
+  let g:ale_sign_error    = '✗'
   let g:ale_sign_warning  = '!'
   let g:lightline#ale#indicator_checking = "."
   let g:lightline#ale#indicator_ok = ""
@@ -97,10 +97,14 @@ Plug 'w0rp/ale'
   nmap <silent> ]W <Plug>(ale_last)
 
 " Shell
-set shell=/usr/bin/zsh
-set noshelltemp " use pipes
-nnoremap <Leader>c :below 10sp term://zsh<CR>
-nnoremap <Leader>cv :vsplit term://zsh<CR>
+Plug 'kassio/neoterm'
+  set shell=/usr/bin/zsh
+  set noshelltemp " use pipes
+  let g:neoterm_autojump = 1
+  nnoremap <silent> ,tc :Tclose<CR>
+  nnoremap <silent> ,tl :Tclear<CR>
+  nnoremap <Leader>c :botright Tnew <bar> :res 10<CR>
+  nnoremap <Leader>cv :vert Tnew<CR>
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -138,6 +142,7 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
   map <F2>  :NERDTreeToggle<CR>
   map <F3>  :NERDTreeFind<CR>
   let g:NERDTreeMinimalUI=1
+  let g:NERDTreeWinSize=20
   let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
   augroup nerd_loader
     autocmd!
@@ -375,6 +380,7 @@ function! LightLineFileencoding()
 endfunction
 
 " Latex
+" Plug 'lervag/vimtex' " Disable vim-polyglot i.e. let g:polyglot_disabled = ['latex']
 " Plug 'donRaphaco/neotex'
 "   let g:tex_flavour = 'latex'
 
@@ -456,7 +462,7 @@ set listchars+=tab:——,trail:·,eol:$,space:· ",extends:❯,precedes:❮,con
 let &showbreak="↪ "
 set breakindent " when wrapping, indent the lines
 set breakindentopt=sbr
-set wrap
+set nowrap
 set formatoptions+=rno1l
 
 " searching
@@ -523,6 +529,11 @@ nnoremap Q @q                   " Use Q to execute default register
 nnoremap <C-s> :<C-u>w<CR>      " Ctrl-S to save in most modes
 vnoremap <C-s> :<C-u>w<CR>
 cnoremap <C-s> <C-u>w<CR>
+inoremap <C-s> <esc>:w<CR>
+command! Q q " Bind :Q to :q
+command! Qall qall
+command! QA qall
+command! E e
 " Navigation made easy
 noremap  H ^
 noremap  L g_
