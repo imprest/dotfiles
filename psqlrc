@@ -5,7 +5,7 @@
 \timing
 
 \set PROMPT1 '%~%#%x '
--- \x auto
+\x auto
 \set ON_ERROR_STOP on
 \set ON_ERROR_ROLLBACK interactive
 \set VERBOSITY verbose
@@ -14,10 +14,10 @@
 \set COMP_KEYWORD_CASE upper
 
 -- Use best avaialable output format
-\pset border 2
+-- \pset border 2
 \pset null ¤
-\pset linestyle 'unicode'
-\pset unicode_header_linestyle single
+-- \pset linestyle 'unicode'
+-- \pset unicode_header_linestyle single
 
 \set intervalstyle to 'postgres_verbose';
 
