@@ -56,4 +56,4 @@ ln -sf ~/dotfiles/zshrc ~/.zshrc
 chsh -s /usr/bin/zsh
 
 # node global packages
-sudo npm install -g @vue/cli eslint neovim eslint-prettier config-prettier eslint-plugin-prettier
+sudo npm install -g @vue/cli eslint neovim prettier

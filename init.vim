@@ -13,10 +13,6 @@ call plug#begin('~/.config/nvim/plugged')
 " General
 let g:mapleader = ','
 Plug 'dietsche/vim-lastplace'
-" Plug 'mhinz/vim-startify'
-"   let g:startify_session_dir        = '~/.data/sessions'
-"   let g:startify_change_to_vcs_root = 1
-"   let g:startify_show_sessions      = 1
 
 " Languages
 Plug 'sheerun/vim-polyglot'
@@ -42,7 +38,6 @@ Plug 'slashmili/alchemist.vim'
 Plug 'mhinz/vim-mix-format'
   let g:mix_format_on_save       = 1
   let g:mix_format_silent_errors = '--check-equivalent'
-" Plug 'powerman/vim-plugin-AnsiEsc'
 Plug 'tpope/vim-endwise'
 Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
   let g:gutentags_cache_dir = '~/.tags_cache'
@@ -55,23 +50,23 @@ Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
   autocmd FileType vim nnoremap <buffer> <CR> <CR>
   let g:alchemist_tag_map = '<CR>'
   let g:alchemist_tag_stack_map = '<C-T>'
-  " tagbar elixir support
-  let g:tagbar_type_elixir = {
-        \ 'ctagstype' : 'elixir',
-        \ 'kinds' : [
-        \ 'f:functions',
-        \ 'functions:functions',
-        \ 'c:callbacks',
-        \ 'd:delegates',
-        \ 'e:exceptions',
-        \ 'i:implementations',
-        \ 'a:macros',
-        \ 'o:operators',
-        \ 'm:modules',
-        \ 'p:protocols',
-        \ 'r:records'
-        \ ]
-        \ }
+  " " tagbar elixir support
+  " let g:tagbar_type_elixir = {
+  "       \ 'ctagstype' : 'elixir',
+  "       \ 'kinds' : [
+  "       \ 'f:functions',
+  "       \ 'functions:functions',
+  "       \ 'c:callbacks',
+  "       \ 'd:delegates',
+  "       \ 'e:exceptions',
+  "       \ 'i:implementations',
+  "       \ 'a:macros',
+  "       \ 'o:operators',
+  "       \ 'm:modules',
+  "       \ 'p:protocols',
+  "       \ 'r:records'
+  "       \ ]
+  "       \ }
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
 
@@ -86,8 +81,8 @@ Plug 'w0rp/ale'
   let g:ale_sign_column_always = 1
   let g:ale_sign_error    = '✗'
   let g:ale_sign_warning  = '!'
-  let g:lightline#ale#indicator_checking = "."
-  let g:lightline#ale#indicator_ok = ""
+  let g:lightline#ale#indicator_checking = ":"
+  let g:lightline#ale#indicator_ok = ";"
   let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
   hi default link ALEErrorSign WarningMsg
   hi default link ALEWarningSign WarningMsg
@@ -101,10 +96,9 @@ Plug 'kassio/neoterm'
   set shell=/usr/bin/zsh
   set noshelltemp " use pipes
   let g:neoterm_autojump = 1
-  nnoremap <silent> ,tc :Tclose<CR>
-  nnoremap <silent> ,tl :Tclear<CR>
-  nnoremap <Leader>c :botright Tnew <bar> :res 10<CR>
-  nnoremap <Leader>cv :vert Tnew<CR>
+  nnoremap <silent> ,tc :Tclear<CR>
+  nnoremap <Leader>t :botright Tnew <bar> :res 6<CR>
+  nnoremap <Leader>tv :vert Tnew<CR>
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -113,7 +107,7 @@ Plug 'Shougo/neosnippet-snippets'
   let g:deoplete#enable_at_startup = 1
   let g:enable_smart_case          = 1
   let g:deoplete#enable_camel_case = 1
-  set completeopt+=menuone
+  set completeopt-=preview
   set shortmess+=c " suppress 'match x of y', 'The only match' and 'Pattern not found' messages
   " <C-h>, <BS>: close popup and delete backword char.
   inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
@@ -123,8 +117,10 @@ Plug 'Shougo/neosnippet-snippets'
   smap <C-i> <Plug>(neosnippet_expand_or_jump)
   xmap <C-i> <Plug>(neosnippet_expand_target)
   " set tab complete to work like SuperTab
-  imap <expr><TAB> neosnippet#expandable_or_jumpable()?"\<Plug>(neosnippet_expand_or_jump)":(pumvisible()?"\<C-n>":"\<TAB>")
-  smap <expr><TAB> neosnippet#expandable_or_jumpable()?"\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
+  " imap <expr><TAB> neosnippet#expandable_or_jumpable()?"\<Plug>(neosnippet_expand_or_jump)":(pumvisible()?"\<C-n>":"\<TAB>")
+  " smap <expr><TAB> neosnippet#expandable_or_jumpable()?"\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
+  imap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+  smap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
   imap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
   smap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
   " For conceal markers.
@@ -185,12 +181,12 @@ nnoremap zM zM:echo &foldlevel<CR>
 
 " Navigation
 Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
-Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
-  nmap <F9> :TagbarToggle<CR>
-  let g:tagbar_width     = 40
-  let g:tagbar_autoclose =  0
-  let g:tagbar_autofocus =  1
-  let g:tagbar_compact   =  1
+" Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
+"   nmap <F9> :TagbarToggle<CR>
+"   let g:tagbar_width     = 40
+"   let g:tagbar_autoclose =  0
+"   let g:tagbar_autofocus =  1
+"   let g:tagbar_compact   =  1
 Plug 'wesQ3/vim-windowswap'        " <Leader>ww once to select window and again to swap window
 Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
 Plug 'junegunn/fzf'
@@ -250,15 +246,15 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 15, 2)<CR>
   noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
   noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
-Plug 'Yggdroot/indentLine'
-  let g:indentLine_faster                   = 1
-  let g:indentLine_setConceal               = 0
-  let g:indentLine_enabled                  = 0
-  let g:indentLine_char                     = "\u250A" " '┆'
-  let g:indent_guides_start_level           = 1
-  let g:indent_guides_guide_size            = 1
-  let g:indent_guides_enable_on_vim_startup = 0
-  let g:indentLine_setColors                = 0
+" Plug 'Yggdroot/indentLine'
+"   let g:indentLine_faster                   = 1
+"   let g:indentLine_setConceal               = 0
+"   let g:indentLine_enabled                  = 1
+"   let g:indentLine_char                     = "\u250A" " '┆'
+"   let g:indent_guides_start_level           = 1
+"   let g:indent_guides_guide_size            = 1
+"   let g:indent_guides_enable_on_vim_startup = 0
+"   let g:indentLine_setColors                = 0
 Plug 'ap/vim-buftabline'
   let g:buftabline_numbers = 2
   let g:buftabline_indicators = 1
@@ -303,7 +299,7 @@ let g:lightline={
     \         ['filename', 'readonly', 'modified']
     \     ],
     \     'right': [
-    \         ['percent', 'windownr'],
+    \         ['percent', 'windownr', 'anzu'],
     \         ['lineno'],
     \         ['filetype', 'fileformat', 'fileencoding', 'linter_checking', 'linter_warnings', 'linter_ok']
     \     ]
@@ -326,6 +322,7 @@ let g:lightline={
     \     'mode':         'LightLineMode',
     \     'percent':      'LightLinePercent',
     \     'readonly':     'LightLineReadonly',
+    \     'anzu':         'anzu#search_status',
     \ },
     \ 'separator': { 'left': '', 'right': '' },
     \ 'subseparator': { 'left': '|', 'right': '|' },
@@ -580,7 +577,7 @@ vnoremap > >gv
 " make Y consistent with C & D
 nnoremap Y y$
 " toggle highlight search
-nnoremap <BS> :set hlsearch! hlsearch?<CR>
+nnoremap <BS> :set hlsearch! hlsearch? \| AnzuClearSearchStatus<CR>
 " Map ctrl-movement keys to window switching
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
