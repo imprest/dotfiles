@@ -50,29 +50,12 @@ Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
   autocmd FileType vim nnoremap <buffer> <CR> <CR>
   let g:alchemist_tag_map = '<CR>'
   let g:alchemist_tag_stack_map = '<C-T>'
-  " " tagbar elixir support
-  " let g:tagbar_type_elixir = {
-  "       \ 'ctagstype' : 'elixir',
-  "       \ 'kinds' : [
-  "       \ 'f:functions',
-  "       \ 'functions:functions',
-  "       \ 'c:callbacks',
-  "       \ 'd:delegates',
-  "       \ 'e:exceptions',
-  "       \ 'i:implementations',
-  "       \ 'a:macros',
-  "       \ 'o:operators',
-  "       \ 'm:modules',
-  "       \ 'p:protocols',
-  "       \ 'r:records'
-  "       \ ]
-  "       \ }
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
 
 " Linting
 Plug 'w0rp/ale'
-  let g:ale_linters = { 'elixir' : ['mix'], 'javascript' : ['eslint'] }
+  let g:ale_linters = { 'javascript' : ['eslint'] }
   let g:ale_fixers  = { 'javascript' : ['eslint'] }
   let g:ale_lint_on_text_changed = 0
   let g:ale_lint_on_save  = 1
@@ -81,11 +64,6 @@ Plug 'w0rp/ale'
   let g:ale_sign_column_always = 1
   let g:ale_sign_error    = '✗'
   let g:ale_sign_warning  = '!'
-  let g:lightline#ale#indicator_checking = ":"
-  let g:lightline#ale#indicator_ok = ";"
-  let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-  hi default link ALEErrorSign WarningMsg
-  hi default link ALEWarningSign WarningMsg
   nmap <silent> [W <Plug>(ale_first)
   nmap <silent> [w <Plug>(ale_previous)
   nmap <silent> ]W <Plug>(ale_next)
@@ -96,9 +74,9 @@ Plug 'kassio/neoterm'
   set shell=/usr/bin/zsh
   set noshelltemp " use pipes
   let g:neoterm_autojump = 1
-  nnoremap <silent> ,tc :Tclear<CR>
-  nnoremap <Leader>t :botright Tnew <bar> :res 6<CR>
-  nnoremap <Leader>tv :vert Tnew<CR>
+  nnoremap <silent> ,tl :Tclear<CR>
+  nnoremap <Leader>c :botright Tnew <bar> :res 6<CR>
+  nnoremap <Leader>cv :vert Tnew<CR>
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -133,7 +111,6 @@ Plug 'airblade/vim-rooter'
   let g:rooter_silent_chdir = 1
   let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
-Plug 'Xuyuanp/nerdtree-git-plugin'
   map <C-\> :NERDTreeToggle<CR>
   map <F2>  :NERDTreeToggle<CR>
   map <F3>  :NERDTreeFind<CR>
@@ -181,12 +158,6 @@ nnoremap zM zM:echo &foldlevel<CR>
 
 " Navigation
 Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
-" Plug 'majutsushi/tagbar'    " F9 to Toggle tabbar window
-"   nmap <F9> :TagbarToggle<CR>
-"   let g:tagbar_width     = 40
-"   let g:tagbar_autoclose =  0
-"   let g:tagbar_autofocus =  1
-"   let g:tagbar_compact   =  1
 Plug 'wesQ3/vim-windowswap'        " <Leader>ww once to select window and again to swap window
 Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
 Plug 'junegunn/fzf'
@@ -246,135 +217,44 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 15, 2)<CR>
   noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
   noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
-" Plug 'Yggdroot/indentLine'
-"   let g:indentLine_faster                   = 1
-"   let g:indentLine_setConceal               = 0
-"   let g:indentLine_enabled                  = 1
-"   let g:indentLine_char                     = "\u250A" " '┆'
-"   let g:indent_guides_start_level           = 1
-"   let g:indent_guides_guide_size            = 1
-"   let g:indent_guides_enable_on_vim_startup = 0
-"   let g:indentLine_setColors                = 0
-Plug 'ap/vim-buftabline'
-  let g:buftabline_numbers = 2
-  let g:buftabline_indicators = 1
-  nmap <leader>1 <Plug>BufTabLine.Go(1)
-  nmap <leader>2 <Plug>BufTabLine.Go(2)
-  nmap <leader>3 <Plug>BufTabLine.Go(3)
-  nmap <leader>4 <Plug>BufTabLine.Go(4)
-  nmap <leader>5 <Plug>BufTabLine.Go(5)
-  nmap <leader>6 <Plug>BufTabLine.Go(6)
-  nmap <leader>7 <Plug>BufTabLine.Go(7)
-  nmap <leader>8 <Plug>BufTabLine.Go(8)
-  nmap <leader>9 <Plug>BufTabLine.Go(9)
-  nmap <leader>0 <Plug>BufTabLine.Go(10)
-  hi default link BufTabLineCurrent Lightline
-  hi default link BufTabLineActive Directory
-  hi default link BufTabLineHidden Directory
-  hi default link BufTabLineFill Directory
-Plug 'itchyny/lightline.vim'
-Plug 'maximbaz/lightline-ale'
-let g:responsive_width_mid=70
-let g:responsive_width_small=50
-let g:omit_fileencoding='utf-8'
-let g:omit_fileformat='unix'
-let g:lightline={
-    \ 'colorscheme': 'default',
-    \ 'component_expand': {
-    \     'linter_checking': 'lightline#ale#checking',
-    \     'linter_warnings': 'lightline#ale#warnings',
-    \     'linter_errors': 'lightline#ale#errors',
-    \     'linter_ok': 'lightline#ale#ok',
-    \ },
-    \ 'component_type': {
-    \     'linter_checking': 'left',
-    \     'linter_warnings': 'warning',
-    \     'linter_errors': 'error',
-    \     'linter_ok': 'left',
-    \ },
-    \ 'active': {
-    \     'left': [
-    \         ['mode'],
-    \         ['fugitive'],
-    \         ['filename', 'readonly', 'modified']
-    \     ],
-    \     'right': [
-    \         ['percent', 'windownr', 'anzu'],
-    \         ['lineno'],
-    \         ['filetype', 'fileformat', 'fileencoding', 'linter_checking', 'linter_warnings', 'linter_ok']
-    \     ]
-    \ },
-    \ 'inactive': {
-    \     'left': [
-    \         ['filename']
-    \     ],
-    \     'right': [
-    \         ['windownr']
-    \     ]
-    \ },
-    \ 'component_function': {
-    \     'fileencoding': 'LightLineFileencoding',
-    \     'fileformat':   'LightLineFileformat',
-    \     'filetype':     'LightLineFiletype',
-    \     'fugitive':     'LightLineFugitive',
-    \     'ale':          'LinterStatus',
-    \     'lineno':       'LightLineLineno',
-    \     'mode':         'LightLineMode',
-    \     'percent':      'LightLinePercent',
-    \     'readonly':     'LightLineReadonly',
-    \     'anzu':         'anzu#search_status',
-    \ },
-    \ 'separator': { 'left': '', 'right': '' },
-    \ 'subseparator': { 'left': '|', 'right': '|' },
-    \ }
-function! LightLineMode()
-    return winwidth(0) > g:responsive_width_small ? lightline#mode() : ''
-endfunction
 
-function! LightLineFugitive()
-    if winwidth(0) > g:responsive_width_mid && exists('*fugitive#head')
-        let l:head=fugitive#head()
-        return l:head !=# '' ? ' '.l:head : ''
-    endif
-    return ''
-endfunction
-
-function! LightLineReadonly()
-    return winwidth(0) > g:responsive_width_mid ?
-        \ (&filetype !~? 'help' && &readonly ? '' : '') : ''
-endfunction
-
-function! LightLineModified()
-    return winwidth(0) > g:responsive_width_mid ?
-        \ (&filetype !~? 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-') : ''
-endfunction
-
-function! LightLineFiletype()
-    return winwidth(0) > g:responsive_width_mid ?
-        \ (&filetype !=# '' ? &filetype : 'no ft') : ''
-endfunction
-
-function! LightLineFileformat()
-    return winwidth(0) > g:responsive_width_mid ?
-        \ (&fileformat !=# g:omit_fileformat ? &fileformat : '') : ''
-endfunction
-
-function! LightLineLineno()
-    return winwidth(0) > g:responsive_width_small ?
-        \ printf(' %d:%-2d', line('.'), col('.')) : ''
-endfunction
-
-function! LightLinePercent()
-    return winwidth(0) > g:responsive_width_mid ?
-        \ printf('%2d%%', line('.') * 100 / line('$')) : ''
-endfunction
-
-function! LightLineFileencoding()
-    return winwidth(0) > g:responsive_width_mid ?
-        \ (&fileencoding !=# '' ?
-        \ (&fileencoding !=# g:omit_fileencoding ? &fileencoding : '') :
-        \ (&encoding !=# g:omit_fileencoding ? &encoding : '')) : ''
-endfunction
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+  let g:airline_theme='ayu_mirage'
+  let g:airline_section_z = ' %3l:%2c %2p%%'
+  let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
+  let g:airline_highlighting_cache              = 1
+  let g:airline_powerline_fonts                 = 1
+  let g:airline_skip_empty_sections             = 1
+  let g:airline_left_sep                        = ''
+  let g:airline_right_sep                       = ''
+  let g:airline#extensions#tabline#enabled      = 1
+  let g:airline#extensions#tabline#left_sep     = ''
+  let g:airline#extensions#tabline#left_alt_sep = ''
+  let g:airline_mode_map = {
+        \ '__' : '-',
+        \ 'n'  : 'N',
+        \ 'i'  : 'I',
+        \ 'R'  : 'R',
+        \ 't'  : 'T',
+        \ 'c'  : 'C',
+        \ 'v'  : 'V',
+        \ 'V'  : 'V',
+        \ ''   : 'V',
+        \ 's'  : 'S',
+        \ 'S'  : 'S',
+        \ '' : 'S',
+        \ }
+  let g:airline#extensions#tabline#buffer_idx_mode = 1
+  nmap <leader>1 <Plug>AirlineSelectTab1
+  nmap <leader>2 <Plug>AirlineSelectTab2
+  nmap <leader>3 <Plug>AirlineSelectTab3
+  nmap <leader>4 <Plug>AirlineSelectTab4
+  nmap <leader>5 <Plug>AirlineSelectTab5
+  nmap <leader>6 <Plug>AirlineSelectTab6
+  nmap <leader>7 <Plug>AirlineSelectTab7
+  nmap <leader>8 <Plug>AirlineSelectTab8
+  nmap <leader>9 <Plug>AirlineSelectTab9
 
 " Latex
 " Plug 'lervag/vimtex' " Disable vim-polyglot i.e. let g:polyglot_disabled = ['latex']
