@@ -34,6 +34,7 @@ Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
 
 " Elixir & Erlang
 Plug 'slashmili/alchemist.vim'
+  let g:alchemist_tag_disable = 1
   let g:alchemist#elixir_erlang_src = "/usr/lib/elixir"
 Plug 'mhinz/vim-mix-format'
   let g:mix_format_on_save       = 1
@@ -75,8 +76,8 @@ Plug 'kassio/neoterm'
   set noshelltemp " use pipes
   let g:neoterm_autojump = 1
   nnoremap <silent> ,tl :Tclear<CR>
-  nnoremap <Leader>c :botright Tnew <bar> :res 6<CR>
-  nnoremap <Leader>cv :vert Tnew<CR>
+  nnoremap <Leader>t :botright Tnew <bar> :res 6<CR>
+  nnoremap <Leader>tv :vert Tnew<CR>
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -135,13 +136,35 @@ au FileType vim let b:AutoPairs = {'(':')','[':']','{':'}',"'":"'",'`':'`'}
 au FileType rust let b:AutoPairs={'(': ')', '[': ']', '{': '}', "|": "|", '"': '"', '`': '`'}
 au FileType tex,markdown let b:AutoPairs={'(': ')', '[': ']', '{': '}', '"': '"', '`': '`', '$': '$'}
 Plug 'junegunn/vim-easy-align'
-Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
+" Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'          " allow added vim motion to be repeatable like vim-surround
 Plug 'machakann/vim-sandwich'    " surround motion ie saiw( foo -> (foo) | sd( for del | sdr({ (foo) -> {foo}
 Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
 Plug 'chrisbra/unicode.vim'      " :UnicodeTable to search and copy unicode chars
+Plug 'scrooloose/nerdcommenter' " Toggle comment bloccks
+" vue files have mixed content, so this
+" informs nerdcommenter about that.
+let g:ft = ''
+function! NERDCommenter_before()
+  if &ft == 'vue'
+    let g:ft = 'vue'
+    let stack = synstack(line('.'), col('.'))
+    if len(stack) > 0
+      let syn = synIDattr((stack)[0], 'name')
+      if len(syn) > 0
+        exe 'setf ' . substitute(tolower(syn), '^vue_', '', '')
+      endif
+    endif
+  endif
+endfunction
+function! NERDCommenter_after()
+  if g:ft == 'vue'
+    setf vue
+    let g:ft = ''
+  endif
+endfunction<Paste>
 
 " Folding
 set foldenable
@@ -221,7 +244,7 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
   let g:airline_theme='ayu_mirage'
-  let g:airline_section_z = ' %3l:%2c %2p%%'
+  let g:airline_section_z = ' %3l:%2c %3p%%'
   let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
   let g:airline_highlighting_cache              = 1
   let g:airline_powerline_fonts                 = 1
@@ -310,7 +333,7 @@ match OverLength /\%81v.\+/
 
 " autocomplete list options
 set wildmenu
-set wildmode=list:longest,list:full " show similar and all options
+set wildmode=list:full " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
 set shortmess+=aoOTI " shorten messages
@@ -456,6 +479,8 @@ vnoremap < <gv
 vnoremap > >gv
 " make Y consistent with C & D
 nnoremap Y y$
+" xclip needs to be installed for visual copy to system clipboard
+vnoremap Y "+y
 " toggle highlight search
 nnoremap <BS> :set hlsearch! hlsearch? \| AnzuClearSearchStatus<CR>
 " Map ctrl-movement keys to window switching

@@ -27,7 +27,7 @@ sudo pacman -Rns konversation inkscape cantata skanlite kget \
   gnome-icon-theme oxygen oxygen-kde4 oxygen-icons gnome-themes-extra
 
 # packages
-sudo pacman -Syu zsh neovim python-neovim fzf ripgrep ctags npm \
+sudo pacman -Syu zsh neovim xclip python-neovim fzf ripgrep ctags npm \
   yay otf-fira-code erlang elixir inotify-tools postgresql
 # optional
 # weechat
