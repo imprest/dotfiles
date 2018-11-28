@@ -76,8 +76,8 @@ Plug 'kassio/neoterm'
   set noshelltemp " use pipes
   let g:neoterm_autojump = 1
   nnoremap <silent> ,tl :Tclear<CR>
-  nnoremap <Leader>t :botright Tnew <bar> :res 6<CR>
-  nnoremap <Leader>tv :vert Tnew<CR>
+  nnoremap <Leader>c :botright Tnew <bar> :res 6<CR>
+  nnoremap <Leader>cv :vert Tnew<CR>
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -136,39 +136,17 @@ au FileType vim let b:AutoPairs = {'(':')','[':']','{':'}',"'":"'",'`':'`'}
 au FileType rust let b:AutoPairs={'(': ')', '[': ']', '{': '}', "|": "|", '"': '"', '`': '`'}
 au FileType tex,markdown let b:AutoPairs={'(': ')', '[': ']', '{': '}', '"': '"', '`': '`', '$': '$'}
 Plug 'junegunn/vim-easy-align'
-" Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
+Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'          " allow added vim motion to be repeatable like vim-surround
 Plug 'machakann/vim-sandwich'    " surround motion ie saiw( foo -> (foo) | sd( for del | sdr({ (foo) -> {foo}
 Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
 Plug 'chrisbra/unicode.vim'      " :UnicodeTable to search and copy unicode chars
-Plug 'scrooloose/nerdcommenter' " Toggle comment bloccks
-" vue files have mixed content, so this
-" informs nerdcommenter about that.
-let g:ft = ''
-function! NERDCommenter_before()
-  if &ft == 'vue'
-    let g:ft = 'vue'
-    let stack = synstack(line('.'), col('.'))
-    if len(stack) > 0
-      let syn = synIDattr((stack)[0], 'name')
-      if len(syn) > 0
-        exe 'setf ' . substitute(tolower(syn), '^vue_', '', '')
-      endif
-    endif
-  endif
-endfunction
-function! NERDCommenter_after()
-  if g:ft == 'vue'
-    setf vue
-    let g:ft = ''
-  endif
-endfunction<Paste>
 
 " Folding
 set foldenable
-set fillchars=diff:⣿,vert:.,fold:· " Subtitute characters shown in certain modes
+set fillchars=diff:\               " Subtitute characters shown in certain modes
 set foldlevelstart=9               " Show most folds by default
 set foldnestmax=5                  " You're writing bad code if you need to up this one
 set foldmethod=syntax              " Fold based on syntax
@@ -180,7 +158,7 @@ nnoremap zR zR:echo &foldlevel<CR>
 nnoremap zM zM:echo &foldlevel<CR>
 
 " Navigation
-Plug 'justinmk/vim-gtfo'    " ,gof open file in filemanager
+Plug 'justinmk/vim-gtfo'           " ,gof open file in filemanager
 Plug 'wesQ3/vim-windowswap'        " <Leader>ww once to select window and again to swap window
 Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
 Plug 'junegunn/fzf'
@@ -243,7 +221,6 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
 
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-  let g:airline_theme='ayu_mirage'
   let g:airline_section_z = ' %3l:%2c %3p%%'
   let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
   let g:airline_highlighting_cache              = 1
@@ -285,7 +262,7 @@ Plug 'vim-airline/vim-airline-themes'
 "   let g:tex_flavour = 'latex'
 
 " Colorschemes
-Plug 'ayu-theme/ayu-vim'
+Plug 'joshdick/onedark.vim'
 
 call plug#end()
 
@@ -303,14 +280,13 @@ set cmdheight=1            " command line height
 set tildeop                " Make ~ toggle case for whole line
 " set clipboard+=unnamedplus " Use system clipboard
 set iskeyword+=-           " Makes foo-bar considered one word
-set cursorline
+set nocursorline
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
-let ayucolor = "mirage"
-colorscheme ayu
-hi NERDTreeFile ctermfg=225 guifg=Number
-hi NERDTreeDir ctermfg=225 guifg=#FFAE57
+let g:onedark_terminal_italics = 1
+let g:airline_theme='onedark'
+colorscheme onedark
 
 " tab stuff
 set expandtab shiftwidth=2 softtabstop=2
@@ -328,7 +304,7 @@ set diffopt+=vertical     " Always diff vertically
 set synmaxcol=200         " Boost performance of rendering long lines
 set inccommand=nosplit    " live substitution preview
 set colorcolumn=          " alternative approach for lines that are too long
-highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+highlight OverLength ctermbg=red ctermfg=white guifg=NORMAL guibg=#592929
 match OverLength /\%81v.\+/
 
 " autocomplete list options
