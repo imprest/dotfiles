@@ -28,12 +28,12 @@ sudo pacman -Rns konversation inkscape cantata skanlite kget \
 
 # packages
 sudo pacman -Syu zsh neovim xclip python-neovim fzf ripgrep ctags npm \
-  yay otf-fira-code erlang elixir inotify-tools postgresql
+  yay otf-fantasque-sans-mono erlang elixir inotify-tools postgresql
+# size 12 in konsole or 10.5 for fira retina
 # optional
-# weechat
+# weechat pdfarranger
 
 # yay packages
-# yay -S otf-fantasque-sans-mono # size 12 in konsole or 10.5 for fira retina
 # yay -S dbview
 
 # git

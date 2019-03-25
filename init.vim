@@ -28,7 +28,7 @@ Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
 Plug 'alvan/vim-closetag'
-  let g:closetag_filenames = '*.html, *.xhtml, *.vue, *.eex'
+  let g:closetag_filenames = '*.html, *.xhtml, *.vue, *.eex, *.leex'
 Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
   imap <c-e> <c-y>,
 
@@ -65,10 +65,8 @@ Plug 'w0rp/ale'
   let g:ale_sign_column_always = 1
   let g:ale_sign_error    = '✗'
   let g:ale_sign_warning  = '!'
-  nmap <silent> [W <Plug>(ale_first)
-  nmap <silent> [w <Plug>(ale_previous)
-  nmap <silent> ]W <Plug>(ale_next)
-  nmap <silent> ]W <Plug>(ale_last)
+  nmap <silent> [r <Plug>(ale_previous_wrap)
+  nmap <silent> ]r <Plug>(ale_next_wrap)
 
 " Shell
 Plug 'kassio/neoterm'
@@ -129,6 +127,7 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
   augroup END
 
 " Editing
+Plug 'pbrisbin/vim-mkdir'   " :e this/does/notexist/file.txt :w Just works
 Plug 'jiangmiao/auto-pairs' " Insert or delete brackets, parens, quotes in pairs
 let g:AutoPairsMapCR=0      " no funny stuff on carriage return
 let g:AutoPairsMultilineClose = 0
@@ -271,8 +270,6 @@ call deoplete#custom#source('omni', 'functions', { 'javascript': ['jspc#omni'] }
 
 " Neovim Settings
 set numberwidth=5
-set ruler
-set autoread
 set complete-=i
 set nrformats-=octal
 set laststatus=2
@@ -485,7 +482,7 @@ vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 " enable matchit (for matching tags with %)
 let g:loaded_matchparen = 1
-runtime macros/matchit.vim
+runtime! macros/matchit.vim
 " Saner cmd line history
 cnoremap <c-n> <down>
 cnoremap <c-p> <up>
