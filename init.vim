@@ -79,8 +79,6 @@ Plug 'kassio/neoterm'
 
 " Autocompletion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'Shougo/neosnippet'
-Plug 'Shougo/neosnippet-snippets'
   let g:deoplete#enable_at_startup = 1
   let g:enable_smart_case          = 1
   let g:deoplete#enable_camel_case = 1
@@ -89,21 +87,24 @@ Plug 'Shougo/neosnippet-snippets'
   " <C-h>, <BS>: close popup and delete backword char.
   inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
   inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
-  " <C-i> to expand selected snippet in popup menu
-  imap <C-i> <Plug>(neosnippet_expand_or_jump)
-  smap <C-i> <Plug>(neosnippet_expand_or_jump)
-  xmap <C-i> <Plug>(neosnippet_expand_target)
   " set tab complete to work like SuperTab
-  " imap <expr><TAB> neosnippet#expandable_or_jumpable()?"\<Plug>(neosnippet_expand_or_jump)":(pumvisible()?"\<C-n>":"\<TAB>")
-  " smap <expr><TAB> neosnippet#expandable_or_jumpable()?"\<Plug>(neosnippet_expand_or_jump)":"\<TAB>"
   imap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
   smap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
   imap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
   smap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
   " For conceal markers.
   if has('conceal')
-    set conceallevel=2
+    set conceallevel=2 concealcursor=niv
   endif
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+  " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+  let g:UltiSnipsExpandTrigger="<tab>"
+  let g:UltiSnipsJumpForwardTrigger="<c-b>"
+  let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+  " If you want :UltiSnipsEdit to split your window.
+  let g:UltiSnipsEditSplit="vertical"
 
 " Project Management
 Plug 'airblade/vim-rooter'
