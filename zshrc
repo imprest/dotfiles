@@ -5,6 +5,7 @@ fi
 
 source ~/.zplug/init.zsh
 
+zplug "rupa/z", use:z.sh
 zplug "k4rthik/git-cal"
 zplug "supercrabtree/k"
 zplug "lib/completion", from:oh-my-zsh
@@ -15,9 +16,9 @@ zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-history-substring-search"
 # zplug "themes/spaceship", from:oh-my-zsh, as:theme
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
-SPACESHIP_CHAR_SYMBOL='λ '
+SPACESHIP_CHAR_SYMBOL='> '
 SPACESHIP_PROMPT_ADD_NEWLINE=false
-SPACESHIP_PROMPT_SEPARATE_LINE=false
+# SPACESHIP_PROMPT_SEPARATE_LINE=false
 SPACESHIP_ELIXIR_SHOW=false
 SPACESHIP_PACKAGE_SHOW=false
 SPACESHIP_NODE_SHOW=false
@@ -105,3 +106,9 @@ alias gd="git diff"
 alias gs="git status"
 alias gl="git log --oneline --decorate -20"
 alias gla="git log --oneline --decorate --graph --all"
+
+# asdf
+source $HOME/.asdf/asdf.sh
+source $HOME/.asdf/completions/asdf.bash
+
+# export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
