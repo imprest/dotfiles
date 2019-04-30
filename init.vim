@@ -74,7 +74,7 @@ Plug 'kassio/neoterm'
   set noshelltemp " use pipes
   let g:neoterm_autojump = 1
   nnoremap <silent> ,tl :Tclear<CR>
-  nnoremap <Leader>c :botright Tnew <bar> :res 6<CR>
+  nnoremap <Leader>c :botright Tnew <bar> :res 6 <bar> :set wfh<CR>
   nnoremap <Leader>cv :vert Tnew<CR>
 
 " Autocompletion
