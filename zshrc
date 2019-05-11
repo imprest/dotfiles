@@ -108,7 +108,7 @@ alias gl="git log --oneline --decorate -20"
 alias gla="git log --oneline --decorate --graph --all"
 
 # asdf
-# source $HOME/.asdf/asdf.sh
-# source $HOME/.asdf/completions/asdf.bash
+# For vscode: echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.profile
+. $HOME/.asdf/asdf.sh
+. $HOME/.asdf/completions/asdf.bash
 
-# export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
