@@ -19,7 +19,6 @@ Plug 'sheerun/vim-polyglot'
 
 " Vue & Javascript
 Plug 'othree/yajs.vim' " Improved syntax highlighting and indentation
-Plug 'othree/jspc.vim' " Deoplete source for javascript
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   let g:used_javascript_libs = 'vue, d3'
   autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
@@ -40,24 +39,14 @@ Plug 'mhinz/vim-mix-format'
   let g:mix_format_on_save       = 1
   let g:mix_format_silent_errors = '--check-equivalent'
 Plug 'tpope/vim-endwise'
-Plug 'ludovicchabant/vim-gutentags' " Easily manage tags files
-  let g:gutentags_cache_dir = '~/.tags_cache'
-  let g:gutentags_ctags_exclude=["node_modules","plugged","tmp","temp","log","vendor","**/db/migrate/*","bower_components","dist","build","coverage","spec","public","app/assets","*.json"]
-  " Enter is go to definition (ctags)
-  nnoremap <CR> <C-]>
-  " In quickfix,  <CR> to jump to error under the cursor
-  autocmd FileType qf  nnoremap <buffer> <CR> <CR>
-  " same for vim type windows
-  autocmd FileType vim nnoremap <buffer> <CR> <CR>
-  let g:alchemist_tag_map = '<CR>'
-  let g:alchemist_tag_stack_map = '<C-T>'
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
 
 " Linting
 Plug 'w0rp/ale'
-  let g:ale_linters = { 'javascript': ['eslint'], 'vue': ['vue', 'javascript'] }
-  let g:ale_fixers  = { 'javascript': ['eslint'], 'vue': ['eslint'] }
+  let g:ale_linters_aliases = { 'svelte': ['javascript'] }
+  let g:ale_linters = { 'javascript': ['eslint'], 'svelte': ['eslint'] }
+  let g:ale_fixers  = { 'javascript': ['eslint'], 'svelte': ['eslint'] }
   let g:ale_lint_on_text_changed = 0
   let g:ale_lint_on_save  = 1
   let g:ale_lint_on_enter = 1
@@ -74,36 +63,11 @@ Plug 'kassio/neoterm'
   set noshelltemp " use pipes
   let g:neoterm_autojump = 1
   nnoremap <silent> ,tl :Tclear<CR>
-  nnoremap <Leader>c :botright Tnew <bar> :res 6 <bar> :set wfh<CR>
+  nnoremap <Leader>c :botright Tnew <bar> :res 8 <bar> :set wfh<CR>
   nnoremap <Leader>cv :vert Tnew<CR>
 
 " Autocompletion
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-  let g:deoplete#enable_at_startup = 1
-  let g:enable_smart_case          = 1
-  let g:deoplete#enable_camel_case = 1
-  set completeopt-=preview
-  set shortmess+=c " suppress 'match x of y', 'The only match' and 'Pattern not found' messages
-  " <C-h>, <BS>: close popup and delete backword char.
-  inoremap <expr><C-h> deoplete#smart_close_popup()."\<C-h>"
-  inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
-  " set tab complete to work like SuperTab
-  imap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-  smap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-  imap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
-  smap <expr><S-TAB> pumvisible() ? "\<C-p>" : ""
-  " For conceal markers.
-  if has('conceal')
-    set conceallevel=2 concealcursor=niv
-  endif
 Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-  " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-  let g:UltiSnipsExpandTrigger="<C-k>"
-  let g:UltiSnipsJumpForwardTrigger="<c-b>"
-  let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-  " If you want :UltiSnipsEdit to split your window.
-  let g:UltiSnipsEditSplit="vertical"
 
 " Project Management
 Plug 'airblade/vim-rooter'
@@ -134,7 +98,7 @@ let g:AutoPairsMultilineClose = 0
 au FileType vim let b:AutoPairs = {'(':')','[':']','{':'}',"'":"'",'`':'`'}
 au FileType rust let b:AutoPairs={'(': ')', '[': ']', '{': '}', "|": "|", '"': '"', '`': '`'}
 au FileType tex,markdown let b:AutoPairs={'(': ')', '[': ']', '{': '}', '"': '"', '`': '`', '$': '$'}
-Plug 'junegunn/vim-easy-align'
+Plug 'godlygeek/tabular'
 Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'          " allow added vim motion to be repeatable like vim-surround
 Plug 'machakann/vim-sandwich'    " surround motion ie saiw( foo -> (foo) | sd( for del | sdr({ (foo) -> {foo}
@@ -145,7 +109,7 @@ Plug 'chrisbra/unicode.vim'      " :UnicodeTable to search and copy unicode char
 
 " Folding
 set foldenable
-set fillchars=diff:\               " Subtitute characters shown in certain modes
+set fillchars=vert:\               " Subtitute characters shown in certain modes
 set foldlevelstart=9               " Show most folds by default
 set foldnestmax=5                  " You're writing bad code if you need to up this one
 set foldmethod=syntax              " Fold based on syntax
@@ -162,7 +126,7 @@ Plug 'wesQ3/vim-windowswap'        " <Leader>ww once to select window and again 
 Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-  let g:fzf_layout = { 'down': '~21%' }
+  let g:fzf_layout = { 'down': '~30%' }
   let g:fzf_colors =
         \ { 'fg':      ['fg', 'Normal'],
         \   'bg':      ['bg', 'Normal'],
@@ -265,8 +229,6 @@ Plug 'joshdick/onedark.vim'
 
 call plug#end()
 
-" Set various Omni completion sources; has to be done after call plug#end()
-call deoplete#custom#source('omni', 'functions', { 'javascript': ['jspc#omni'] })
 
 " Neovim Settings
 set numberwidth=5
@@ -294,6 +256,7 @@ set smartindent
 set title
 set showmatch matchtime=2 " show matching brackets/braces (2*1/10 sec)
 set number
+set relativenumber
 set noshowmode
 set t_ut=                 " improve screen clearing by using the background colour
 set diffopt+=iwhite       " Add ignorance of whitespace to diff
@@ -304,11 +267,11 @@ set colorcolumn=          " alternative approach for lines that are too long
 highlight OverLength ctermbg=red ctermfg=white guifg=NORMAL guibg=#592929
 match OverLength /\%81v.\+/
 
-" autocomplete list options
+" Autocomplete list options
 set wildmenu
-set wildmode=list:full " show similar and all options
+set wildmode=list:longest,full " show similar and all options
 set wildignorecase
-set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js
+set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js,*.scssc,*.csv,*.xls
 set shortmess+=aoOTI " shorten messages
 set timeoutlen=300   " mapping timeout
 set ttimeoutlen=10   " keycode timeout
@@ -331,11 +294,11 @@ set nostartofline " don't jump to the start of line when scrolling
 " whitespace, hidden characters & line breaks
 " set list      " Toggle showing hidden characters i.e. space
 set linebreak   " Wrap long lines at a character
-set listchars+=tab:——,trail:·,eol:$,space:· ",extends:❯,precedes:❮,conceal:Δ,nbsp:+
+set listchars+=tab:▸\ ,trail:.,eol:¬,space:·,extends:❯,precedes:❮ ",conceal:Δ,nbsp:+
 let &showbreak="↪ "
 set breakindent " when wrapping, indent the lines
 set breakindentopt=sbr
-set nowrap
+set wrap
 set formatoptions+=rno1l
 
 " searching
@@ -499,29 +462,54 @@ function! OpenExDoc()
   endif
 endfunction
 
-" Auto Commands
-augroup vimrc
+" FileType settings {{{
+augroup general
   au!
+  au BufWritePre * %s/\s\+$//e " Trim whitespace onsave
 
-  " Trim whitespace onsave
-  autocmd BufWritePre * %s/\s\+$//e
-
-  " For newly started terminal; start in insert mode
-  autocmd TermOpen * :startinsert
-  autocmd BufEnter,BufNew term://* set nonumber
-  autocmd BufEnter,BufNew term://* :startinsert
+  " Help buffer
+  au FileType help nnoremap <buffer><cr> <c-]>
+  au FileType help nnoremap <buffer><bs> <c-T>
+  au FileType help nnoremap <buffer>q :q<CR>
 augroup END
 
-augroup MyFileTypes
+" Vim
+augroup filetype_vim
+  au FileType vim setlocal fdm=indent keywordprg=:help
+  " fold automatically with triple {
+  au FileType vim,javascript,python,c setlocal foldmethod=marker nofoldenable
+augroup END
+
+" Terminal window
+augroup terminal
+  au!
+  au TermOpen * setlocal nonumber norelativenumber
+  au TermOpen * :startinsert
+  au BufEnter,BufNew term://* :startinsert
+augroup END
+
+" Disable automatic comment insertion
+augroup auto_comments
+  au!
+  au FileType * setlocal formatoptions-=ro
+augroup END
+
+" enable <CR> in command line window and quickfix
+augroup enable_cr
+  au!
+  au CmdWinEnter * nnoremap <buffer> <CR> <CR>
+  au BufWinEnter quickfix nnoremap  <buffer> <CR> <CR>
+augroup END
+
+" Svelte
+augroup filetype_svelte
+  au!
+  au BufNewFile,BufRead,BufReadPost *.svelte set syntax=html
+augroup END
+
+" SCSS
+augroup filetype_scss
   au!
   au FileType css,scss setlocal foldmethod=marker foldmarker={,}
-  au filetype vim setlocal fdm=indent keywordprg=:help
-  au FileType vim setlocal fdm=indent keywordprg=:help
-
-  " Help System Speedups
-  autocmd filetype help nnoremap <buffer><cr> <c-]>
-  autocmd filetype help nnoremap <buffer><bs> <c-T>
-  autocmd filetype help nnoremap <buffer>q :q<CR>
-
-  autocmd filetype qf setlocal wrap
 augroup END
+" }}}
