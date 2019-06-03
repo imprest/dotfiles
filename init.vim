@@ -18,18 +18,9 @@ Plug 'dietsche/vim-lastplace'
 Plug 'sheerun/vim-polyglot'
 
 " AutoCompletion, linting, Lsp etc.
+Plug 'ervandew/supertab'
+  let g:SuperTabDefaultCompletionType = "<c-n>"
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
-  function! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~ '\s'
-  endfunction
-  inoremap <silent><expr> <Tab>
-    \ pumvisible() ? "\<C-n>" :
-    \ <SID>check_back_space() ? "\<Tab>" :
-    \ coc#refresh()
-  inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-  inoremap <expr> <S-TAB> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-  autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
   nmap <silent> gd <Plug>(coc-definition)
   nmap <silent> gy <Plug>(coc-type-definition)
   nmap <silent> gi <Plug>(coc-implementation)
@@ -62,6 +53,7 @@ Plug 'janko-m/vim-test'
   nmap <Leader>t :TestNearest
   nmap <Leader>f :TestFile
   " nmap <Leader>s :TestSuite
+iabbrev <buffer> pp \|>
 
 " Shell
 Plug 'kassio/neoterm'
@@ -112,8 +104,7 @@ Plug 'stefandtw/quickfix-reflector.vim' " Edit quickfix list and commit changes 
 
 " Folding
 set foldenable
-set fillchars+=vert:.              " Subtitute characters shown in certain modes
-set foldlevelstart=9               " Show most folds by default
+set foldlevelstart=3               " Show most folds by default
 set foldnestmax=5                  " You're writing bad code if you need to up this one
 set foldmethod=syntax              " Fold based on syntax
 set foldopen+=jump
@@ -124,6 +115,8 @@ nnoremap zR zR:echo &foldlevel<CR>
 nnoremap zM zM:echo &foldlevel<CR>
 
 " Navigation
+Plug 'moll/vim-bbye'               " Delete buffers without closing windows or messing with layout
+  nnoremap q :Bdelete<cr>
 Plug 'justinmk/vim-gtfo'           " ,gof open file in filemanager
 Plug 'wesQ3/vim-windowswap'        " <Leader>ww once to select window and again to swap window
 Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
@@ -502,3 +495,4 @@ augroup filetype_scss
   au FileType css,scss setlocal foldmethod=marker foldmarker={,}
 augroup END
 " }}}
+
