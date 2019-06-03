@@ -17,12 +17,33 @@ Plug 'dietsche/vim-lastplace'
 " Languages
 Plug 'sheerun/vim-polyglot'
 
+" AutoCompletion, linting, Lsp etc.
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+  function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+  endfunction
+  inoremap <silent><expr> <Tab>
+    \ pumvisible() ? "\<C-n>" :
+    \ <SID>check_back_space() ? "\<Tab>" :
+    \ coc#refresh()
+  inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+  inoremap <expr> <S-TAB> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+  autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+  nmap <silent> gd <Plug>(coc-definition)
+  nmap <silent> gy <Plug>(coc-type-definition)
+  nmap <silent> gi <Plug>(coc-implementation)
+  nmap <silent> gr <Plug>(coc-references)
+Plug 'Shougo/echodoc.vim'
+  let g:echo_enable_at_startup = 1
+
 " Vue & Javascript
 Plug 'othree/yajs.vim' " Improved syntax highlighting and indentation
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   let g:used_javascript_libs = 'vue, d3'
   autocmd BufReadPre *.vue let b:javascript_lib_use_vue = 1
   autocmd FileType vue syntax sync fromstart
+Plug 'evanleck/vim-svelte'
 
 " HTML
 Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
@@ -32,30 +53,15 @@ Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
   imap <c-e> <c-y>,
 
 " Elixir & Erlang
-Plug 'slashmili/alchemist.vim'
-  let g:alchemist_tag_disable = 1
-  let g:alchemist#elixir_erlang_src = "/usr/lib/elixir"
 Plug 'mhinz/vim-mix-format'
   let g:mix_format_on_save       = 1
   let g:mix_format_silent_errors = '--check-equivalent'
 Plug 'tpope/vim-endwise'
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim' " run tests in neovim strategy
-
-" Linting
-Plug 'w0rp/ale'
-  let g:ale_linters_aliases = { 'svelte': ['javascript'] }
-  let g:ale_linters = { 'javascript': ['eslint'], 'svelte': ['eslint'] }
-  let g:ale_fixers  = { 'javascript': ['eslint'], 'svelte': ['eslint'] }
-  let g:ale_lint_on_text_changed = 0
-  let g:ale_lint_on_save  = 1
-  let g:ale_lint_on_enter = 1
-  let g:ale_fix_on_save   = 1
-  let g:ale_sign_column_always = 1
-  let g:ale_sign_error    = '✗'
-  let g:ale_sign_warning  = '!'
-  nmap <silent> [r <Plug>(ale_previous_wrap)
-  nmap <silent> ]r <Plug>(ale_next_wrap)
+  nmap <Leader>t :TestNearest
+  nmap <Leader>f :TestFile
+  " nmap <Leader>s :TestSuite
 
 " Shell
 Plug 'kassio/neoterm'
@@ -66,7 +72,7 @@ Plug 'kassio/neoterm'
   nnoremap <Leader>c :botright Tnew <bar> :res 8 <bar> :set wfh<CR>
   nnoremap <Leader>cv :vert Tnew<CR>
 
-" Autocompletion
+" Snippets
 Plug 'SirVer/ultisnips'
 
 " Project Management
@@ -79,6 +85,7 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
   map <F3>  :NERDTreeFind<CR>
   let g:NERDTreeMinimalUI=1
   let g:NERDTreeWinSize=20
+  let g:NERDTreeStatusLine = ''
   let NERDTreeIgnore = ['\.git','\.hg','\.npm','\node_modules','\.rebar']
   augroup nerd_loader
     autocmd!
@@ -92,12 +99,7 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 
 " Editing
 Plug 'pbrisbin/vim-mkdir'   " :e this/does/notexist/file.txt :w Just works
-Plug 'jiangmiao/auto-pairs' " Insert or delete brackets, parens, quotes in pairs
-let g:AutoPairsMapCR=0      " no funny stuff on carriage return
-let g:AutoPairsMultilineClose = 0
-au FileType vim let b:AutoPairs = {'(':')','[':']','{':'}',"'":"'",'`':'`'}
-au FileType rust let b:AutoPairs={'(': ')', '[': ']', '{': '}', "|": "|", '"': '"', '`': '`'}
-au FileType tex,markdown let b:AutoPairs={'(': ')', '[': ']', '{': '}', '"': '"', '`': '`', '$': '$'}
+Plug 'rstacruz/vim-closer'
 Plug 'godlygeek/tabular'
 Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'          " allow added vim motion to be repeatable like vim-surround
@@ -106,10 +108,11 @@ Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
 Plug 'chrisbra/unicode.vim'      " :UnicodeTable to search and copy unicode chars
+Plug 'stefandtw/quickfix-reflector.vim' " Edit quickfix list and commit changes to files
 
 " Folding
 set foldenable
-set fillchars=vert:\               " Subtitute characters shown in certain modes
+set fillchars+=vert:.              " Subtitute characters shown in certain modes
 set foldlevelstart=9               " Show most folds by default
 set foldnestmax=5                  " You're writing bad code if you need to up this one
 set foldmethod=syntax              " Fold based on syntax
@@ -126,7 +129,7 @@ Plug 'wesQ3/vim-windowswap'        " <Leader>ww once to select window and again 
 Plug 'milkypostman/vim-togglelist' " <leader>l & q for location and quick list
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-  let g:fzf_layout = { 'down': '~30%' }
+  let g:fzf_layout = { 'down': '~18%' }
   let g:fzf_colors =
         \ { 'fg':      ['fg', 'Normal'],
         \   'bg':      ['bg', 'Normal'],
@@ -148,13 +151,8 @@ Plug 'junegunn/fzf.vim'
   nnoremap <Leader>bt :BTags<CR>
   nnoremap <Leader>T  :Tags<CR>
   nnoremap <Leader>b  :Buffers<CR>
-
-" Searching
-Plug 'mileszs/ack.vim' " :Ack <word to search>
-  if executable('rg')
-    let g:ackprg = "rg --column --smart-case --follow"
-    set grepprg=rg\ --vimgrep
-  endif
+Plug 'jremmen/vim-ripgrep'
+  let g:rg_command = 'rg --vimgrep -S'
 Plug 'osyo-manga/vim-anzu'
   nmap n <Plug>(anzu-n)zz
   nmap N <Plug>(anzu-N)zz
@@ -191,9 +189,11 @@ Plug 'vim-airline/vim-airline-themes'
   let g:airline_skip_empty_sections             = 1
   let g:airline_left_sep                        = ''
   let g:airline_right_sep                       = ''
+  let g:airline_exclude_preview                 = 1
   let g:airline#extensions#tabline#enabled      = 1
   let g:airline#extensions#tabline#left_sep     = ''
   let g:airline#extensions#tabline#left_alt_sep = ''
+  let g:airline#extensions#tabline#formatter    ='unique_tail'
   let g:airline_mode_map = {
         \ '__' : '-',
         \ 'n'  : 'N',
@@ -225,7 +225,8 @@ Plug 'vim-airline/vim-airline-themes'
 "   let g:tex_flavour = 'latex'
 
 " Colorschemes
-Plug 'joshdick/onedark.vim'
+" Plug 'rakr/vim-one'
+Plug 'mhartington/oceanic-next'
 
 call plug#end()
 
@@ -237,15 +238,16 @@ set nrformats-=octal
 set laststatus=2
 set cmdheight=1            " command line height
 set tildeop                " Make ~ toggle case for whole line
-" set clipboard+=unnamedplus " Use system clipboard
+set clipboard+=unnamedplus " Use system clipboard
 set iskeyword+=-           " Makes foo-bar considered one word
 set nocursorline
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
-let g:onedark_terminal_italics = 1
-let g:airline_theme='onedark'
-colorscheme onedark
+let g:oceanic_text_terminal_bold = 1
+let g:oceanic_text_terminal_italics = 1
+let g:airline_theme='oceanicnext'
+colorscheme OceanicNext
 
 " tab stuff
 set expandtab shiftwidth=2 softtabstop=2
@@ -256,7 +258,6 @@ set smartindent
 set title
 set showmatch matchtime=2 " show matching brackets/braces (2*1/10 sec)
 set number
-set relativenumber
 set noshowmode
 set t_ut=                 " improve screen clearing by using the background colour
 set diffopt+=iwhite       " Add ignorance of whitespace to diff
@@ -272,7 +273,7 @@ set wildmenu
 set wildmode=list:longest,full " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js,*.scssc,*.csv,*.xls
-set shortmess+=aoOTI " shorten messages
+set shortmess+=c     " shorten messages
 set timeoutlen=300   " mapping timeout
 set ttimeoutlen=10   " keycode timeout
 
@@ -314,28 +315,16 @@ set nobackup
 set nowritebackup
 set noswapfile
 let g:data_dir = $HOME . '/.data/'
-let g:backup_dir = g:data_dir . 'backup'
-let g:swap_dir = g:data_dir . 'swap'
 let g:undo_dir = g:data_dir . 'undofile'
 if finddir(g:data_dir) == ''
   silent call mkdir(g:data_dir)
 endif
-if finddir(g:backup_dir) == ''
-  silent call mkdir(g:backup_dir)
-endif
-if finddir(g:swap_dir) == ''
-  silent call mkdir(g:swap_dir)
-endif
 if finddir(g:undo_dir) == ''
   silent call mkdir(g:undo_dir)
 endif
-unlet g:backup_dir
-unlet g:swap_dir
 unlet g:data_dir
 unlet g:undo_dir
 set undodir=$HOME/.data/undofile
-set backupdir=$HOME/.data/backup
-set directory=$HOME/.data/swap
 set undofile
 set undolevels=1000
 set undoreload=1000
@@ -356,6 +345,8 @@ function! CloseWindowOrKillBuffer()
     bdelete
   endif
 endfunction
+" Automaticaly close nvim if NERDTree is only thing left open
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " Keyboard mappings
 " common actions
@@ -370,6 +361,7 @@ command! Q q " Bind :Q to :q
 command! Qall qall
 command! QA qall
 command! E e
+nnoremap <Leader>* :%s/\<<c-r><c-w>\>//g<left><left> " replace the word under cursor
 " Navigation made easy
 noremap  H ^
 noremap  L g_
@@ -450,15 +442,12 @@ runtime! macros/matchit.vim
 cnoremap <c-n> <down>
 cnoremap <c-p> <up>
 " Make K or help open in vertical split
-autocmd FileType help  wincmd L | vert res 80<CR>
-autocmd FileType elixir nnoremap <buffer> <s-k> :call OpenExDoc()<CR>
-autocmd FileType elixir nnoremap <buffer> <leader>d :call alchemist#exdef()<CR>
-" Opens alchemist exdoc
-function! OpenExDoc()
-  :call alchemist#exdoc() | wincmd L | vert res 80
-  setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap modifiable nocursorline nofoldenable
-  if exists('&relativenumber')
-    setlocal norelativenumber
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+function! s:show_documentation()
+  if (index(['vim', 'help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
   endif
 endfunction
 
