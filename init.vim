@@ -20,7 +20,7 @@ Plug 'sheerun/vim-polyglot'
 " AutoCompletion, linting, Lsp etc.
 Plug 'ervandew/supertab'
   let g:SuperTabDefaultCompletionType = "<c-n>"
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': './install.sh'}
   nmap <silent> gd <Plug>(coc-definition)
   nmap <silent> gy <Plug>(coc-type-definition)
   nmap <silent> gi <Plug>(coc-implementation)
@@ -37,10 +37,10 @@ Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
 Plug 'evanleck/vim-svelte'
 
 " HTML
-Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
+Plug 'gregsexton/MatchTag', { 'for': ['html', 'javascript', 'vue', 'elixir', 'svelte'] }
 Plug 'alvan/vim-closetag'
-  let g:closetag_filenames = '*.html, *.xhtml, *.vue, *.eex, *.leex'
-Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir'] }
+  let g:closetag_filenames = '*.html, *.xhtml, *.vue, *.eex, *.leex, *.svelte'
+Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir', 'svelte'] }
   imap <c-e> <c-y>,
 
 " Elixir & Erlang
@@ -66,6 +66,9 @@ Plug 'kassio/neoterm'
 
 " Snippets
 Plug 'SirVer/ultisnips'
+  let g:UltiSnipsJumpForwardTrigger="<c-f>"
+  let g:UltiSnipsJumpBackwardTrigger="<c-b>"
+Plug 'honza/vim-snippets'
 
 " Project Management
 Plug 'airblade/vim-rooter'
@@ -90,8 +93,13 @@ Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
   augroup END
 
 " Editing
-Plug 'pbrisbin/vim-mkdir'   " :e this/does/notexist/file.txt :w Just works
-Plug 'rstacruz/vim-closer'
+Plug 'pbrisbin/vim-mkdir'    " :e this/does/notexist/file.txt :w Just works
+Plug 'jiangmiao/auto-pairs'  " Insert or delete brackets, parens, quotes in pairs
+  let g:AutoPairsMapCR=0     " no funny stuff on carriage return
+  let g:AutoPairsMultilineClose = 0
+  au FileType vim let b:AutoPairs = {'(':')','[':']','{':'}',"'":"'",'`':'`'}
+  au FileType rust let b:AutoPairs={'(': ')', '[': ']', '{': '}', "|": "|", '"': '"', '`': '`'}
+  au FileType tex,markdown let b:AutoPairs={'(': ')', '[': ']', '{': '}', '"': '"', '`': '`', '$': '$'}
 Plug 'godlygeek/tabular'
 Plug 'tpope/vim-commentary'      " gc i.e. toggle commenting code
 Plug 'tpope/vim-repeat'          " allow added vim motion to be repeatable like vim-surround
@@ -170,8 +178,8 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   nnoremap <C-u> <C-e>
   noremap <silent> <c-e> :call smooth_scroll#up(&scroll, 15, 2)<CR>
   noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 15, 2)<CR>
-  noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
-  noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
+  " noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 15, 4)<CR>
+  " noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 15, 4)<CR>
 
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -366,7 +374,7 @@ inoremap <C-j> <up>
 inoremap <C-k> <down>
 inoremap <C-l> <right>
 inoremap <C-u> <C-g>u<C-u> " Del from start of line to cursor position
-inoremap <C-b> <S-Left>
+" inoremap <C-b> <S-Left> " give to ultisnips
 inoremap <C-w> <S-Right>
 " Navigation between display lines
 noremap  <silent> <Up>   gk
