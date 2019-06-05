@@ -53,7 +53,9 @@ Plug 'janko-m/vim-test'
   nmap <Leader>t :TestNearest
   nmap <Leader>f :TestFile
   " nmap <Leader>s :TestSuite
-iabbrev <buffer> pp \|>
+  augroup filetype_elixir
+    au FileType elixir,eelixir iabbrev <buffer> pp \|>
+  augroup END
 
 " Shell
 Plug 'kassio/neoterm'
@@ -245,8 +247,8 @@ set nocursorline
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
-let g:oceanic_text_terminal_bold = 1
-let g:oceanic_text_terminal_italics = 1
+let g:oceanic_next_terminal_bold = 1
+let g:oceanic_next_terminal_italic = 1
 let g:airline_theme='oceanicnext'
 colorscheme OceanicNext
 
