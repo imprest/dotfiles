@@ -109,7 +109,6 @@ Plug 'machakann/vim-sandwich'    " surround motion ie saiw( foo -> (foo) | sd( f
 Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
-Plug 'chrisbra/unicode.vim'      " :UnicodeTable to search and copy unicode chars
 Plug 'stefandtw/quickfix-reflector.vim' " Edit quickfix list and commit changes to files
 
 " Folding
