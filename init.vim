@@ -56,6 +56,7 @@ Plug 'janko-m/vim-test'
   augroup filetype_elixir
     au FileType elixir,eelixir iabbrev <buffer> pp \|>
   augroup END
+Plug 'andymass/vim-matchup'
 
 " Shell
 Plug 'kassio/neoterm'
@@ -437,9 +438,6 @@ nnoremap <Leader>ff :execute 'vimgrep /'.@/.'/g %'<CR>:copen<cr>
 " Move visual block
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
-" enable matchit (for matching tags with %)
-let g:loaded_matchparen = 1
-runtime! macros/matchit.vim
 " Saner cmd line history
 cnoremap <c-n> <down>
 cnoremap <c-p> <up>
