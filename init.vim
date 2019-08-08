@@ -20,7 +20,7 @@ Plug 'sheerun/vim-polyglot'
 " AutoCompletion, linting, Lsp etc.
 Plug 'ervandew/supertab'
   let g:SuperTabDefaultCompletionType = "<c-n>"
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': './install.sh'}
+Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release'}
   nmap <silent> gd <Plug>(coc-definition)
   nmap <silent> gy <Plug>(coc-type-definition)
   nmap <silent> gi <Plug>(coc-implementation)
