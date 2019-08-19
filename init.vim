@@ -28,7 +28,7 @@ Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release'}
 Plug 'Shougo/echodoc.vim'
   let g:echo_enable_at_startup = 1
 
-" Vue & Javascript
+" Svelte, Vue, D3 & Javascript
 Plug 'othree/yajs.vim' " Improved syntax highlighting and indentation
 Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion of Vue
   let g:used_javascript_libs = 'vue, d3'
@@ -110,12 +110,11 @@ Plug 'machakann/vim-sandwich'    " surround motion ie saiw( foo -> (foo) | sd( f
 Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
   vmap v <Plug>(expand_region_expand)
   vmap <C-v> <Plug>(expand_region_shrink)
-Plug 'stefandtw/quickfix-reflector.vim' " Edit quickfix list and commit changes to files
+" Plug 'stefandtw/quickfix-reflector.vim' " Edit quickfix list and commit changes to files
 
 " Folding
 set foldenable
-set foldlevelstart=3               " Show most folds by default
-set foldnestmax=5                  " You're writing bad code if you need to up this one
+set foldlevelstart=2               " Show most folds by default
 set foldmethod=syntax              " Fold based on syntax
 set foldopen+=jump
 let g:xml_sytax_folding = 1
@@ -150,10 +149,10 @@ Plug 'junegunn/fzf.vim'
   autocmd  FileType fzf set laststatus=0 noshowmode noruler
         \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
   nnoremap <c-p>      :Files<CR>
-  noremap  <Leader>r  :History<CR>
+  nnoremap <c-b>      :Buffers<CR>
+  nnoremap <Leader>r  :History<CR>
   nnoremap <Leader>bt :BTags<CR>
   nnoremap <Leader>T  :Tags<CR>
-  nnoremap <Leader>b  :Buffers<CR>
 Plug 'jremmen/vim-ripgrep'
   let g:rg_command = 'rg --vimgrep -S'
 Plug 'osyo-manga/vim-anzu'
@@ -185,7 +184,7 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
 
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-  let g:airline_section_z = ' %3l:%2c %3p%%'
+  let g:airline_section_z = '%3l:%2c%3p%%'
   let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
   let g:airline_highlighting_cache              = 1
   let g:airline_powerline_fonts                 = 1
@@ -229,7 +228,8 @@ Plug 'vim-airline/vim-airline-themes'
 
 " Colorschemes
 " Plug 'rakr/vim-one'
-Plug 'mhartington/oceanic-next'
+" Plug 'mhartington/oceanic-next'
+Plug 'chriskempson/base16-vim'
 
 call plug#end()
 
@@ -247,10 +247,10 @@ set nocursorline
 set mouse=a
 set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
-let g:oceanic_next_terminal_bold = 1
-let g:oceanic_next_terminal_italic = 1
-let g:airline_theme='oceanicnext'
-colorscheme OceanicNext
+" let g:oceanic_next_terminal_bold = 1
+" let g:oceanic_next_terminal_italic = 1
+let g:airline_theme='base16-atelier-dune'
+colorscheme base16-atelier-dune
 
 " tab stuff
 set expandtab shiftwidth=2 softtabstop=2
@@ -260,6 +260,7 @@ set smartindent
 " ui options
 set title
 set showmatch matchtime=2 " show matching brackets/braces (2*1/10 sec)
+set relativenumber
 set number
 set noshowmode
 set t_ut=                 " improve screen clearing by using the background colour
@@ -267,13 +268,14 @@ set diffopt+=iwhite       " Add ignorance of whitespace to diff
 set diffopt+=vertical     " Always diff vertically
 set synmaxcol=200         " Boost performance of rendering long lines
 set inccommand=nosplit    " live substitution preview
-set colorcolumn=          " alternative approach for lines that are too long
-highlight OverLength ctermbg=red ctermfg=white guifg=NORMAL guibg=#592929
-match OverLength /\%81v.\+/
+set colorcolumn=80        " alternative approach for lines that are too long
+" highlight OverLength ctermbg=red ctermfg=white guifg=NORMAL guibg=#592929
+" match OverLength /\%81v.\+/
+set signcolumn=yes
 
 " Autocomplete list options
 set wildmenu
-set wildmode=list:longest,full " show similar and all options
+set wildmode=list:longest " show similar and all options
 set wildignorecase
 set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot,*public/css/*,*public/js,*.scssc,*.csv,*.xls
 set shortmess+=c     " shorten messages
@@ -390,6 +392,11 @@ inoremap <silent> <End>  <C-o>g<End>
 " smash escape
 inoremap jk <esc>
 inoremap kj <esc>
+" Ctrl+c nad Ctrl+j as Esc
+inoremap <C-j> <Esc>
+vnoremap <C-j> <Esc>
+inoremap <C-c> <Esc>
+vnoremap <C-c> <Esc>
 " quickly move between open buffers
 nnoremap <Right> :bnext<CR>
 nnoremap <Left>  :bprev<CR>

@@ -6,7 +6,7 @@
 sudo systemctl disable avahi-daemon
 
 # select fastest mirrors
-sudo pacman-mirrors -f 0
+sudo pacman-mirrors -f 5
 
 # run mhwd for nvidia drivers
 # i.e. disable via bubblebee and acpi_rev_override=1 in /etc/default/grub
@@ -28,8 +28,8 @@ sudo pacman -Rns konversation inkscape cantata skanlite kget \
 
 # packages
 sudo pacman -Syu zsh neovim xclip python-neovim fzf ripgrep ctags npm \
-  yay otf-fantasque-sans-mono erlang elixir inotify-tools postgresql
-# size 12 in konsole or 10.5 for fira retina
+  yay otf-fira-code erlang elixir inotify-tools postgresql
+# size 12 in konsole or 10 for fira code light
 # optional
 # weechat pdfarranger
 
