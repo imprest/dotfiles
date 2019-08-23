@@ -249,7 +249,7 @@ set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
 " let g:oceanic_next_terminal_bold = 1
 " let g:oceanic_next_terminal_italic = 1
-let g:airline_theme='base16-atelier-dune'
+let g:airline_theme='base16-atelier'
 colorscheme base16-atelier-dune
 
 " tab stuff
