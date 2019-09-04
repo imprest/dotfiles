@@ -114,7 +114,7 @@ Plug 'terryma/vim-expand-region' " hit v repeatable to select surrounding
 
 " Folding
 set foldenable
-set foldlevelstart=2               " Show most folds by default
+set foldlevelstart=5               " Show most folds by default
 set foldmethod=syntax              " Fold based on syntax
 set foldopen+=jump
 let g:xml_sytax_folding = 1
@@ -249,7 +249,7 @@ set termguicolors          " Enable 24-bit colors in supported terminals
 set background=dark
 " let g:oceanic_next_terminal_bold = 1
 " let g:oceanic_next_terminal_italic = 1
-let g:airline_theme='base16-atelier'
+let g:airline_theme='base16_atelierdune'
 colorscheme base16-atelier-dune
 
 " tab stuff
@@ -392,7 +392,7 @@ inoremap <silent> <End>  <C-o>g<End>
 " smash escape
 inoremap jk <esc>
 inoremap kj <esc>
-" Ctrl+c nad Ctrl+j as Esc
+" Ctrl+c and Ctrl+j as Esc
 inoremap <C-j> <Esc>
 vnoremap <C-j> <Esc>
 inoremap <C-c> <Esc>
@@ -467,6 +467,10 @@ augroup general
   au FileType help nnoremap <buffer><cr> <c-]>
   au FileType help nnoremap <buffer><bs> <c-T>
   au FileType help nnoremap <buffer>q :q<CR>
+
+  " Save folds
+  autocmd BufWinLeave .* mkview
+  autocmd BufWinEnter .* silent loadview
 augroup END
 
 " Vim
