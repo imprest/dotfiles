@@ -60,7 +60,7 @@ export LANG=en_GB.UTF-8
 export LESS='--tabs=4 --no-init --LONG-PROMPT --ignore-case --quit-if-one-screen --RAW-CONTROL-CHARS'
 export ERL_AFLAGS='-kernel shell_history enabled'
 export PGDATABASE='mgp_dev' # frequently used database
-export PATH=$HOME/development/flutter/bin:$PATH # $HOME/.cargo/bin:$PATH
+export PATH=$HOME/development/flutter/bin:$HOME/Downloads/android-sdk/android-studio:$PATH # $HOME/.cargo/bin:$PATH
 export FZF_DEFAULT_COMMAND='rg --files --follow'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
