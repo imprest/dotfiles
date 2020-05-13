@@ -58,6 +58,9 @@ export VISUAL=nvim
 export EDITOR=$VISUAL
 export LANG=en_GB.UTF-8
 export LESS='--tabs=4 --no-init --LONG-PROMPT --ignore-case --quit-if-one-screen --RAW-CONTROL-CHARS'
+export KERL_CONFIGURE_OPTIONS='--without-javac --without-odbc'
+export KERL_BUILD_DOCS='yes'
+export KERL_DOC_TARGETS='chunks'
 export ERL_AFLAGS='-kernel shell_history enabled'
 export PGDATABASE='mgp_dev' # frequently used database
 export PATH=$HOME/development/flutter/bin:$HOME/Downloads/android-sdk/android-studio:$PATH # $HOME/.cargo/bin:$PATH
