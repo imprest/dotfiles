@@ -6,17 +6,15 @@ fi
 source ~/.zplug/init.zsh
 
 zplug "rupa/z", use:z.sh
-zplug "k4rthik/git-cal"
 zplug "supercrabtree/k"
 zplug "lib/completion", from:oh-my-zsh
-zplug "plugins/colored-man-pages", from:oh-my-zsh
 zplug "modules/pacman", from:prezto
 zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-history-substring-search"
 # zplug "themes/spaceship", from:oh-my-zsh, as:theme
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
-SPACESHIP_CHAR_SYMBOL='$ '
+SPACESHIP_CHAR_SYMBOL='❯ '
 SPACESHIP_PROMPT_ADD_NEWLINE=false
 SPACESHIP_PROMPT_SEPARATE_LINE=false
 SPACESHIP_ELIXIR_SHOW=false

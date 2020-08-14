@@ -22,19 +22,16 @@ sudo pacman-mirrors -f 5
 # dmesg | grep bbswitch
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
-# remove following packages
-sudo pacman -Rns konversation inkscape cantata skanlite kget \
-  gnome-icon-theme oxygen oxygen-kde4 oxygen-icons gnome-themes-extra
-
 # packages
-sudo pacman -Syu zsh neovim xclip python-neovim fzf ripgrep ctags npm \
-  yay otf-fira-code erlang elixir inotify-tools postgresql
+sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep \
+  yay otf-fira-code erlang elixir wxgtk inotify-tools postgresql
 # size 12 in konsole or 10 for fira code light
+# size 12 in gnome-terminal with Inconsolata Bold
 # optional
-# weechat pdfarranger
+# weechat pdfarranger ctags
 
 # yay packages
-# yay -S dbview
+# yay -S tectonic
 
 # git
 git config --global user.email "hardikvaria@gmail.com"
@@ -43,8 +40,8 @@ git config --global user.name  "Hardik Varia"
 # neovim
 mkdir -p ~/.config/nvim
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
-ln -sf ~/dotfiles/ctags ~/.ctags
-nvim +PlugInstal +qall
+# ln -sf ~/dotfiles/ctags ~/.ctags
+nvim +PlugInstall +qall
 nvim +UpdateRemotePlugins +qall
 
 # psql
@@ -56,4 +53,4 @@ ln -sf ~/dotfiles/zshrc ~/.zshrc
 chsh -s /usr/bin/zsh
 
 # node global packages
-sudo npm install -g @vue/cli eslint neovim prettier
+npm i -g neovim
