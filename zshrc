@@ -14,7 +14,7 @@ zplug "zsh-users/zsh-autosuggestions"
 zplug "zsh-users/zsh-history-substring-search"
 # zplug "themes/spaceship", from:oh-my-zsh, as:theme
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
-SPACESHIP_CHAR_SYMBOL='❯ '
+SPACESHIP_CHAR_SYMBOL='λ '
 SPACESHIP_PROMPT_ADD_NEWLINE=false
 SPACESHIP_PROMPT_SEPARATE_LINE=false
 SPACESHIP_ELIXIR_SHOW=false
