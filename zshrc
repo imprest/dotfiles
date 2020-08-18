@@ -1,19 +1,29 @@
-# Check if zplug is installed
-if [[ ! -d ~/.zplug ]]; then
-  git clone https://github.com/zplug/zplug ~/.zplug
+### Added by Zinit's installer
+if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
+    print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma/zinit%F{220})…%f"
+    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
+    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
+        print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" || \
+        print -P "%F{160}▓▒░ The clone has failed.%f%b"
 fi
 
-source ~/.zplug/init.zsh
+source "$HOME/.zinit/bin/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+### End of Zinit's installer chunk
 
-zplug "rupa/z", use:z.sh
-zplug "supercrabtree/k"
-zplug "lib/completion", from:oh-my-zsh
-zplug "modules/pacman", from:prezto
-zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-history-substring-search"
-# zplug "themes/spaceship", from:oh-my-zsh, as:theme
-zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
+zinit load rupa/z
+zinit light supercrabtree/k
+zinit snippet OMZ::lib/completion.zsh
+zinit snippet PZT::modules/pacman
+zinit ice as"program" atclone"perl Makefile.PL PREFIX=$ZPFX" \
+    atpull'%atclone' make'install' pick"$ZPFX/bin/git-cal"
+zinit load k4rthik/git-cal
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+zinit load zdharma/history-search-multi-word # Ctrl-R to activate
+zstyle :plugin:history-search-multi-word reset-prompt-protect 1
+zinit light denysdovhan/spaceship-prompt
 SPACESHIP_CHAR_SYMBOL='λ '
 SPACESHIP_PROMPT_ADD_NEWLINE=false
 SPACESHIP_PROMPT_SEPARATE_LINE=false
@@ -21,19 +31,7 @@ SPACESHIP_ELIXIR_SHOW=false
 SPACESHIP_PACKAGE_SHOW=false
 SPACESHIP_NODE_SHOW=false
 SPACESHIP_EXEC_TIME_SHOW=false
-
-# Install plugins if there are plugins that have not been installed
-if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
-fi
-
-# Then, source plugins and add commands to $PATH
-zplug load
-
-zplug 'zplug/zplug', hook-build:'zplug --self-manage'
+zinit light zsh-users/zsh-history-substring-search
 
 # historical backward/forward search with linehead string binded to ^P/^N
 autoload history-search-end
@@ -61,7 +59,7 @@ export KERL_BUILD_DOCS='yes'
 export KERL_DOC_TARGETS='chunks'
 export ERL_AFLAGS='-kernel shell_history enabled'
 export PGDATABASE='mgp_dev' # frequently used database
-export PATH=$HOME/development/flutter/bin:$HOME/Downloads/android-sdk/android-studio:$PATH # $HOME/.cargo/bin:$PATH
+export PATH=$HOME/Downloads/android-sdk/android-studio:$PATH # $HOME/.cargo/bin:$PATH
 export FZF_DEFAULT_COMMAND='rg --files --follow'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
@@ -109,9 +107,8 @@ alias gl="git log --oneline --decorate -20"
 alias gla="git log --oneline --decorate --graph --all"
 
 # asdf
-# For vscode: echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.profile
 . $HOME/.asdf/asdf.sh
-. $HOME/.asdf/completions/asdf.bash
-
-
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+fpath=(${ASDF_DIR}/completions $fpath) # append completions to fpath
+# initialise completions with ZSH's compinit
+autoload -Uz compinit
+compinit
