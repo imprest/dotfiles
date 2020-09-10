@@ -1,74 +1,96 @@
-" Setup stole mainly from https://github.com/Arkham/vimfiles
-" git clone https://github.com/k-takata/minpac.git \
-" ~/.config/nvim/pack/minpac/opt/minpac
+" Setup stolen mainly from https://github.com/Arkham/vimfiles
+
+" vim-plug (https://github.com/junegunn/vim-plug) settings
+" Automatically install vim-plug and run PlugInstall if vim-plug not found
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+  silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall | source $MYVIMRC
+endif
 
 let g:loaded_python_provider = 1
 let g:python3_host_prog = '/usr/bin/python3'
 let mapleader = ","
 
 "" PLUGIN MANAGEMENT {{{
-packadd minpac
-call minpac#init()
-
-" Managed plugins (automatically installed and updated via "Pu" and "Pc")
-call minpac#add('k-takata/minpac', {'type': 'opt'})
+call plug#begin('~/.config/nvim/plugged')
 
 " Autocomplete & Snippets
-call minpac#add('ervandew/supertab')
+Plug 'ervandew/supertab'
   let g:SuperTabDefaultCompletionType = "<c-n>"
-call minpac#add('SirVer/ultisnips')
-call minpac#add('honza/vim-snippets')
+Plug 'nvim-lua/completion-nvim'
+Plug 'steelsojka/completion-buffers'
+Plug 'kristijanhusak/vim-dadbod-completion'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+  let g:completion_enable_snippet = "UltiSnips"
+  let g:completion_trigger_keyword_length = 2
+  let g:completion_matching_strategy_list=['exact', 'substring', 'fuzzy']
+  set completeopt=menuone,noinsert,noselect " Set completeopt to have a better completion experience
+  set shortmess+=c                          " Avoid showing extra message when using completion
+  "" Configure the completion chains
+  let g:completion_chain_complete_list = {
+        \'default' : {
+        \ 'default' : [
+        \  {'complete_items' : ['lsp', 'snippet', 'buffers']},
+        \  {'mode' : 'file'}, {'mode' : '<c-p>' }, { 'mode' : '<c-n>' },
+        \ ],
+        \ 'comment' : [ {'complete_items' : ['buffer'] }],
+        \ 'string' : [ {'complete_items' : ['buffer'] }],
+        \ },
+        \'vim' : [
+        \ {'complete_items': ['snippet', 'buffer', 'buffers']},
+        \ {'mode' : 'cmd'}
+        \ ],
+        \'sql': [
+        \ {'complete_items': ['vim-dadbod-completion']},
+        \],
+        \}
+  au BufEnter * lua require'completion'.on_attach()
+  augroup CompletionTriggerCharacter
+    autocmd!
+    autocmd BufEnter * let g:completion_trigger_character = ['.']
+    autocmd FileType sql setlocal omnifunc=vim_dadbod_completion#omni
+    autocmd FileType sql let g:completion_trigger_character=['.','"']
+    autocmd BufEnter *.ex,*.eex let g:completion_trigger_character = ['.', '@']
+    autocmd BufEnter *.c,*.cpp let g:completion_trigger_character = ['.', '>', ':']
+    autocmd BufEnter *.vim let g:completion_trigger_character = ['.', ':', '#', '[', '&', '$', '<', '"', "'"]
+  augroup end
 
 " Elixir
-call minpac#add('airblade/vim-rooter')
+Plug 'airblade/vim-rooter'
   let g:rooter_silent_chdir = 1
   let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
-call minpac#add('sheerun/vim-polyglot')
-call minpac#add('janko-m/vim-test')
+Plug 'sheerun/vim-polyglot'
+Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim'
-call minpac#add('slashmili/alchemist.vim')
-  "let g:alchemist_tag_disable = 1
-  "mkdir ~/.asdf/src
-  "ln -s ~/.asdf/installs/erlang/22.0.1 ~/.asdf/src/otp
-  "ln -s ~/.asdf/installs/elixir/1.9.2 ~/.asdf/src/elixir
-  let g:alchemist#elixir_erlang_src = "/home/hvaria/.asdf/src"
-call minpac#add('tpope/vim-endwise')
-call minpac#add('w0rp/ale')
-  let g:ale_completion_enabled = 1
-  let g:ale_sign_error = '✘'
-  let g:ale_sign_warning = '!' "⚠
-  let g:ale_lint_on_enter = 0
-  let g:ale_lint_on_text_changed = 'never'
-  let g:ale_sign_column_always = 1
-  let g:ale_linters_explicit = 1
-  let g:ale_lint_on_save = 1
-  let g:ale_fix_on_save = 1
-  let g:ale_elixir_elixir_ls_release = $HOME."/elixir_ls"
-  let g:ale_linters = { 'elixir': ['elixir-ls'], 'javascript': ['eslint'] }
-  let g:ale_fixers = { '*': ['remove_trailing_lines', 'trim_whitespace'], 'elixir': ['mix_format'] }
-  hi ALEError guibg=124 ctermbg=124 gui=NONE cterm=NONE
-  nnoremap <Leader>w :ALEDetail<CR>
-  nnoremap <M-p> :ALEPreviousWrap<CR>
-  nnoremap <M-n> :ALENextWrap<CR>
-  nnoremap <silent> gd :ALEGoToDefinition<CR>
-  nnoremap <silent> gr :ALEFindReferences<CR>
+Plug 'tpope/vim-endwise'
+Plug 'neovim/nvim-lsp'
+  nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
+  nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
+  nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
+  nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
+  nnoremap <silent> S     <cmd>lua vim.lsp.buf.signature_help()<CR>
+  nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
+  nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+  nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+  nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+Plug 'nvim-treesitter/nvim-treesitter'
 
-" HTML, Svelte, Vue, D3.js
-call minpac#add('alvan/vim-closetag')
-  let g:closetag_filenames = '*.html, *.xhtml, *.vue, *.eex, *.leex, *.svelte'
-call minpac#add('mattn/emmet-vim')
+" HTML, Vue, D3.js
+Plug 'alvan/vim-closetag'
+  let g:closetag_filenames = '*.html, *.xhtml, *.vue, *.eex, *.leex'
+Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir', 'eelixir'] }
   imap <c-e> <c-y>,
-call minpac#add('evanleck/vim-svelte')
-call minpac#add('othree/yajs.vim') " Improved syntax hl and indentation
-call minpac#add('othree/javascript-libraries-syntax.vim') " Autocompletion
+Plug 'othree/yajs.vim' " Improved syntax hl and indentation
+Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion
   let g:used_javascript_libs = 'vue, d3'
-call minpac#add('lilydjwg/colorizer')
-  nmap <F5> :ColorToggle<CR>
+Plug 'norcalli/nvim-colorizer.lua'
 
 " Customize UI
-call minpac#add('morhetz/gruvbox')
-call minpac#add('vim-airline/vim-airline')
-call minpac#add('vim-airline/vim-airline-themes')
+Plug 'morhetz/gruvbox'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
   if !exists('g:airline_symbols')
     let g:airline_symbols = {}
   endif
@@ -112,45 +134,47 @@ call minpac#add('vim-airline/vim-airline-themes')
   nmap <leader>9 <Plug>AirlineSelectTab9
 
 " Editing
-call minpac#add('pbrisbin/vim-mkdir')       " :e this/does/notexist/file.txt :w Just works
-call minpac#add('tpope/vim-repeat')
-call minpac#add('tpope/vim-unimpaired')
-call minpac#add('tpope/vim-surround')       " cs({ ds' ysW' vlllS'
-call minpac#add('scrooloose/nerdcommenter') " ,cc ,c<space> ,cn
-call minpac#add('godlygeek/tabular')
-call minpac#add('chrisbra/unicode.vim')     " :UnicodeTable to search and copy unicode chars
+Plug 'pbrisbin/vim-mkdir'       " :e this/does/notexist/file.txt :w Just works
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-surround'       " cs({ ds' ysW' vlllS'
+Plug 'scrooloose/nerdcommenter' " ,cc ,c<space> ,cn
+Plug 'junegunn/vim-easy-align'
+  xmap ga <Plug>(EasyAlign)
+  nmap ga <Plug>(EasyAlign)
 
 " Navigation
-call minpac#add('moll/vim-bbye')            " delete buffers w/o closing the buffer pane
+Plug 'moll/vim-bbye'            " delete buffers w/o closing the buffer pane
   nnoremap <Leader>d :Bdelete<CR>
-call minpac#add('andymass/vim-matchup')     " drop-in replacement for matchit
-call minpac#add('justinmk/vim-gtfo')        " ,gof open file in filemanager
-call minpac#add('junegunn/fzf')
-call minpac#add('junegunn/fzf.vim')
+Plug 'andymass/vim-matchup'     " drop-in replacement for matchit
+Plug 'justinmk/vim-gtfo'        " ,gof open file in filemanager
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
   let g:fzf_layout = { 'down': '~25%' }
   nnoremap <C-p>     :Files<CR>
   nnoremap <Leader>b :Buffers<CR>
   nnoremap <Leader>m :History<CR>
-call minpac#add('scrooloose/nerdtree')
+Plug 'scrooloose/nerdtree'
   map <C-\> :NERDTreeToggle<CR>
   map <F2>  :NERDTreeToggle<CR>
   map <F3>  :NERDTreeFind<CR>
+  let NERDTreeMinimalUI = 1
   let NERDTreeIgnore = ['\.git','\.hg','\.npm','\.rebar']
   let g:NERDTreeHighlightCursorline = 0
   let g:NERDTreeMouseMode = 3
-call minpac#add('terryma/vim-smooth-scroll') " Ctrl-e and Ctrl-d to scroll up/down
+Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   nnoremap <C-e> <C-u>
   nnoremap <C-u> <C-e>
   noremap <silent> <c-e> :call smooth_scroll#up(&scroll, 15, 2)<CR>
   noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 15, 2)<CR>
 
 " Search
-call minpac#add('jremmen/vim-ripgrep')
+Plug 'jremmen/vim-ripgrep'
   let g:rg_command = 'rg --vimgrep -S'
-call minpac#add('osyo-manga/vim-anzu')
+Plug 'osyo-manga/vim-anzu'
 
 " Postgresql
-call minpac#add('tpope/vim-dadbod')
+Plug 'tpope/vim-dadbod'
   let g:db = "postgresql://hvaria:@localhost/mgp_dev"
   xnoremap <expr> <Plug>(DBExe)     db#op_exec()
   nnoremap <expr> <Plug>(DBExe)     db#op_exec()
@@ -161,16 +185,15 @@ call minpac#add('tpope/vim-dadbod')
   nmap <leader>pb <Plug>(DBExeLine)
 
 " Git
-call minpac#add('airblade/vim-gitgutter')
-call minpac#add('tpope/vim-fugitive') " Gdiff Gstatus (then select add via -) Gwrite Gedit
+Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-fugitive' " Gdiff Gstatus (then select add via -) Gwrite Gedit
 
 " Latex
 " Plug 'lervag/vimtex' " Disable vim-polyglot i.e. let g:polyglot_disabled = ['latex']
 " Plug 'donRaphaco/neotex'
 "   let g:tex_flavour = 'latex'
 
-command! Pu call minpac#update()
-command! Pc call minpac#clean()
+call plug#end()
 " }}}
 
 "" CONFIGURATION {{{
@@ -180,6 +203,22 @@ filetype plugin indent on
 set shell=/bin/zsh                " Set the shell
 set clipboard=unnamed             " use system clipboard
 set termguicolors
+" Activate colorizer for certain filetypes, needs to be after termguicolors
+lua << EOF
+require 'colorizer'.setup {
+  'css';
+  'scss';
+  'javascript';
+  html = {
+    mode = 'foreground';
+  }
+}
+
+local nvim_lsp = require'nvim_lsp'
+nvim_lsp.elixirls.setup{
+  cmd = { "/home/hvaria/elixir_ls/language_server.sh" };
+}
+EOF
 
 " Style
 set background=dark
@@ -255,7 +294,6 @@ set undoreload=1000
 "" KEYBINDINGS {{{
 " Common keybindings
 nnoremap ; :
-noremap <Leader>w :w<CR>
 noremap <c-s> :w<CR>
 noremap <Leader>q :q!<CR> " Exit w/o saving
 " Escape
@@ -329,19 +367,8 @@ nnoremap <Leader>R :%s:::gc<Left><Left><Left><Left>
 " easy global search
 nnoremap <C-f> :Rg <C-R><C-W><CR>
 vnoremap <C-f> y<Esc>:Rg <C-R>"<CR>
-" Make K or help open in vertical split
-autocmd FileType help  wincmd L | vert res 79<CR>
-autocmd FileType elixir nnoremap <buffer> <s-k> :call OpenExDoc()<CR>
-"}}}
 
 "" FUNCTIONS {{{
-function! OpenExDoc()
-  :call alchemist#exdoc() | wincmd L | vert res 79
-  setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap modifiable nocursorline nofoldenable
-  if exists('&relativenumber')
-    setlocal norelativenumber
-  endif
-endfunction
 function! CloseWindowOrKillBuffer()
   let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
 
@@ -363,15 +390,16 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 
 "" FILETYPE SETTINGS {{{
 " Help buffer
-augroup general
+augroup filetype_help
   au!
+  au FileType help wincmd L | vert res 79<CR>  " Make K or help open in vertical split
   au FileType help nnoremap <buffer><cr> <c-]>
   au FileType help nnoremap <buffer><bs> <c-T>
   au FileType help nnoremap <buffer>q :q<CR>
 augroup END
 
 " Vue
-augroup filetype_make
+augroup filetype_vue
   au!
   au BufReadPre *.vue let b:javascript_lib_use_vue = 1
   au FileType vue syntax sync fromstart
@@ -386,7 +414,7 @@ augroup END
 " make sure all markdown files have the correct filetype set and setup wrapping
 augroup filetype_markdown
   au!
-  au FileType markdown setl tw=75
+  au FileType markdown setl tw=75 | syntax sync fromstart
   au BufRead,BufNewFile *.{md,markdown,mdown,mkd,mkdn,txt} setf markdown
 augroup END
 
@@ -400,8 +428,16 @@ augroup END
 augroup filetype_elixir
   au!
   au FileType elixir,eelixir iab pp \|>
+  au FileType elixir,eelixir setlocal omnifunc=v:lua.vim.lsp.omnifunc
+  au BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting_sync()
   au BufNewFile,BufRead *.{ex,exs}
-        \ let b:endwise_addition = '\=submatch(0)=="fn" ? "end)" : "end"'
+    \ let b:endwise_addition = '\=submatch(0)=="fn" ? "end)" : "end"'
+  au BufNewFile,BufRead *.{ex,exs}
+    \ syn match elixirCustomOperators " def "  conceal cchar= " Space
+  au BufNewFile,BufRead *.{ex,exs}
+    \ syn match elixirCustomOperators " defp " conceal cchar=_
+  au BufNewFile,BufRead *.{ex,exs} set concealcursor=nc
+  au BufNewFile,BufRead *.{ex,exs} set conceallevel=1
 augroup END
 
 " delete Fugitive buffers when they become inactive
@@ -434,15 +470,9 @@ augroup END
 " Terminal window
 augroup terminal_numbers
   au!
-  au TermOpen * setlocal nonumber norelativenumber
+  au TermOpen * setlocal nonumber
   au TermOpen * :startinsert
   au BufEnter,BufNew term://* :startinsert
-augroup END
-
-" Svelte
-augroup filetype_svelte
-  au!
-  au BufNewFile,BufRead,BufReadPost *.svelte set syntax=html
 augroup END
 
 " SCSS
