@@ -15,6 +15,7 @@ autoload -Uz _zinit
 zinit load rupa/z
 zinit light supercrabtree/k
 zinit snippet OMZ::lib/completion.zsh
+zinit snippet OMZ::plugins/colored-man-pages
 zinit snippet PZT::modules/pacman
 zinit ice as"program" atclone"perl Makefile.PL PREFIX=$ZPFX" \
     atpull'%atclone' make'install' pick"$ZPFX/bin/git-cal"
