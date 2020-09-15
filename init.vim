@@ -75,8 +75,8 @@ Plug 'neovim/nvim-lsp'
   nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
   nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
   nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-  sign define LspDiagnosticsErrorSign text=✘ texthl=LspDiagnosticsError linehl= numhl=
-  sign define LspDiagnosticsWarningSign text=! texthl=LspDiagnosticsWarning linehl= numhl=
+  sign define LspDiagnosticsErrorSign text=✘ texthl=WarningMsg linehl= numhl=WarningMsg
+  sign define LspDiagnosticsWarningSign text=! texthl=ModeMsg linehl= numhl=ModeMsg
 Plug 'nvim-treesitter/nvim-treesitter'
 
 " HTML, Vue, D3.js
@@ -221,7 +221,7 @@ nvim_lsp.elixirls.setup{
 }
 
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "javascript", "css", "html",
+  ensure_installed = {"javascript", "css", "html", "lua", "json", "markdown"},
   highlight = {
     enable = true,
   },
