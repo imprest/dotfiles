@@ -32,14 +32,14 @@ Plug 'honza/vim-snippets'
   let g:completion_chain_complete_list = {
         \'default' : {
         \ 'default' : [
-        \  {'complete_items' : ['lsp', 'snippet', 'buffers']},
+        \  {'complete_items' : ['lsp', 'snippet', 'buffers', 'path']},
         \  {'mode' : 'file'}, {'mode' : '<c-p>' }, { 'mode' : '<c-n>' },
         \ ],
         \ 'comment' : [ {'complete_items' : ['buffer'] }],
         \ 'string' : [ {'complete_items' : ['buffer'] }],
         \ },
         \'vim' : [
-        \ {'complete_items': ['snippet', 'buffer', 'buffers']},
+        \ {'complete_items': ['snippet', 'buffer', 'buffers', 'path']},
         \ {'mode' : 'cmd'}
         \ ],
         \'sql': [
@@ -75,6 +75,8 @@ Plug 'neovim/nvim-lsp'
   nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
   nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
   nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+  sign define LspDiagnosticsErrorSign text=✘ texthl=LspDiagnosticsError linehl= numhl=
+  sign define LspDiagnosticsWarningSign text=! texthl=LspDiagnosticsWarning linehl= numhl=
 Plug 'nvim-treesitter/nvim-treesitter'
 
 " HTML, Vue, D3.js
@@ -82,9 +84,6 @@ Plug 'alvan/vim-closetag'
   let g:closetag_filenames = '*.html, *.xhtml, *.vue, *.eex, *.leex'
 Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir', 'eelixir'] }
   imap <c-e> <c-y>,
-Plug 'othree/yajs.vim' " Improved syntax hl and indentation
-Plug 'othree/javascript-libraries-syntax.vim' " Autocompletion
-  let g:used_javascript_libs = 'vue, d3'
 Plug 'norcalli/nvim-colorizer.lua'
 
 " Customize UI
@@ -150,7 +149,6 @@ Plug 'andymass/vim-matchup'     " drop-in replacement for matchit
 Plug 'justinmk/vim-gtfo'        " ,gof open file in filemanager
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
-  let g:fzf_layout = { 'down': '~25%' }
   nnoremap <C-p>     :Files<CR>
   nnoremap <Leader>b :Buffers<CR>
   nnoremap <Leader>m :History<CR>
@@ -162,6 +160,8 @@ Plug 'scrooloose/nerdtree'
   let NERDTreeIgnore = ['\.git','\.hg','\.npm','\.rebar']
   let g:NERDTreeHighlightCursorline = 0
   let g:NERDTreeMouseMode = 3
+  let g:NERDTreeWinSize=21
+  let g:NERDTreeStatusline=""
 Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   nnoremap <C-e> <C-u>
   nnoremap <C-u> <C-e>
@@ -186,6 +186,7 @@ Plug 'tpope/vim-dadbod'
 
 " Git
 Plug 'airblade/vim-gitgutter'
+set updatetime=100
 Plug 'tpope/vim-fugitive' " Gdiff Gstatus (then select add via -) Gwrite Gedit
 
 " Latex
@@ -218,16 +219,26 @@ local nvim_lsp = require'nvim_lsp'
 nvim_lsp.elixirls.setup{
   cmd = { "/home/hvaria/elixir_ls/language_server.sh" };
 }
+
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "javascript", "css", "html",
+  highlight = {
+    enable = true,
+  },
+}
 EOF
 
 " Style
 set background=dark
+let g:gruvbox_italic=1
+let g:gruvbox_sign_column="none"
 silent! color gruvbox
 set number                        " line numbers are cool
 " set relativenumber              " relative numbers are cooler
 set ruler                         " show the cursor position all the time
 set nocursorline                  " disable cursor line
 set showcmd                       " display incomplete commands
+set signcolumn=yes                " always display signcolumn i.e. less redraw and some space
 set novisualbell                  " no flashes please
 set scrolloff=3                   " provide some context when editing
 set hidden                        " allow backgrounding buffers without writing them, and
@@ -237,7 +248,7 @@ set mouse=a                       " we love the mouse
 set mousehide                     " but hide it when we're writing
 
 " Whitespace
-set wrap                          " wrap long lines
+set nowrap                        " don't wrap long lines
 set tabstop=2                     " a tab is two spaces
 set shiftwidth=2                  " an autoindent (with <<) is two spaces
 set softtabstop=2                 " when deleting, treat spaces as tabs
