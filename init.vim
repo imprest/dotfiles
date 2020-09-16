@@ -35,8 +35,8 @@ Plug 'honza/vim-snippets'
         \  {'complete_items' : ['lsp', 'snippet', 'buffers', 'path']},
         \  {'mode' : 'file'}, {'mode' : '<c-p>' }, { 'mode' : '<c-n>' },
         \ ],
-        \ 'comment' : [ {'complete_items' : ['buffer'] }],
-        \ 'string' : [ {'complete_items' : ['buffer'] }],
+        \ 'comment' : [ {'complete_items' : ['buffer', 'path'] }],
+        \ 'string' : [ {'complete_items' : ['buffer', 'path'] }],
         \ },
         \'vim' : [
         \ {'complete_items': ['snippet', 'buffer', 'buffers', 'path']},
