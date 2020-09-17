@@ -75,8 +75,6 @@ Plug 'neovim/nvim-lsp'
   nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
   nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
   nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-  sign define LspDiagnosticsErrorSign text=✘ texthl=WarningMsg linehl= numhl=WarningMsg
-  sign define LspDiagnosticsWarningSign text=! texthl=ModeMsg linehl= numhl=ModeMsg
 Plug 'nvim-treesitter/nvim-treesitter'
 
 " HTML, Vue, D3.js
@@ -203,7 +201,12 @@ syntax enable
 filetype plugin indent on
 set shell=/bin/zsh                " Set the shell
 set clipboard=unnamed             " use system clipboard
+" Colours
 set termguicolors
+set background=dark
+let g:gruvbox_italic=1
+let g:gruvbox_sign_column="none"
+silent! color gruvbox
 " Activate colorizer for certain filetypes, needs to be after termguicolors
 lua << EOF
 require 'colorizer'.setup {
@@ -229,12 +232,7 @@ require'nvim-treesitter.configs'.setup {
 EOF
 
 " Style
-set background=dark
-let g:gruvbox_italic=1
-let g:gruvbox_sign_column="none"
-silent! color gruvbox
 set number                        " line numbers are cool
-" set relativenumber              " relative numbers are cooler
 set ruler                         " show the cursor position all the time
 set nocursorline                  " disable cursor line
 set showcmd                       " display incomplete commands
