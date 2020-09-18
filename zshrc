@@ -54,6 +54,7 @@ setopt share_history     # share command history data
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export LANG=en_GB.UTF-8
+export BROWSER=firefox
 export LESS='--tabs=4 --no-init --LONG-PROMPT --ignore-case --quit-if-one-screen --RAW-CONTROL-CHARS'
 export KERL_CONFIGURE_OPTIONS='--without-javac --without-odbc'
 export KERL_BUILD_DOCS='yes'
@@ -106,6 +107,7 @@ alias gd="git diff"
 alias gs="git status"
 alias gl="git log --oneline --decorate -20"
 alias gla="git log --oneline --decorate --graph --all"
+alias commit="git add -A; git commit -m"
 
 # asdf
 . $HOME/.asdf/asdf.sh

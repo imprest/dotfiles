@@ -12,6 +12,14 @@ let g:loaded_python_provider = 1
 let g:python3_host_prog = '/usr/bin/python3'
 let mapleader = ","
 
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call lua vim.lsp.buf.hover()
+  endif
+endfunction
+
 "" PLUGIN MANAGEMENT {{{
 call plug#begin('~/.config/nvim/plugged')
 
@@ -68,7 +76,8 @@ Plug 'tpope/vim-endwise'
 Plug 'neovim/nvim-lsp'
   nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
   nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
-  nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
+  nnoremap <silent> K     <SID>show_documentation()<CR>
+  "nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
   nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
   nnoremap <silent> S     <cmd>lua vim.lsp.buf.signature_help()<CR>
   nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
@@ -150,6 +159,7 @@ Plug 'junegunn/fzf.vim'
   nnoremap <C-p>     :Files<CR>
   nnoremap <Leader>b :Buffers<CR>
   nnoremap <Leader>m :History<CR>
+  nnoremap // :BLines<CR>
 Plug 'scrooloose/nerdtree'
   map <C-\> :NERDTreeToggle<CR>
   map <F2>  :NERDTreeToggle<CR>
@@ -169,8 +179,15 @@ Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
 " Search
 Plug 'jremmen/vim-ripgrep'
   let g:rg_command = 'rg --vimgrep -S'
-Plug 'osyo-manga/vim-anzu'
-
+Plug 'osyo-manga/vim-anzu' " Keybinding below to auto center when moving around the buffer
+  nnoremap <silent> n nzz
+  nnoremap <silent> N Nzz
+  nnoremap <silent> * *zz
+  nnoremap <silent> # #zz
+  nnoremap <silent> g* g*zz
+  nnoremap <silent> g# g#zz
+  nnoremap <silent> <C-o> <C-o>zz
+  nnoremap <silent> <C-i> <C-i>zz
 " Postgresql
 Plug 'tpope/vim-dadbod'
   let g:db = "postgresql://hvaria:@localhost/mgp_dev"
@@ -378,6 +395,7 @@ nnoremap <C-f> :Rg <C-R><C-W><CR>
 vnoremap <C-f> y<Esc>:Rg <C-R>"<CR>
 
 "" FUNCTIONS {{{
+
 function! CloseWindowOrKillBuffer()
   let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
 
@@ -401,7 +419,7 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 " Help buffer
 augroup filetype_help
   au!
-  au FileType help wincmd L | vert res 79<CR>  " Make K or help open in vertical split
+  au FileType help wincmd L | vert res 81<CR>  " Make K or help open in vertical split
   au FileType help nnoremap <buffer><cr> <c-]>
   au FileType help nnoremap <buffer><bs> <c-T>
   au FileType help nnoremap <buffer>q :q<CR>
@@ -410,7 +428,6 @@ augroup END
 " Vue
 augroup filetype_vue
   au!
-  au BufReadPre *.vue let b:javascript_lib_use_vue = 1
   au FileType vue syntax sync fromstart
 augroup END
 
@@ -460,7 +477,7 @@ augroup filetype_vim
   au!
   au FileType vim setlocal fdm=indent keywordprg=:help
   " fold automatically with triple {
-  au FileType vim,javascript,python,c setlocal foldmethod=marker nofoldenable
+  au FileType vim setlocal foldmethod=marker nofoldenable
 augroup END
 
 " enable <CR> in command line window and quickfix
@@ -498,7 +515,7 @@ augroup last_position
   au!
   au BufReadPost *
     \ if &filetype !~ '^git\c' && line("'\"") > 1 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
+    \   exe "normal! g`\"zvzz" |
     \ endif
 augroup END
 " }}}
