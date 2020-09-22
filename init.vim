@@ -12,25 +12,39 @@ let g:loaded_python_provider = 1
 let g:python3_host_prog = '/usr/bin/python3'
 let mapleader = ","
 
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call lua vim.lsp.buf.hover()
-  endif
-endfunction
-
 "" PLUGIN MANAGEMENT {{{
 call plug#begin('~/.config/nvim/plugged')
 
-" Autocomplete & Snippets
-Plug 'ervandew/supertab'
-  let g:SuperTabDefaultCompletionType = "<c-n>"
+" Autocomplete, LSP & Snippets
 Plug 'nvim-lua/completion-nvim'
+Plug 'nvim-lua/diagnostic-nvim'
+  let g:diagnostic_enable_virtual_text = 1
+  let g:diagnostic_virtual_text_prefix = ' '
+  let g:diagnostic_trimmed_virtual_text = '20'
 Plug 'steelsojka/completion-buffers'
 Plug 'kristijanhusak/vim-dadbod-completion'
 Plug 'SirVer/ultisnips'
+  let g:UltiSnipsExpandTrigger="<c-u>"       " This is important else it will hijack default <Tab>
+  let g:UltiSnipsJumpForwardTrigger="<c-b>"
+  let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 Plug 'honza/vim-snippets'
+Plug 'hrsh7th/vim-vsnip'
+  let g:completion_confirm_key = "\<C-y>"
+Plug 'hrsh7th/vim-vsnip-integ'
+  " Use tab for trigger completion with characters ahead and navigate.
+  " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+  " other plugin before putting this into your config.
+  inoremap <silent><expr> <TAB>
+  \ pumvisible() ? "\<C-n>" :
+  \ <SID>check_back_space() ? "\<TAB>" :
+  \ completion#trigger_completion()
+  " Use <Tab> and <S-Tab> to navigate through popup menu
+  inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+  inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+  function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
+  endfunction
   let g:completion_enable_snippet = "UltiSnips"
   let g:completion_trigger_keyword_length = 2
   let g:completion_matching_strategy_list=['exact', 'substring', 'fuzzy']
@@ -54,15 +68,10 @@ Plug 'honza/vim-snippets'
         \ {'complete_items': ['vim-dadbod-completion']},
         \],
         \}
-  au BufEnter * lua require'completion'.on_attach()
   augroup CompletionTriggerCharacter
-    autocmd!
-    autocmd BufEnter * let g:completion_trigger_character = ['.']
-    autocmd FileType sql setlocal omnifunc=vim_dadbod_completion#omni
-    autocmd FileType sql let g:completion_trigger_character=['.','"']
-    autocmd BufEnter *.ex,*.eex let g:completion_trigger_character = ['.', '@']
-    autocmd BufEnter *.c,*.cpp let g:completion_trigger_character = ['.', '>', ':']
-    autocmd BufEnter *.vim let g:completion_trigger_character = ['.', ':', '#', '[', '&', '$', '<', '"', "'"]
+    au!
+    au BufEnter * lua require'completion'.on_attach()
+    au FileType sql setlocal omnifunc=vim_dadbod_completion#omni
   augroup end
 
 " Elixir
@@ -84,6 +93,13 @@ Plug 'neovim/nvim-lsp'
   nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
   nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
   nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+  function! s:show_documentation()
+    if (index(['vim','help'], &filetype) >= 0)
+      execute 'h '.expand('<cword>')
+    else
+      call lua vim.lsp.buf.hover()
+    endif
+  endfunction
 Plug 'nvim-treesitter/nvim-treesitter'
 
 " HTML, Vue, D3.js
@@ -225,6 +241,7 @@ let g:gruvbox_italic=1
 let g:gruvbox_sign_column="none"
 silent! color gruvbox
 " Activate colorizer for certain filetypes, needs to be after termguicolors
+" Setup for nvim complete, diagnostic and lsp
 lua << EOF
 require 'colorizer'.setup {
   'css';
@@ -239,6 +256,12 @@ local nvim_lsp = require'nvim_lsp'
 nvim_lsp.elixirls.setup{
   cmd = { "/home/hvaria/elixir_ls/language_server.sh" };
 }
+
+local on_attach_vim = function(client)
+  require'completion'.on_attach(client)
+  require'diagnostic'.on_attach(client)
+end
+require'nvim_lsp'.elixirls.setup{on_attach=on_attach_vim}
 
 require'nvim-treesitter.configs'.setup {
   ensure_installed = {"javascript", "css", "html", "lua", "json", "markdown"},
