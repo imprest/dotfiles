@@ -20,7 +20,12 @@ Plug 'nvim-lua/completion-nvim'
 Plug 'nvim-lua/diagnostic-nvim'
   let g:diagnostic_enable_virtual_text = 1
   let g:diagnostic_virtual_text_prefix = ' '
-  let g:diagnostic_trimmed_virtual_text = '20'
+  call sign_define("LspDiagnosticsErrorSign", {"text" : "✘", "texthl" : "LspDiagnosticsError"})
+  call sign_define("LspDiagnosticsWarningSign", {"text" : "!", "texthl" : "LspDiagnosticsWarning"})
+  call sign_define("LspDiagnosticsInformationSign", {"text" : "I", "texthl" : "LspDiagnosticsInformation"})
+  call sign_define("LspDiagnosticsHintSign", {"text" : "H", "texthl" : "LspDiagnosticsHint"})
+  nnoremap <M-p> :PrevDiagnosticCycle<CR>
+  nnoremap <M-n> :NextDiagnosticCycle<CR>
 Plug 'steelsojka/completion-buffers'
 Plug 'kristijanhusak/vim-dadbod-completion'
 Plug 'SirVer/ultisnips'
@@ -85,8 +90,6 @@ Plug 'tpope/vim-endwise'
 Plug 'neovim/nvim-lsp'
   nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
   nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
-  nnoremap <silent> K     <SID>show_documentation()<CR>
-  "nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
   nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
   nnoremap <silent> S     <cmd>lua vim.lsp.buf.signature_help()<CR>
   nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
@@ -176,16 +179,18 @@ Plug 'junegunn/fzf.vim'
   nnoremap <Leader>b :Buffers<CR>
   nnoremap <Leader>m :History<CR>
   nnoremap // :BLines<CR>
-Plug 'scrooloose/nerdtree'
-  map <C-\> :NERDTreeToggle<CR>
-  map <F2>  :NERDTreeToggle<CR>
-  map <F3>  :NERDTreeFind<CR>
-  let NERDTreeMinimalUI = 1
-  let NERDTreeIgnore = ['\.git','\.hg','\.npm','\.rebar']
-  let g:NERDTreeHighlightCursorline = 0
-  let g:NERDTreeMouseMode = 3
-  let g:NERDTreeWinSize=21
-  let g:NERDTreeStatusline=""
+Plug 'kyazdani42/nvim-web-devicons' " for file icons
+Plug 'kyazdani42/nvim-tree.lua'
+"Plug 'scrooloose/nerdtree'
+  "map <C-\> :NERDTreeToggle<CR>
+  "map <F2>  :NERDTreeToggle<CR>
+  "map <F3>  :NERDTreeFind<CR>
+  "let NERDTreeMinimalUI = 1
+  "let NERDTreeIgnore = ['\.git','\.hg','\.npm','\.rebar']
+  "let g:NERDTreeHighlightCursorline = 0
+  "let g:NERDTreeMouseMode = 3
+  "let g:NERDTreeWinSize=21
+  "let g:NERDTreeStatusline=""
 Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   nnoremap <C-e> <C-u>
   nnoremap <C-u> <C-e>
@@ -252,16 +257,14 @@ require 'colorizer'.setup {
   }
 }
 
-local nvim_lsp = require'nvim_lsp'
-nvim_lsp.elixirls.setup{
-  cmd = { "/home/hvaria/elixir_ls/language_server.sh" };
-}
-
 local on_attach_vim = function(client)
   require'completion'.on_attach(client)
   require'diagnostic'.on_attach(client)
 end
-require'nvim_lsp'.elixirls.setup{on_attach=on_attach_vim}
+require'nvim_lsp'.elixirls.setup{
+  on_attach=on_attach_vim,
+  cmd = { "/home/hvaria/elixir_ls/language_server.sh" }
+}
 
 require'nvim-treesitter.configs'.setup {
   ensure_installed = {"javascript", "css", "html", "lua", "json", "markdown"},
@@ -436,6 +439,10 @@ function! CloseWindowOrKillBuffer()
 endfunction
 " Automaticaly close nvim if NERDTree is only thing left open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+function! OpenExDoc()
+  :wincmd L | vert res 81
+endfunction
 "}}}
 
 "" FILETYPE SETTINGS {{{
@@ -478,6 +485,7 @@ augroup filetype_elixir
   au!
   au FileType elixir,eelixir iab pp \|>
   au FileType elixir,eelixir setlocal omnifunc=v:lua.vim.lsp.omnifunc
+  au FileType elixir,eelixir noremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
   au BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting_sync()
   au BufNewFile,BufRead *.{ex,exs}
     \ let b:endwise_addition = '\=submatch(0)=="fn" ? "end)" : "end"'
