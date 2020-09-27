@@ -181,16 +181,11 @@ Plug 'junegunn/fzf.vim'
   nnoremap // :BLines<CR>
 Plug 'kyazdani42/nvim-web-devicons' " for file icons
 Plug 'kyazdani42/nvim-tree.lua'
-"Plug 'scrooloose/nerdtree'
-  "map <C-\> :NERDTreeToggle<CR>
-  "map <F2>  :NERDTreeToggle<CR>
-  "map <F3>  :NERDTreeFind<CR>
-  "let NERDTreeMinimalUI = 1
-  "let NERDTreeIgnore = ['\.git','\.hg','\.npm','\.rebar']
-  "let g:NERDTreeHighlightCursorline = 0
-  "let g:NERDTreeMouseMode = 3
-  "let g:NERDTreeWinSize=21
-  "let g:NERDTreeStatusline=""
+  map <C-\> :LuaTreeToggle<CR>
+  map <F2>  :LuaTreeToggle<CR>
+  map <F3>  :LuaTreeFind<CR>
+  let g:lua_tree_width = 26
+  let g:lua_tree_ignore = [ '.git', 'node_modules', '.cache', '.npm', '.rebar' ]
 Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   nnoremap <C-e> <C-u>
   nnoremap <C-u> <C-e>
@@ -222,7 +217,7 @@ Plug 'tpope/vim-dadbod'
 
 " Git
 Plug 'airblade/vim-gitgutter'
-set updatetime=100
+set updatetime=250
 Plug 'tpope/vim-fugitive' " Gdiff Gstatus (then select add via -) Gwrite Gedit
 
 " Latex
@@ -262,8 +257,7 @@ local on_attach_vim = function(client)
   require'diagnostic'.on_attach(client)
 end
 require'nvim_lsp'.elixirls.setup{
-  on_attach=on_attach_vim,
-  cmd = { "/home/hvaria/elixir_ls/language_server.sh" }
+  on_attach=on_attach_vim
 }
 
 require'nvim-treesitter.configs'.setup {
@@ -421,27 +415,14 @@ nnoremap <C-f> :Rg <C-R><C-W><CR>
 vnoremap <C-f> y<Esc>:Rg <C-R>"<CR>
 
 "" FUNCTIONS {{{
-
 function! CloseWindowOrKillBuffer()
   let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
-
-  " never bdelete a nerd tree
-  if matchstr(expand("%"), 'NERD') == 'NERD'
-    wincmd c
-    return
-  endif
 
   if number_of_windows_to_this_buffer > 1
     wincmd c
   else
     bdelete
   endif
-endfunction
-" Automaticaly close nvim if NERDTree is only thing left open
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-function! OpenExDoc()
-  :wincmd L | vert res 81
 endfunction
 "}}}
 
