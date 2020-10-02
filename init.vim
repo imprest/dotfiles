@@ -278,6 +278,9 @@ set novisualbell                  " no flashes please
 set scrolloff=3                   " provide some context when editing
 set hidden                        " allow backgrounding buffers without writing them, and
                                   " remember marks/undo for backgrounded buffers
+set textwidth=98
+set colorcolumn=+1
+
 " Mouse
 set mouse=a                       " we love the mouse
 set mousehide                     " but hide it when we're writing
@@ -316,6 +319,12 @@ set smartcase                     " unless they contain at least one capital let
 " Windows
 set splitright                    " create new horizontal split on the right
 set splitbelow                    " create new vertical split below the current window
+
+" Folding
+set foldmethod=indent
+set foldlevelstart=6
+nnoremap <leader>f zc
+nnoremap <leader>uf zo
 
 " Backup, undo and file management
 set nobackup
