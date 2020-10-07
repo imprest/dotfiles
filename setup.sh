@@ -24,7 +24,7 @@ sudo pacman-mirrors -f 5
 
 # packages
 sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep \
-  yay otf-fira-code erlang elixir wxgtk inotify-tools postgresql
+  yay otf-fira-code erlang elixir fop wxgtk inotify-tools postgresql
 # size 12 in konsole or 10 for fira code light
 # size 12 in gnome-terminal with Inconsolata Bold
 # optional
