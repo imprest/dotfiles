@@ -29,13 +29,10 @@ Plug 'nvim-lua/diagnostic-nvim'
 Plug 'steelsojka/completion-buffers'
 Plug 'kristijanhusak/vim-dadbod-completion'
 Plug 'SirVer/ultisnips'
-  let g:UltiSnipsExpandTrigger="<c-u>"       " This is important else it will hijack default <Tab>
-  let g:UltiSnipsJumpForwardTrigger="<c-b>"
-  let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+  let g:UltiSnipsExpandTrigger="<c-j>"       " This is important else it will hijack default <Tab>
+  let g:UltiSnipsJumpForwardTrigger="<c-l>"
+  let g:UltiSnipsJumpBackwardTrigger="<c-b>"
 Plug 'honza/vim-snippets'
-Plug 'hrsh7th/vim-vsnip'
-  let g:completion_confirm_key = "\<C-y>"
-Plug 'hrsh7th/vim-vsnip-integ'
   " Use tab for trigger completion with characters ahead and navigate.
   " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
   " other plugin before putting this into your config.
@@ -87,7 +84,7 @@ Plug 'sheerun/vim-polyglot'
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim'
 Plug 'tpope/vim-endwise'
-Plug 'neovim/nvim-lsp'
+Plug 'neovim/nvim-lspconfig'
   nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
   nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
   nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
@@ -96,13 +93,6 @@ Plug 'neovim/nvim-lsp'
   nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
   nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
   nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-  function! s:show_documentation()
-    if (index(['vim','help'], &filetype) >= 0)
-      execute 'h '.expand('<cword>')
-    else
-      call lua vim.lsp.buf.hover()
-    endif
-  endfunction
 Plug 'nvim-treesitter/nvim-treesitter'
 
 " HTML, Vue, D3.js
@@ -242,31 +232,31 @@ let g:gruvbox_sign_column="none"
 silent! color gruvbox
 " Activate colorizer for certain filetypes, needs to be after termguicolors
 " Setup for nvim complete, diagnostic and lsp
-lua << EOF
-require 'colorizer'.setup {
-  'css';
-  'scss';
-  'javascript';
-  html = {
-    mode = 'foreground';
-  }
-}
+"lua << EOF
+"require 'colorizer'.setup {
+  "'css';
+  "'scss';
+  "'javascript';
+  "html = {
+    "mode = 'foreground';
+  "}
+"}
 
-local on_attach_vim = function(client)
-  require'completion'.on_attach(client)
-  require'diagnostic'.on_attach(client)
-end
-require'nvim_lsp'.elixirls.setup{
-  on_attach=on_attach_vim
-}
+"local on_attach_vim = function(client)
+  "require'completion'.on_attach(client)
+  "require'diagnostic'.on_attach(client)
+"end
+"require'nvim_lsp'.elixirls.setup{
+  "on_attach=on_attach_vim
+"}
 
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = {"javascript", "css", "html", "lua", "json", "markdown"},
-  highlight = {
-    enable = true,
-  },
-}
-EOF
+"require'nvim-treesitter.configs'.setup {
+  "ensure_installed = {"javascript", "css", "html", "lua", "json", "markdown"},
+  "highlight = {
+    "enable = true,
+  "},
+"}
+"EOF
 
 " Style
 set number                        " line numbers are cool
