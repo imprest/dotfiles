@@ -56,14 +56,14 @@ Plug 'honza/vim-snippets'
   let g:completion_chain_complete_list = {
         \'default' : {
         \ 'default' : [
-        \  {'complete_items' : ['lsp', 'snippet', 'buffers', 'path']},
+        \  {'complete_items' : ['lsp', 'snippet', 'buffer', 'buffers', 'path']},
         \  {'mode' : 'file'}, {'mode' : '<c-p>' }, { 'mode' : '<c-n>' },
         \ ],
         \ 'comment' : [ {'complete_items' : ['buffer', 'path'] }],
         \ 'string' : [ {'complete_items' : ['buffer', 'path'] }],
         \ },
         \'vim' : [
-        \ {'complete_items': ['snippet', 'buffer', 'buffers', 'path']},
+        \ {'complete_items': ['snippet', 'buffer', 'path']},
         \ {'mode' : 'cmd'}
         \ ],
         \'sql': [
@@ -232,31 +232,51 @@ let g:gruvbox_sign_column="none"
 silent! color gruvbox
 " Activate colorizer for certain filetypes, needs to be after termguicolors
 " Setup for nvim complete, diagnostic and lsp
-"lua << EOF
-"require 'colorizer'.setup {
-  "'css';
-  "'scss';
-  "'javascript';
-  "html = {
-    "mode = 'foreground';
-  "}
-"}
+lua << EOF
+require 'colorizer'.setup {
+  'css';
+  'scss';
+  'javascript';
+  html = {
+    mode = 'foreground';
+  }
+}
 
-"local on_attach_vim = function(client)
-  "require'completion'.on_attach(client)
-  "require'diagnostic'.on_attach(client)
-"end
-"require'nvim_lsp'.elixirls.setup{
-  "on_attach=on_attach_vim
-"}
+local validate = vim.validate
+local mapper = function(mode, key, result)
+  vim.fn.nvim_buf_set_keymap(0, mode, key, result, {noremap = true, silent = true})
+end
 
-"require'nvim-treesitter.configs'.setup {
-  "ensure_installed = {"javascript", "css", "html", "lua", "json", "markdown"},
-  "highlight = {
-    "enable = true,
-  "},
-"}
-"EOF
+function _G.dump(...)
+  local objects = vim.tbl_map(vim.inspect, {...})
+  print(unpack(objects))
+end
+
+function _G.exdoc(method)
+  local params = vim.lsp.util.make_position_params()
+  validate {
+    method = {method, 's'};
+    callback = {callback, 'f', true};
+  }
+  return vim.lsp.buf_request(0, method, params, callback)
+end
+
+local on_attach_vim = function(client)
+  require'completion'.on_attach(client)
+  require'diagnostic'.on_attach(client)
+  mapper('n', 'T', '<cmd>lua dump(exdoc("textDocument/hover"))<CR>')
+end
+require'nvim_lsp'.elixirls.setup{
+  on_attach=on_attach_vim
+}
+
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = {"javascript", "css", "html", "lua", "json", "markdown"},
+  highlight = {
+    enable = true,
+  },
+}
+EOF
 
 " Style
 set number                        " line numbers are cool
