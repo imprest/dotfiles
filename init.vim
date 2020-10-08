@@ -77,6 +77,8 @@ Plug 'honza/vim-snippets'
   augroup end
 
 " Elixir
+Plug 'slashmili/alchemist.vim'
+  let g:alchemist_tag_disable = 1
 Plug 'airblade/vim-rooter'
   let g:rooter_silent_chdir = 1
   let g:rooter_patterns = ['mix.exs', '.git/', 'package.json']
@@ -242,29 +244,9 @@ require 'colorizer'.setup {
   }
 }
 
-local validate = vim.validate
-local mapper = function(mode, key, result)
-  vim.fn.nvim_buf_set_keymap(0, mode, key, result, {noremap = true, silent = true})
-end
-
-function _G.dump(...)
-  local objects = vim.tbl_map(vim.inspect, {...})
-  print(unpack(objects))
-end
-
-function _G.exdoc(method)
-  local params = vim.lsp.util.make_position_params()
-  validate {
-    method = {method, 's'};
-    callback = {callback, 'f', true};
-  }
-  return vim.lsp.buf_request(0, method, params, callback)
-end
-
 local on_attach_vim = function(client)
   require'completion'.on_attach(client)
   require'diagnostic'.on_attach(client)
-  mapper('n', 'T', '<cmd>lua dump(exdoc("textDocument/hover"))<CR>')
 end
 require'nvim_lsp'.elixirls.setup{
   on_attach=on_attach_vim
@@ -434,6 +416,14 @@ nnoremap <C-f> :Rg <C-R><C-W><CR>
 vnoremap <C-f> y<Esc>:Rg <C-R>"<CR>
 
 "" FUNCTIONS {{{
+function! OpenExDoc()
+  :call alchemist#exdoc() | wincmd L | vert res 81
+  setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap modifiable nocursorline nofoldenable signcolumn=no
+  if exists('&relativenumber')
+    setlocal norelativenumber
+  endif
+endfunction
+
 function! CloseWindowOrKillBuffer()
   let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
 
@@ -485,7 +475,8 @@ augroup filetype_elixir
   au!
   au FileType elixir,eelixir iab pp \|>
   au FileType elixir,eelixir setlocal omnifunc=v:lua.vim.lsp.omnifunc
-  au FileType elixir,eelixir noremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
+  "au FileType elixir,eelixir noremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
+  au FileType elixir,eelixir nnoremap <buffer> <s-k> :call OpenExDoc()<CR>
   au BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting_sync()
   au BufNewFile,BufRead *.{ex,exs}
     \ let b:endwise_addition = '\=submatch(0)=="fn" ? "end)" : "end"'
