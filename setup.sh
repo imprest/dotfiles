@@ -23,12 +23,12 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep \
+sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep konsole \
   yay otf-fira-code erlang elixir fop wxgtk inotify-tools postgresql
-# size 12 in konsole or 10 for fira code light
-# size 12 in gnome-terminal with Inconsolata Bold
+# size 12 in konsole or 9 for fira code light
+# size 12 in gnome-terminal with Inconsolata SemiBold
 # optional
-# weechat pdfarranger ctags
+# weechat pdfarranger
 
 # yay packages
 # yay -S tectonic
@@ -40,7 +40,6 @@ git config --global user.name  "Hardik Varia"
 # neovim
 mkdir -p ~/.config/nvim
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
-# ln -sf ~/dotfiles/ctags ~/.ctags
 nvim +PlugInstall +qall
 nvim +UpdateRemotePlugins +qall
 
