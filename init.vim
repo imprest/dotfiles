@@ -418,9 +418,11 @@ vnoremap <C-f> y<Esc>:Rg <C-R>"<CR>
 "" FUNCTIONS {{{
 function! OpenExDoc()
   :call alchemist#exdoc() | wincmd L | vert res 81
-  setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap modifiable nocursorline nofoldenable signcolumn=no
-  if exists('&relativenumber')
-    setlocal norelativenumber
+  if bufname('') == "[ExDoc]"
+    setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap modifiable nocursorline nofoldenable signcolumn=no
+    if exists('&relativenumber')
+      setlocal norelativenumber
+    endif
   endif
 endfunction
 
