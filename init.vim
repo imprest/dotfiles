@@ -230,34 +230,38 @@ set clipboard=unnamed             " use system clipboard
 set termguicolors
 set background=dark
 let g:gruvbox_italic=1
-let g:gruvbox_sign_column="none"
+" let g:gruvbox_sign_column="none"
 silent! color gruvbox
 " Activate colorizer for certain filetypes, needs to be after termguicolors
 " Setup for nvim complete, diagnostic and lsp
-lua << EOF
-require 'colorizer'.setup {
-  'css';
-  'scss';
-  'javascript';
-  html = {
-    mode = 'foreground';
+:lua <<EOF
+  require 'colorizer'.setup {
+    'css';
+    'scss';
+    'javascript';
+    html = {
+      mode = 'foreground';
+    }
   }
-}
 
-local on_attach_vim = function(client)
-  require'completion'.on_attach(client)
-  require'diagnostic'.on_attach(client)
-end
-require'nvim_lsp'.elixirls.setup{
-  on_attach=on_attach_vim
-}
+  local nvim_lsp = require('lspconfig')
+  local on_attach = function(_, bufnr)
+    require('diagnostic').on_attach()
+    require('completion').on_attach()
+  end
+  local servers = {'elixirls', 'vimls'}
+  for _, lsp in ipairs(servers) do
+    nvim_lsp[lsp].setup {
+      on_attach = on_attach,
+    }
+  end
 
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = {"javascript", "css", "html", "lua", "json", "markdown"},
-  highlight = {
-    enable = true,
-  },
-}
+  require('nvim-treesitter.configs').setup {
+    ensure_installed = {"javascript", "erlang", "css", "html", "lua", "json", "markdown"},
+    highlight = {
+      enable = true,
+    },
+  }
 EOF
 
 " Style
@@ -271,7 +275,7 @@ set scrolloff=3                   " provide some context when editing
 set hidden                        " allow backgrounding buffers without writing them, and
                                   " remember marks/undo for backgrounded buffers
 set textwidth=98
-set colorcolumn=+1
+"set colorcolumn=+1
 
 " Mouse
 set mouse=a                       " we love the mouse
