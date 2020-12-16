@@ -15,6 +15,8 @@ let mapleader = ","
 "" PLUGIN MANAGEMENT {{{
 call plug#begin('~/.config/nvim/plugged')
 
+Plug 'tweekmonster/startuptime.vim'
+
 " Autocomplete, LSP & Snippets
 Plug 'nvim-lua/completion-nvim'
 Plug 'nvim-lua/diagnostic-nvim'
@@ -26,7 +28,7 @@ Plug 'nvim-lua/diagnostic-nvim'
   call sign_define("LspDiagnosticsHintSign", {"text" : "H", "texthl" : "LspDiagnosticsHint"})
   nnoremap <M-p> :PrevDiagnosticCycle<CR>
   nnoremap <M-n> :NextDiagnosticCycle<CR>
-Plug 'steelsojka/completion-buffers'
+"Plug 'steelsojka/completion-buffers'
 Plug 'kristijanhusak/vim-dadbod-completion'
 Plug 'SirVer/ultisnips'
   let g:UltiSnipsExpandTrigger="<c-j>"       " This is important else it will hijack default <Tab>
@@ -72,7 +74,7 @@ Plug 'honza/vim-snippets'
         \}
   augroup CompletionTriggerCharacter
     au!
-    au BufEnter * lua require'completion'.on_attach()
+    " au BufEnter * lua require'completion'.on_attach()
     au FileType sql setlocal omnifunc=vim_dadbod_completion#omni
   augroup end
 
@@ -86,6 +88,7 @@ Plug 'sheerun/vim-polyglot'
 Plug 'janko-m/vim-test'
   let g:test#strategy = 'neovim'
 Plug 'tpope/vim-endwise'
+Plug 'rstacruz/vim-closer'
 Plug 'neovim/nvim-lspconfig'
   nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
   nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
@@ -95,7 +98,7 @@ Plug 'neovim/nvim-lspconfig'
   nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
   nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
   nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-Plug 'nvim-treesitter/nvim-treesitter'
+"Plug 'nvim-treesitter/nvim-treesitter'
 
 " HTML, Vue, D3.js
 Plug 'alvan/vim-closetag'
@@ -105,13 +108,17 @@ Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir', 'eelixi
 Plug 'norcalli/nvim-colorizer.lua'
 
 " Customize UI
-Plug 'morhetz/gruvbox'
+" Plug 'morhetz/gruvbox'
+Plug 'lifepillar/vim-gruvbox8'
+Plug 'machakann/vim-highlightedyank'
+Plug 'machakann/vim-sandwich'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+  let g:airline_theme = 'gruvbox8'
   if !exists('g:airline_symbols')
     let g:airline_symbols = {}
   endif
-  let g:airline_section_z = '%3l:%2c' "\'%3l:%2c %3p%%'
+  let g:airline_section_z = ' %3l:%2c' "\'%3l:%2c %3p%%'
   let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
   let g:airline_highlighting_cache              = 1
   let g:airline_powerline_fonts                 = 1
@@ -152,18 +159,15 @@ Plug 'vim-airline/vim-airline-themes'
 
 " Editing
 Plug 'pbrisbin/vim-mkdir'       " :e this/does/notexist/file.txt :w Just works
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-unimpaired'
-Plug 'tpope/vim-surround'       " cs({ ds' ysW' vlllS'
-Plug 'scrooloose/nerdcommenter' " ,cc ,c<space> ,cn
+Plug 'machakann/vim-sandwich'   " sr({ sd' <select text>sa'
+Plug 'preservim/nerdcommenter'  " ,cc ,c<space> ,cn
 Plug 'junegunn/vim-easy-align'
   xmap ga <Plug>(EasyAlign)
   nmap ga <Plug>(EasyAlign)
 
-" Navigation
+                                " Navigation
 Plug 'moll/vim-bbye'            " delete buffers w/o closing the buffer pane
   nnoremap <Leader>d :Bdelete<CR>
-Plug 'andymass/vim-matchup'     " drop-in replacement for matchit
 Plug 'justinmk/vim-gtfo'        " ,gof open file in filemanager
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
@@ -171,7 +175,7 @@ Plug 'junegunn/fzf.vim'
   nnoremap <Leader>b :Buffers<CR>
   nnoremap <Leader>m :History<CR>
   nnoremap // :BLines<CR>
-Plug 'kyazdani42/nvim-web-devicons' " for file icons
+" Plug 'kyazdani42/nvim-web-devicons' " for file icons
 Plug 'kyazdani42/nvim-tree.lua'
   map <C-\> :LuaTreeToggle<CR>
   map <F2>  :LuaTreeToggle<CR>
@@ -231,7 +235,7 @@ set termguicolors
 set background=dark
 let g:gruvbox_italic=1
 " let g:gruvbox_sign_column="none"
-silent! color gruvbox
+silent! color gruvbox8
 " Activate colorizer for certain filetypes, needs to be after termguicolors
 " Setup for nvim complete, diagnostic and lsp
 :lua <<EOF
@@ -247,7 +251,7 @@ silent! color gruvbox
   local nvim_lsp = require('lspconfig')
   local on_attach = function(_, bufnr)
     require('diagnostic').on_attach()
-    require('completion').on_attach()
+    --require('completion').on_attach()
   end
   local servers = {'elixirls', 'vimls'}
   for _, lsp in ipairs(servers) do
@@ -256,12 +260,12 @@ silent! color gruvbox
     }
   end
 
-  require('nvim-treesitter.configs').setup {
-    ensure_installed = {"javascript", "erlang", "css", "html", "lua", "json", "markdown"},
-    highlight = {
-      enable = true,
-    },
-  }
+  --require('nvim-treesitter.configs').setup {
+    --ensure_installed = {"javascript", "erlang", "css", "html", "lua", "json", "markdown"},
+    --highlight = {
+      --enable = true,
+    --},
+  --}
 EOF
 
 " Style
@@ -269,7 +273,7 @@ set number                        " line numbers are cool
 set ruler                         " show the cursor position all the time
 set nocursorline                  " disable cursor line
 set showcmd                       " display incomplete commands
-set signcolumn=yes                " always display signcolumn i.e. less redraw and some space
+set signcolumn=number             " always display signcolumn i.e. less redraw and some space
 set novisualbell                  " no flashes please
 set scrolloff=3                   " provide some context when editing
 set hidden                        " allow backgrounding buffers without writing them, and
@@ -486,12 +490,12 @@ augroup filetype_elixir
   au BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting_sync()
   au BufNewFile,BufRead *.{ex,exs}
     \ let b:endwise_addition = '\=submatch(0)=="fn" ? "end)" : "end"'
-  au BufNewFile,BufRead *.{ex,exs}
-    \ syn match elixirCustomOperators " def "  conceal cchar= " Space
-  au BufNewFile,BufRead *.{ex,exs}
-    \ syn match elixirCustomOperators " defp " conceal cchar=_
-  au BufNewFile,BufRead *.{ex,exs} set concealcursor=nc
-  au BufNewFile,BufRead *.{ex,exs} set conceallevel=1
+  "au BufNewFile,BufRead *.{ex,exs}
+    "\ syn match elixirCustomOperators " def "  conceal cchar= " Space
+  "au BufNewFile,BufRead *.{ex,exs}
+    "\ syn match elixirCustomOperators " defp " conceal cchar=_
+  "au BufNewFile,BufRead *.{ex,exs} set concealcursor=nc
+  "au BufNewFile,BufRead *.{ex,exs} set conceallevel=1
 augroup END
 
 " delete Fugitive buffers when they become inactive
