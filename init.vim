@@ -114,7 +114,7 @@ Plug 'machakann/vim-highlightedyank'
 Plug 'machakann/vim-sandwich'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-  let g:airline_theme = 'gruvbox8'
+  let g:airline_theme = 'simple'
   if !exists('g:airline_symbols')
     let g:airline_symbols = {}
   endif

@@ -61,6 +61,7 @@ export KERL_BUILD_DOCS='yes'
 export KERL_DOC_TARGETS='chunks'
 export ERL_AFLAGS='-kernel shell_history enabled'
 export PGDATABASE='mgp_dev' # frequently used database
+export MANPAGER='nvim +Man!'
 export PATH=$HOME/Downloads/android-sdk/android-studio:$PATH # $HOME/.cargo/bin:$PATH
 export FZF_DEFAULT_COMMAND='rg --files --follow'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
