@@ -15,17 +15,13 @@ autoload -Uz _zinit
 zinit load rupa/z
 zinit light supercrabtree/k
 zinit snippet OMZ::lib/completion.zsh
-zinit snippet OMZ::plugins/colored-man-pages
 zinit snippet PZT::modules/pacman
-zinit ice as"program" atclone"perl Makefile.PL PREFIX=$ZPFX" \
-    atpull'%atclone' make'install' pick"$ZPFX/bin/git-cal"
-zinit load k4rthik/git-cal
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit load zdharma/history-search-multi-word # Ctrl-R to activate
 zstyle :plugin:history-search-multi-word reset-prompt-protect 1
 zinit light denysdovhan/spaceship-prompt
-SPACESHIP_CHAR_SYMBOL='λ '
+SPACESHIP_CHAR_SYMBOL='$ '
 SPACESHIP_PROMPT_ADD_NEWLINE=false
 SPACESHIP_PROMPT_SEPARATE_LINE=false
 SPACESHIP_ELIXIR_SHOW=false
@@ -109,6 +105,7 @@ alias gs="git status"
 alias gl="git log --oneline --decorate -20"
 alias gla="git log --oneline --decorate --graph --all"
 alias commit="git add -A; git commit -m"
+alias nvimrc="$EDITOR ~/dotfiles/init.vim"
 
 # asdf
 . $HOME/.asdf/asdf.sh

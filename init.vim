@@ -108,17 +108,16 @@ Plug 'mattn/emmet-vim', { 'for': ['html', 'javascript', 'vue', 'elixir', 'eelixi
 Plug 'norcalli/nvim-colorizer.lua'
 
 " Customize UI
-" Plug 'morhetz/gruvbox'
-Plug 'lifepillar/vim-gruvbox8'
+Plug 'rakr/vim-one'
 Plug 'machakann/vim-highlightedyank'
 Plug 'machakann/vim-sandwich'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-  let g:airline_theme = 'simple'
+  let g:airline_theme = 'one'
   if !exists('g:airline_symbols')
     let g:airline_symbols = {}
   endif
-  let g:airline_section_z = ' %3l:%2c' "\'%3l:%2c %3p%%'
+  let g:airline_section_z = '%3l:%2c' "\'%3l:%2c %3p%%'
   let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
   let g:airline_highlighting_cache              = 1
   let g:airline_powerline_fonts                 = 1
@@ -233,9 +232,8 @@ set clipboard=unnamed             " use system clipboard
 " Colours
 set termguicolors
 set background=dark
-let g:gruvbox_italic=1
-" let g:gruvbox_sign_column="none"
-silent! color gruvbox8
+let g:one_allow_italics=1
+silent! color one
 " Activate colorizer for certain filetypes, needs to be after termguicolors
 " Setup for nvim complete, diagnostic and lsp
 :lua <<EOF
@@ -350,7 +348,8 @@ set undoreload=1000
 " Common keybindings
 nnoremap ; :
 noremap <c-s> :w<CR>
-noremap <Leader>q :q!<CR> " Exit w/o saving
+noremap <Leader>q :q!<CR> " Exit
+noremap <Leader>Q :q!<CR> " Exit w/o saving
 " Escape
 inoremap jk <ESC>
 inoremap <C-c> <Esc>
