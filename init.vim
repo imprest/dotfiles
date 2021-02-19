@@ -19,17 +19,18 @@ Plug 'tweekmonster/startuptime.vim'
 
 " Autocomplete, LSP & Snippets
 Plug 'nvim-lua/completion-nvim'
-Plug 'nvim-lua/diagnostic-nvim'
+Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'steelsojka/completion-buffers'
+Plug 'kristijanhusak/vim-dadbod-completion'
+Plug 'nvim-treesitter/completion-treesitter'
   let g:diagnostic_enable_virtual_text = 1
   let g:diagnostic_virtual_text_prefix = ' '
-  call sign_define("LspDiagnosticsErrorSign", {"text" : "✘", "texthl" : "LspDiagnosticsError"})
+  call sign_define("LspDiagnosticsSignError", {"text" : "✘", "texthl" : "LspDiagnosticsError"})
   call sign_define("LspDiagnosticsWarningSign", {"text" : "!", "texthl" : "LspDiagnosticsWarning"})
   call sign_define("LspDiagnosticsInformationSign", {"text" : "I", "texthl" : "LspDiagnosticsInformation"})
   call sign_define("LspDiagnosticsHintSign", {"text" : "H", "texthl" : "LspDiagnosticsHint"})
   nnoremap <M-p> :PrevDiagnosticCycle<CR>
   nnoremap <M-n> :NextDiagnosticCycle<CR>
-"Plug 'steelsojka/completion-buffers'
-Plug 'kristijanhusak/vim-dadbod-completion'
 Plug 'SirVer/ultisnips'
   let g:UltiSnipsExpandTrigger="<c-j>"       " This is important else it will hijack default <Tab>
   let g:UltiSnipsJumpForwardTrigger="<c-l>"
@@ -69,15 +70,15 @@ Plug 'honza/vim-snippets'
         \ {'mode' : 'cmd'}
         \ ],
         \'sql': [
-        \ {'complete_items': ['vim-dadbod-completion']},
+        \ {'complete_items': ['vim-dadbod-completion', 'buffer']},
         \],
         \}
   augroup CompletionTriggerCharacter
     au!
-    " au BufEnter * lua require'completion'.on_attach()
+    au BufEnter * lua require'completion'.on_attach()
     au FileType sql setlocal omnifunc=vim_dadbod_completion#omni
   augroup end
-
+  
 " Elixir
 Plug 'slashmili/alchemist.vim'
   let g:alchemist_tag_disable = 1
@@ -90,6 +91,7 @@ Plug 'janko-m/vim-test'
 Plug 'tpope/vim-endwise'
 Plug 'rstacruz/vim-closer'
 Plug 'neovim/nvim-lspconfig'
+Plug 'alexaandru/nvim-lspupdate'
   nnoremap <silent> gd    <cmd>lua vim.lsp.buf.declaration()<CR>
   nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
   nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
@@ -98,7 +100,6 @@ Plug 'neovim/nvim-lspconfig'
   nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
   nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
   nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-"Plug 'nvim-treesitter/nvim-treesitter'
 
 " HTML, Vue, D3.js
 Plug 'alvan/vim-closetag'
@@ -111,6 +112,7 @@ Plug 'norcalli/nvim-colorizer.lua'
 Plug 'rakr/vim-one'
 Plug 'machakann/vim-highlightedyank'
 Plug 'machakann/vim-sandwich'
+Plug 'glepnir/indent-guides.nvim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
   let g:airline_theme = 'one'
@@ -174,13 +176,13 @@ Plug 'junegunn/fzf.vim'
   nnoremap <Leader>b :Buffers<CR>
   nnoremap <Leader>m :History<CR>
   nnoremap // :BLines<CR>
-" Plug 'kyazdani42/nvim-web-devicons' " for file icons
+Plug 'kyazdani42/nvim-web-devicons' " for file icons
 Plug 'kyazdani42/nvim-tree.lua'
-  map <C-\> :LuaTreeToggle<CR>
-  map <F2>  :LuaTreeToggle<CR>
-  map <F3>  :LuaTreeFind<CR>
-  let g:lua_tree_width = 26
-  let g:lua_tree_ignore = [ '.git', 'node_modules', '.cache', '.npm', '.rebar' ]
+  map <C-\> :NvimTreeToggle<CR>
+  map <F2>  :NvimTreeToggle<CR>
+  map <F3>  :NvimTreeFind<CR>
+  let g:nvim_tree_width = 26
+  let g:nvim_tree_ignore = [ '.git', 'node_modules', '.cache', '.npm', '.rebar' ]
 Plug 'terryma/vim-smooth-scroll' " Ctrl-e and Ctrl-d to scroll up/down
   nnoremap <C-e> <C-u>
   nnoremap <C-u> <C-e>
@@ -246,24 +248,45 @@ silent! color one
     }
   }
 
+  vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+    vim.lsp.diagnostic.on_publish_diagnostics, {
+      -- This will disable virtual text, like doing:
+      -- let g:diagnostic_enable_virtual_text = 0
+      virtual_text = true,
+
+      -- This is similar to:
+      -- let g:diagnostic_show_sign = 1
+      -- To configure sign display,
+      --  see: ":help vim.lsp.diagnostic.set_signs()"
+      signs = true,
+
+      -- This is similar to:
+      -- "let g:diagnostic_insert_delay = 1"
+      update_in_insert = false,
+    }
+  )
+
   local nvim_lsp = require('lspconfig')
   local on_attach = function(_, bufnr)
-    require('diagnostic').on_attach()
-    --require('completion').on_attach()
+    require('completion').on_attach()
   end
-  local servers = {'elixirls', 'vimls'}
+  local servers = {'elixirls'}
   for _, lsp in ipairs(servers) do
     nvim_lsp[lsp].setup {
       on_attach = on_attach,
+      cmd = { "/home/hvaria/elixir-ls/language_server.sh" };
     }
   end
 
-  --require('nvim-treesitter.configs').setup {
-    --ensure_installed = {"javascript", "erlang", "css", "html", "lua", "json", "markdown"},
-    --highlight = {
-      --enable = true,
-    --},
-  --}
+  require('nvim-treesitter.configs').setup {
+    ensure_installed = {"javascript", "erlang", "css", "html", "ledger", "lua", "json"},
+    highlight = {
+      enable = true,
+    },
+    indent = {
+      enable = true
+    }
+  }
 EOF
 
 " Style
