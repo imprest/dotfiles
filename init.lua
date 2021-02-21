@@ -11,6 +11,29 @@ local function map(mode, lhs, rhs, opts)
   api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
+local fn = vim.fn
+local fmt = string.format
+
+local function pad(c, m)
+  local padch = ' '
+  return string.rep(padch, string.len(tostring(m)) - string.len(tostring(c)))
+end
+
+local function get_line()
+  local nbline = fn.line('$')
+  local line = fn.line('.')
+  return fmt('%s%d', pad(line, nbline), line)
+end
+
+local function get_column()
+  local col = fn.col('.')
+  return fmt('%s%d', pad(col, 10), col)
+end
+
+local function get_item()
+  return table.concat({'',get_line(), ':', get_column()})
+end
+
 g['loaded_python_provider'] = 1
 g['python3_host_prog'] = '/usr/bin/python3'
 g['mapleader'] = ","
@@ -18,10 +41,12 @@ g['mapleader'] = ","
 -------------------- PLUGINS -------------------------------
 cmd 'packadd paq-nvim'               -- load the package manager
 local paq = require('paq-nvim').paq  -- a convenient alias
+paq {'akinsho/nvim-bufferline.lua'}
 paq {'airblade/vim-gitgutter'}
 paq {'airblade/vim-rooter'}
 paq {'dstein64/nvim-scrollview'}
 paq {'elixir-editors/vim-elixir'}
+paq {'farmergreg/vim-lastplace'}
 paq {'joshdick/onedark.vim'}
 paq {'junegunn/fzf'}
 paq {'junegunn/fzf.vim'}
@@ -31,12 +56,14 @@ paq {'kyazdani42/nvim-web-devicons'}
 paq {'kyazdani42/nvim-tree.lua'}
 paq {'lervag/vimtex'}
 paq {'machakann/vim-sandwich'}       -- sr({ sd' <select text>sa'
+paq {'mattn/emmet-vim'}
 -- paq {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
 paq {'neovim/nvim-lspconfig'}
 paq {'norcalli/nvim-colorizer.lua'}
 paq {'nvim-lua/completion-nvim'}
 paq {'nvim-treesitter/nvim-treesitter'}
 paq {'ojroques/nvim-bufdel'}
+paq {'ojroques/nvim-hardline'}
 paq {'ojroques/nvim-lspfuzzy'}
 paq {'pbrisbin/vim-mkdir'}           -- :e this/does/not/exist/file.txt then :w
 paq {'savq/paq-nvim', opt = true}    -- paq-nvim manages itself
@@ -46,8 +73,6 @@ paq {'terryma/vim-smooth-scroll'}
 paq {'tpope/vim-commentary'}
 paq {'tpope/vim-fugitive'}
 paq {'tpope/vim-dadbod'}
-paq {'vim-airline/vim-airline'}
-paq {'vim-airline/vim-airline-themes'}
 
 -------------------- PLUGIN SETUP --------------------------
 -- bufdel
@@ -59,12 +84,44 @@ require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }
 g['dirvish_mode'] = [[:sort ,^.*[\/],]]
 -- elixir
 g['alchemist_tag_disable'] = 1
+-- emmet
+vim.api.nvim_exec([[imap <C-e> <C-y>,<CR>]], false)
 -- fzf
 map('n', '<C-p>', '<cmd>Files<CR>')
 map('n', '<leader>g', '<cmd>Commits<CR>')
-map('n', '<leader>p', '<cmd>Rg<CR>')
+map('n', '<C-f>', '<cmd>Rg<CR>')
 map('n', 's', '<cmd>Buffers<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
+-- hardline
+require('hardline').setup {
+  sections = {
+    {class = 'mode', item = require('hardline.parts.mode').get_item},
+    {class = 'high', item = require('hardline.parts.git').get_item, hide = 80},
+    '%<',
+    {class = 'med', item = require('hardline.parts.filename').get_item},
+    {class = 'med', item ='%='},
+    {class = 'low', item = require('hardline.parts.wordcount').get_item, hide = 80},
+    {class = 'error', item = require('hardline.parts.lsp').get_error},
+    {class = 'warning', item = require('hardline.parts.lsp').get_warning},
+    {class = 'high', item = require('hardline.parts.filetype').get_item, hide = 80},
+    {class = 'mode', item = get_item},
+  },
+}
+-- nvim-bufferline
+require('bufferline').setup{}
+-- nvim-tree
+map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
+vim.api.nvim_exec([[
+  xnoremap <expr> <Plug>(DBExe) db#op_exec()
+  nnoremap <expr> <Plug>(DBExe) db#op_exec()
+  nnoremap <expr> <Plug>(DBExeLine) db#op_exec() . '_'
+  xmap <leader>p <Plug>(DBExe)
+  nmap <leader>p <Plug>(DBExe)
+  omap <leader>p <Plug>(DBExe)
+  nmap <leader>p <Plug>(DBExeLine)
+  ]], false)
+-- vim-dadbod
+g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
 -- vim-sandwich
 cmd 'runtime macros/sandwich/keymap/surround.vim'
 -- vim-smooth-scroll
@@ -75,18 +132,6 @@ map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 2)<CR>')
 -- vimtex
 g['vimtex_quickfix_mode'] = 0
 g['vimtex_view_method'] = 'evince'
--- vim-airline
-g['airline_theme'] = 'onedark'
-g['airline_section_z'] = '%3l:%2c' -- '%3l:%2c %3p%%'
-g['airline_powerline_fonts'] = 1
-g['airline_left_sep'] = ''
-g['airline_right_sep'] = ''
-g['airline#parts#ffenc#skip_expected_string'] = 'utf-8[unix]'
-g['airline_skip_empty_sections'] = 1
-g['airline_exclude_preview'] = 1
-g['airline#extensions#tabline#enabled'] = 1
-g['airline#extensions#tabline#left_sep'] = ''
-g['airline#extensions#tabline#left_alt_sep'] = ''
 
 -------------------- OPTIONS -------------------------------
 local indent = 2
@@ -132,39 +177,53 @@ bo.tabstop = indent                       -- Number of spaces tabs count for
 bo.textwidth = width                      -- Maximum width of text
 
 -------------------- MAPPINGS ------------------------------
-map('', '<leader>c', '"+y')
-map('i', '<C-u>', '<C-g>u<C-u>')
-map('i', '<C-w>', '<C-g>u<C-w>')
+-- completion
 map('i', '<S-Tab>', 'pumvisible() ? "\\<C-p>" : "\\<S-Tab>"', {expr = true})
 map('i', '<Tab>', 'pumvisible() ? "\\<C-n>" : "\\<Tab>"', {expr = true})
-map('i', 'jk', '<ESC>')
-map('n', '<C-s>', ':w<CR>')
-map('n', '<C-l>', '<cmd>nohlsearch<CR>')
+-- common tasks
+map('n', '<C-s>', '<cmd>update<CR>')
+map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('n', '<F3>', '<cmd>lua toggle_wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
-map('n', '<F5>', '<cmd>checktime<CR>')
-map('n', '<F6>', '<cmd>set scrollbind!<CR>')
-map('n', '<S-Down>', '<C-w>2<')
-map('n', '<S-Left>', '<C-w>2-')
-map('n', '<S-Right>', '<C-w>2+')
-map('n', '<S-Up>', '<C-w>2>')
+map('n', '<leader>t', '<cmd>terminal<CR>')
+map('i', '<C-u>', '<C-g>u<C-u>')
+map('i', '<C-w>', '<C-g>u<C-w>')
+-- Escape
+map('i', 'jk', '<ESC>')
+map('t', 'jk', '<ESC>', {noremap = false})
+map('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"' , {expr = true})
+-- Navigation & Window management
+map('n', '<leader>s', '<cmd>split<CR>')
+map('n', '<leader>v', '<C-w>v<C-w>l')
+map('n', 'H', '^')
+map('n', 'L', 'g_')
+map('n', 'F', '%')
+map('v', 'L', 'g_')
+map('n', '<leader><leader>', '<C-^>')
+map('n', 'S', '<cmd>bn<CR>')
+map('n', 'X', '<cmd>bp<CR>')
+map('n', '<Right>', '<cmd>bn<CR>')
+map('n', '<Left>', '<cmd>bp<CR>')
+map('n', '<C-h>', '<C-w>h')
+map('n', '<C-j>', '<C-w>j')
+map('n', '<C-k>', '<C-w>k')
+map('n', '<C-l>', '<C-w>l')
+map('n', '<S-Right>', '<C-w>2<')
+map('n', '<S-Up>', '<C-w>2-')
+map('n', '<S-Down>', '<C-w>2+')
+map('n', '<S-Left>', '<C-w>2>')
 map('n', '<leader><Down>', '<cmd>cclose<CR>')
 map('n', '<leader><Left>', '<cmd>cprev<CR>')
 map('n', '<leader><Right>', '<cmd>cnext<CR>')
 map('n', '<leader><Up>', '<cmd>copen<CR>')
-map('n', '<leader>i', '<cmd>conf qa<CR>')
-map('n', '<leader>o', 'm`o<Esc>0D``')
-map('n', '<leader>s', ':%s//gcI<Left><Left><Left><Left>')
-map('n', '<leader>t', '<cmd>terminal<CR>')
-map('n', '<leader>u', '<cmd>update<CR>')
-map('n', 'Q', '<cmd>lua warn_caps()<CR>')
-map('n', 'S', '<cmd>bn<CR>')
-map('n', 'U', '<cmd>lua warn_caps()<CR>')
-map('n', 'X', '<cmd>bp<CR>')
-map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
-map('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"' , {expr = true})
-map('t', 'jk', '<ESC>', {noremap = false})
-map('v', '<leader>s', ':s//gcI<Left><Left><Left><Left>')
+-- paste
+map('', '<leader>c', '"+y')
+-- reselect visual block after indent
+map('v', '<', '<gv')
+map('v', '>', '>gv')
+-- quick substitue
+map('n', '<leader>r', ':%s//gcI<Left><Left><Left><Left>')
+map('v', '<leader>r', ':s//gcI<Left><Left><Left><Left>')
 
 -------------------- LSP -----------------------------------
 local lsp = require('lspconfig')
@@ -200,12 +259,15 @@ function init_term()
 end
 
 function toggle_wrap()
-  opt('w', 'breakindent', not vim.wo.breakindent)
-  opt('w', 'linebreak', not vim.wo.linebreak)
-  opt('w', 'wrap', not vim.wo.wrap)
+  wo.breakindent = not wo.breakindent
+  wo.linebreak = not wo.linebreak
+  wo.wrap = not wo.wrap
 end
 
 vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
   'TermOpen * lua init_term()',
   'TextYankPost * lua vim.highlight.on_yank {on_visual = false, timeout = 200}',
+  'FileType elixir,eelixir iab pp \\|>',
+  'FileType elixir,eelixir setlocal omnifunc=v:lua.vim.lsp.omnifunc',
+  'BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting_sync()',
 })
