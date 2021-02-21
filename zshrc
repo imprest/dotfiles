@@ -105,7 +105,7 @@ alias gs="git status"
 alias gl="git log --oneline --decorate -20"
 alias gla="git log --oneline --decorate --graph --all"
 alias commit="git add -A; git commit -m"
-alias nvimrc="$EDITOR ~/dotfiles/init.vim"
+alias nvimrc="$EDITOR ~/dotfiles/init.lua"
 
 # asdf
 . $HOME/.asdf/asdf.sh

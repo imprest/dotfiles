@@ -166,7 +166,7 @@ Plug 'junegunn/vim-easy-align'
   xmap ga <Plug>(EasyAlign)
   nmap ga <Plug>(EasyAlign)
 
-                                " Navigation
+" Navigation
 Plug 'moll/vim-bbye'            " delete buffers w/o closing the buffer pane
   nnoremap <Leader>d :Bdelete<CR>
 Plug 'justinmk/vim-gtfo'        " ,gof open file in filemanager
@@ -298,7 +298,6 @@ set signcolumn=number             " always display signcolumn i.e. less redraw a
 set novisualbell                  " no flashes please
 set scrolloff=3                   " provide some context when editing
 set hidden                        " allow backgrounding buffers without writing them, and
-                                  " remember marks/undo for backgrounded buffers
 set textwidth=98
 "set colorcolumn=+1
 
