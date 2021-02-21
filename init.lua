@@ -166,8 +166,6 @@ o.writebackup = false
 o.swapfile = false
 o.undodir = '~/.data/undofile'
 o.undofile = true
-o.undolevels = 1000
-o.undoreload = 1000
 -- window-local options
 wo.colorcolumn = tostring(width)          -- Line length marker
 wo.cursorline = true                      -- Highlight cursor line
