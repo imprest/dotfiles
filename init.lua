@@ -39,11 +39,13 @@ paq {'lervag/vimtex'}
 paq {'machakann/vim-sandwich'}       -- sr({ sd' <select text>sa'
 paq {'mattn/emmet-vim'}
 -- paq {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
+paq {'moll/vim-bbye'}
 paq {'neovim/nvim-lspconfig'}
 paq {'norcalli/nvim-colorizer.lua'}
 paq {'norcalli/nvim-terminal.lua'}
 paq {'nvim-lua/completion-nvim'}
 paq {'nvim-treesitter/nvim-treesitter'}
+paq {'nvim-treesitter/completion-treesitter'}
 paq {'ojroques/nvim-bufdel'}
 paq {'ojroques/nvim-hardline'}
 paq {'ojroques/nvim-lspfuzzy'}
@@ -55,6 +57,7 @@ paq {'tpope/vim-dadbod'}
 paq {'tpope/vim-endwise'}
 paq {'tpope/vim-fugitive'}
 paq {'Yggdroot/indentLine'}
+paq {'windwp/nvim-autopairs'}
 
 -------------------- PLUGIN SETUP --------------------------
 -- bufdel
@@ -64,6 +67,8 @@ require('bufdel').setup {next = 'alternate'}
 g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex'
 -- colorizer
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
+-- completion-nvim
+g['completion_trigger_keyword_length'] = 2
 -- elixir
 g['alchemist_tag_disable'] = 1
 -- emmet
@@ -73,6 +78,7 @@ map('n', '<C-p>', '<cmd>Files<CR>')
 map('n', '<leader>g', '<cmd>Commits<CR>')
 map('n', '<C-f>', '<cmd>Rg<CR>')
 map('n', 's', '<cmd>Buffers<CR>')
+map('n', '<leader>m', '<cmd>History<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 -- hardline
 local fmt = string.format
@@ -112,6 +118,8 @@ map('n', '<leader>cc', '<Plug>kommentary_line_default', { noremap = false })
 map('n', '<leader>c', '<Plug>kommentary_motion_default', { noremap = false })
 map('v', '<leader>c', '<Plug>kommentary_visual_default', { noremap = false })
 require('kommentary.config').setup()
+-- nvim-autopairs
+require('nvim-autopairs').setup()
 -- nvim-bufferline
 require('bufferline').setup{highlights = {buffer_selected = {gui = ""}}}
 -- nvim-terminal
@@ -119,6 +127,8 @@ require('terminal').setup()
 -- nvim-tree
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 g['nvim_tree_width'] = 26
+-- vim-bbye
+map('n', '<leader>d', '<cmd>Bdelete<CR>')
 -- vim-easy-align
 map('x', 'ga', '<Plug>(EasyAlign)', {noremap=false})
 -- vim-dadbod
@@ -152,7 +162,7 @@ o.completeopt = 'menuone,noinsert,noselect'  -- Completion options
 o.ignorecase = true                       -- Ignore case
 o.joinspaces = false                      -- No double spaces with join
 o.pastetoggle = '<F2>'                    -- Paste mode
-o.scrolloff = 4                           -- Lines of context
+o.scrolloff = 5                           -- Lines of context
 o.shiftround = true                       -- Round indent
 o.sidescrolloff = 8                       -- Columns of context
 o.smartcase = true                        -- Don't ignore case with capitals
@@ -191,7 +201,7 @@ map('n', '<C-s>', '<cmd>update<CR>')
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('n', '<F3>', '<cmd>lua toggle_wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
-map('n', '<leader>t', '<cmd>terminal<CR>')
+map('n', '<leader>t', '<cmd>split<bar>res 10 <bar>terminal<CR>')
 map('i', '<C-u>', '<C-g>u<C-u>')
 map('i', '<C-w>', '<C-g>u<C-w>')
 -- move lines up/down
@@ -229,7 +239,7 @@ map('n', '<leader><Down>', '<cmd>cclose<CR>')
 map('n', '<leader><Left>', '<cmd>cprev<CR>')
 map('n', '<leader><Right>', '<cmd>cnext<CR>')
 map('n', '<leader><Up>', '<cmd>copen<CR>')
--- paste
+-- yank to system clipboard
 map('', '<leader>y', '"+y')
 -- reselect visual block after indent
 map('v', '<', '<gv')
@@ -251,10 +261,11 @@ map('n', '<space>,', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
 map('n', '<space>;', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
 map('n', '<space>d', '<cmd>lua vim.lsp.buf.definition()<CR>')
 map('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>')
-map('n', '<space>h', '<cmd>lua vim.lsp.buf.hover()<CR>')
+map('n', '<space>k', '<cmd>lua vim.lsp.buf.hover()<CR>')
 map('n', '<space>m', '<cmd>lua vim.lsp.buf.rename()<CR>')
 map('n', '<space>r', '<cmd>lua vim.lsp.buf.references()<CR>')
 map('n', '<space>s', '<cmd>lua vim.lsp.buf.document_symbol()<CR>')
+map('n', '<space>t', '<cmd>lua vim.lsp.buf.type_definition()<CR>')
 
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
@@ -282,6 +293,8 @@ vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
   'TextYankPost * lua vim.highlight.on_yank {on_visual = false, timeout = 200}',
   'FileType elixir,eelixir iab pp \\|>',
   'FileType elixir,eelixir setlocal omnifunc=v:lua.vim.lsp.omnifunc',
+  'FileType elixir,eelixir nnoremap <silent><buffer> <s-k> :call alchemist#exdoc()<bar>wincmd L<bar>vert res 84<bar>set nonumber<CR>',
   'BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting_sync()',
   'FileType sql setlocal omnifunc=vim_dadbod_completion#omni',
+  'BufEnter * lua require\'completion\'.on_attach()'
 })
