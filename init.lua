@@ -24,6 +24,7 @@ paq {'akinsho/nvim-bufferline.lua'}
 paq {'airblade/vim-gitgutter'}
 paq {'airblade/vim-rooter'}
 paq {'b3nj5m1n/kommentary'}
+paq {'cohama/lexima.vim'}
 paq {'dstein64/nvim-scrollview'}
 paq {'elixir-editors/vim-elixir'}
 paq {'farmergreg/vim-lastplace'}
@@ -54,10 +55,8 @@ paq {'slashmili/alchemist.vim'}
 paq {'steelsojka/completion-buffers'}
 paq {'terryma/vim-smooth-scroll'}
 paq {'tpope/vim-dadbod'}
-paq {'tpope/vim-endwise'}
 paq {'tpope/vim-fugitive'}
 paq {'Yggdroot/indentLine'}
-paq {'windwp/nvim-autopairs'}
 
 -------------------- PLUGIN SETUP --------------------------
 -- bufdel
@@ -69,6 +68,8 @@ g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex'
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
 -- completion-nvim
 g['completion_trigger_keyword_length'] = 2
+g['completion_confirm_key'] = ""
+map('i','<CR>','pumvisible() ? complete_info()["selected"] != "-1" ? "\\<Plug>(completion_confirm_completion)" : "\\<c-e>\\<CR>" : "\\<CR>"', {expr = true})
 -- elixir
 g['alchemist_tag_disable'] = 1
 -- emmet
@@ -118,8 +119,6 @@ map('n', '<leader>cc', '<Plug>kommentary_line_default', { noremap = false })
 map('n', '<leader>c', '<Plug>kommentary_motion_default', { noremap = false })
 map('v', '<leader>c', '<Plug>kommentary_visual_default', { noremap = false })
 require('kommentary.config').setup()
--- nvim-autopairs
-require('nvim-autopairs').setup()
 -- nvim-bufferline
 require('bufferline').setup{highlights = {buffer_selected = {gui = ""}}}
 -- nvim-terminal
@@ -128,7 +127,7 @@ require('terminal').setup()
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 g['nvim_tree_width'] = 26
 -- vim-bbye
-map('n', '<leader>d', '<cmd>Bdelete<CR>')
+map('n', 'Q', '<cmd>Bdelete<CR>')
 -- vim-easy-align
 map('x', 'ga', '<Plug>(EasyAlign)', {noremap=false})
 -- vim-dadbod
@@ -174,7 +173,7 @@ o.wildmode = 'list:longest'               -- Command-line completion mode
 o.backup = false
 o.writebackup = false
 o.swapfile = false
-o.undodir = '~/.data/undofile'
+-- o.undodir = '~/.data/undofile'
 o.undofile = true
 -- window-local options
 wo.colorcolumn = tostring(width)          -- Line length marker
@@ -194,8 +193,10 @@ bo.textwidth = width                      -- Maximum width of text
 
 -------------------- MAPPINGS ------------------------------
 -- completion
-map('i', '<S-Tab>', 'pumvisible() ? "\\<C-p>" : "\\<S-Tab>"', {expr = true})
 map('i', '<Tab>', 'pumvisible() ? "\\<C-n>" : "\\<Tab>"', {expr = true})
+map('i', '<S-Tab>', 'pumvisible() ? "\\<C-p>" : "\\<S-Tab>"', {expr = true})
+map('i', '<Tab>','<Plug>(completion_smart_tab)', {noremap = false})
+map('i', '<S-Tab>','<Plug>(completion_smart_s_tab)', {noremap = false})
 -- common tasks
 map('n', '<C-s>', '<cmd>update<CR>')
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
@@ -216,6 +217,7 @@ map('i', 'jk', '<ESC>')
 map('t', 'jk', '<ESC>', {noremap = false})
 map('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"' , {expr = true})
 -- Navigation & Window management
+map('n', 'q', '<C-w>c')
 map('n', '<leader>s', '<cmd>split<CR>')
 map('n', '<leader>v', '<C-w>v<C-w>l')
 map('n', 'H', '^')
