@@ -70,6 +70,24 @@ require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }
 g['completion_trigger_keyword_length'] = 2
 g['completion_confirm_key'] = ""
 map('i','<CR>','pumvisible() ? complete_info()["selected"] != "-1" ? "\\<Plug>(completion_confirm_completion)" : "\\<c-e>\\<CR>" : "\\<CR>"', {expr = true})
+g['completion_chain_complete_list'] = {
+  sql = {{completion_items = {'vim-dadbod-completion', 'buffer'}}},
+  default = {
+    default = {
+      {complete_items = {'lsp', 'snippet', 'buffer'}},
+      {complete_items = {'path'}, triggered_only = {'/'}},
+      {mode = '<c-p>'}, {mode = '<c-n>'}
+    },
+    string = {
+      {complete_items = {'buffer'}},
+      {complete_items = {'path'}, triggered_only = {'/'}}
+    },
+    comment = {
+      {complete_items = {'buffer'}},
+      {complete_items = {'path'}, triggered_only = {'/'}}
+    }
+  }
+}
 -- elixir
 g['alchemist_tag_disable'] = 1
 -- emmet
@@ -170,6 +188,7 @@ o.splitright = true                       -- Put new windows right of current
 o.termguicolors = true                    -- True color support
 o.updatetime = 200                        -- Delay before swap file is saved
 o.wildmode = 'list:longest'               -- Command-line completion mode
+o.shortmess = 'filnxtToOFc'               -- Avoid showing extra message on completion
 o.backup = false
 o.writebackup = false
 o.swapfile = false
