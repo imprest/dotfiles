@@ -36,7 +36,7 @@ paq {'justinmk/vim-gtfo'}            -- ,gof open file in filemanager
 paq {'kristijanhusak/vim-dadbod-completion'}
 paq {'kyazdani42/nvim-web-devicons'}
 paq {'kyazdani42/nvim-tree.lua'}
-paq {'lervag/vimtex'}
+-- paq {'lervag/vimtex'}
 paq {'machakann/vim-sandwich'}       -- sr({ sd' <select text>sa'
 paq {'mattn/emmet-vim'}
 -- paq {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
@@ -59,6 +59,7 @@ paq {'tpope/vim-fugitive'}
 paq {'Yggdroot/indentLine'}
 
 -------------------- PLUGIN SETUP --------------------------
+o.termguicolors = true                    -- True color support
 -- bufdel
 map('n', '<leader>w', '<cmd>BufDel<CR>')
 require('bufdel').setup {next = 'alternate'}
@@ -165,8 +166,8 @@ map('n', '<C-u>', '<C-e>')
 map('n', '<c-e>', ':call smooth_scroll#up(&scroll, 15, 2)<CR>', {silent=true})
 map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 2)<CR>', {silent=true})
 -- vimtex
-g['vimtex_quickfix_mode'] = 0
-g['vimtex_view_method'] = 'evince'
+-- g['vimtex_quickfix_mode'] = 0
+-- g['vimtex_view_method'] = 'evince'
 
 -------------------- OPTIONS -------------------------------
 local indent = 2
@@ -185,7 +186,6 @@ o.sidescrolloff = 8                       -- Columns of context
 o.smartcase = true                        -- Don't ignore case with capitals
 o.splitbelow = true                       -- Put new windows below current
 o.splitright = true                       -- Put new windows right of current
-o.termguicolors = true                    -- True color support
 o.updatetime = 200                        -- Delay before swap file is saved
 o.wildmode = 'list:longest'               -- Command-line completion mode
 o.shortmess = 'filnxtToOFc'               -- Avoid showing extra message on completion
