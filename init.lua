@@ -28,6 +28,7 @@ paq {'cohama/lexima.vim'}
 paq {'dstein64/nvim-scrollview'}
 paq {'elixir-editors/vim-elixir'}
 paq {'farmergreg/vim-lastplace'}
+paq {'haya14busa/is.vim'}
 paq {'joshdick/onedark.vim'}
 paq {'junegunn/fzf'}
 paq {'junegunn/fzf.vim'}
@@ -51,6 +52,7 @@ paq {'ojroques/nvim-bufdel'}
 paq {'ojroques/nvim-hardline'}
 paq {'ojroques/nvim-lspfuzzy'}
 paq {'pbrisbin/vim-mkdir'}           -- :e this/does/not/exist/file.txt then :w
+paq {'phaazon/hop.nvim'}
 paq {'slashmili/alchemist.vim'}
 paq {'steelsojka/completion-buffers'}
 paq {'terryma/vim-smooth-scroll'}
@@ -97,7 +99,7 @@ map('i', '<C-e>', '<C-y>,', {noremap=false, silent=true})
 map('n', '<C-p>', '<cmd>Files<CR>')
 map('n', '<leader>g', '<cmd>Commits<CR>')
 map('n', '<C-f>', '<cmd>Rg<CR>')
-map('n', 's', '<cmd>Buffers<CR>')
+map('n', '<leader>b', '<cmd>Buffers<CR>')
 map('n', '<leader>m', '<cmd>History<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 -- hardline
@@ -132,6 +134,9 @@ require('hardline').setup {
     {class = 'mode', item = get_item},
   },
 }
+-- hop
+require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
+map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 -- kommentary
 g['kommentary_create_default_mappings'] = false
 map('n', '<leader>cc', '<Plug>kommentary_line_default', { noremap = false })
@@ -196,7 +201,7 @@ o.swapfile = false
 o.undofile = true
 -- window-local options
 wo.colorcolumn = tostring(width)          -- Line length marker
-wo.cursorline = true                      -- Highlight cursor line
+wo.cursorline = false                     -- Highlight cursor line
 wo.list = true                            -- Show some invisible characters
 wo.number = true                          -- Show line numbers
 wo.relativenumber = false                 -- Relative line numbers
@@ -218,7 +223,6 @@ map('i', '<Tab>','<Plug>(completion_smart_tab)', {noremap = false})
 map('i', '<S-Tab>','<Plug>(completion_smart_s_tab)', {noremap = false})
 -- common tasks
 map('n', '<C-s>', '<cmd>update<CR>')
-map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('n', '<F3>', '<cmd>lua toggle_wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
 map('n', '<leader>t', '<cmd>split<bar>res 10 <bar>terminal<CR>')
