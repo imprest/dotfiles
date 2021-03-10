@@ -197,7 +197,7 @@ o.shortmess = 'filnxtToOFc'               -- Avoid showing extra message on comp
 o.backup = false
 o.writebackup = false
 o.swapfile = false
--- o.undodir = '~/.data/undofile'
+o.undodir = '/home/hvaria/.nvim/undo'
 o.undofile = true
 -- window-local options
 wo.colorcolumn = tostring(width)          -- Line length marker
