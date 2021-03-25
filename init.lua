@@ -58,7 +58,7 @@ paq {'steelsojka/completion-buffers'}
 paq {'terryma/vim-smooth-scroll'}
 paq {'tpope/vim-dadbod'}
 paq {'tpope/vim-fugitive'}
-paq {'Yggdroot/indentLine'}
+-- paq {'Yggdroot/indentLine'}
 
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true                    -- True color support
@@ -200,7 +200,7 @@ o.swapfile = false
 o.undodir = '/home/hvaria/.nvim/undo'
 o.undofile = true
 -- window-local options
-wo.colorcolumn = tostring(width)          -- Line length marker
+--wo.colorcolumn = tostring(width)          -- Line length marker
 wo.cursorline = false                     -- Highlight cursor line
 wo.list = true                            -- Show some invisible characters
 wo.number = true                          -- Show line numbers
