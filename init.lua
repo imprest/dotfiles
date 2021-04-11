@@ -37,6 +37,7 @@ paq {'justinmk/vim-gtfo'}            -- ,gof open file in filemanager
 paq {'kristijanhusak/vim-dadbod-completion'}
 paq {'kyazdani42/nvim-web-devicons'}
 paq {'kyazdani42/nvim-tree.lua'}
+paq {'leafOfTree/vim-svelte-plugin'}
 -- paq {'lervag/vimtex'}
 paq {'machakann/vim-sandwich'}       -- sr({ sd' <select text>sa'
 paq {'mattn/emmet-vim'}
