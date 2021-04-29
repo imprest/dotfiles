@@ -198,8 +198,8 @@ o.shortmess = 'filnxtToOFc'               -- Avoid showing extra message on comp
 o.backup = false
 o.writebackup = false
 o.swapfile = false
-o.undodir = '/home/hvaria/.nvim/undo'
 o.undofile = true
+o.undodir = '/home/hvaria/.nvim/undo'
 -- window-local options
 --wo.colorcolumn = tostring(width)          -- Line length marker
 wo.cursorline = false                     -- Highlight cursor line
@@ -208,6 +208,8 @@ wo.number = true                          -- Show line numbers
 wo.relativenumber = false                 -- Relative line numbers
 wo.signcolumn = 'yes'                     -- Show sign column
 wo.wrap = false                           -- Disable line wrap
+wo.foldmethod = 'syntax'
+wo.foldlevel = 99
 -- buffer-local options
 bo.expandtab = true                       -- Use spaces instead of tabs
 bo.formatoptions = 'crqnj'                -- Automatic formatting options
