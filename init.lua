@@ -21,7 +21,6 @@ local paq = require('paq-nvim').paq  -- a convenient alias
 paq {'savq/paq-nvim', opt = true}    -- paq-nvim manages itself
 paq {'alvan/vim-closetag'}
 paq {'akinsho/nvim-bufferline.lua'}
-paq {'airblade/vim-gitgutter'}
 paq {'airblade/vim-rooter'}
 paq {'b3nj5m1n/kommentary'}
 paq {'cohama/lexima.vim'}
@@ -29,7 +28,7 @@ paq {'dstein64/nvim-scrollview'}
 paq {'elixir-editors/vim-elixir'}
 paq {'farmergreg/vim-lastplace'}
 paq {'haya14busa/is.vim'}
-paq {'joshdick/onedark.vim'}
+paq {'Th3Whit3Wolf/one-nvim'}
 paq {'junegunn/fzf'}
 paq {'junegunn/fzf.vim'}
 paq {'junegunn/vim-easy-align'}
@@ -38,17 +37,24 @@ paq {'kristijanhusak/vim-dadbod-completion'}
 paq {'kyazdani42/nvim-web-devicons'}
 paq {'kyazdani42/nvim-tree.lua'}
 paq {'leafOfTree/vim-svelte-plugin'}
+paq {'lukas-reineke/indent-blankline.nvim', branch = 'lua'}
+paq {'leafOfTree/vim-svelte-plugin'}
+paq {'nvim-lua/plenary.nvim'}
+paq {'lewis6991/gitsigns.nvim'}
 -- paq {'lervag/vimtex'}
 paq {'machakann/vim-sandwich'}       -- sr({ sd' <select text>sa'
 paq {'mattn/emmet-vim'}
 -- paq {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
 paq {'moll/vim-bbye'}
 paq {'neovim/nvim-lspconfig'}
+-- autocomplete and snippets
+paq {'hrsh7th/nvim-compe'}
+paq {'hrsh7th/vim-vsnip'}
+paq {'hrsh7th/vim-vsnip-integ'}
 paq {'norcalli/nvim-colorizer.lua'}
 paq {'norcalli/nvim-terminal.lua'}
-paq {'nvim-lua/completion-nvim'}
+-- paq {'nvim-lua/completion-nvim'}
 paq {'nvim-treesitter/nvim-treesitter'}
-paq {'nvim-treesitter/completion-treesitter'}
 paq {'ojroques/nvim-bufdel'}
 paq {'ojroques/nvim-hardline'}
 paq {'ojroques/nvim-lspfuzzy'}
@@ -59,7 +65,7 @@ paq {'steelsojka/completion-buffers'}
 paq {'terryma/vim-smooth-scroll'}
 paq {'tpope/vim-dadbod'}
 paq {'tpope/vim-fugitive'}
--- paq {'Yggdroot/indentLine'}
+paq {'yamatsum/nvim-nonicons'}
 
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true                    -- True color support
@@ -71,7 +77,7 @@ g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex'
 -- colorizer
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
 -- completion-nvim
-g['completion_trigger_keyword_length'] = 2
+--[[ g['completion_trigger_keyword_length'] = 2
 g['completion_confirm_key'] = ""
 map('i','<CR>','pumvisible() ? complete_info()["selected"] != "-1" ? "\\<Plug>(completion_confirm_completion)" : "\\<c-e>\\<CR>" : "\\<CR>"', {expr = true})
 g['completion_chain_complete_list'] = {
@@ -91,18 +97,30 @@ g['completion_chain_complete_list'] = {
       {complete_items = {'path'}, triggered_only = {'/'}}
     }
   }
-}
+} ]]
 -- elixir
 g['alchemist_tag_disable'] = 1
 -- emmet
 map('i', '<C-e>', '<C-y>,', {noremap=false, silent=true})
 -- fzf
 map('n', '<C-p>', '<cmd>Files<CR>')
+map('n', 'gl', '<cmd>BLines<CR>')
 map('n', '<leader>g', '<cmd>Commits<CR>')
 map('n', '<C-f>', '<cmd>Rg<CR>')
 map('n', '<leader>b', '<cmd>Buffers<CR>')
-map('n', '<leader>m', '<cmd>History<CR>')
+map('n', '<leader>r', '<cmd>History<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
+-- gitsigns
+require("gitsigns").setup {
+  signs = {
+    add = {text = "▎"},
+    change = {text = "▎"},
+    delete = {text = "▎"},
+    topdelete = {text = "▎"},
+    changedelete = {text = "▎"}
+  },
+  sign_priority = 100
+}
 -- hardline
 local fmt = string.format
 local function pad(c, m)
@@ -119,7 +137,7 @@ local function get_column()
   return fmt('%s%d', pad(col, 10), col)
 end
 local function get_item()
-  return table.concat({'',get_line(), ':', get_column()})
+  return table.concat({' ',get_line(), ':', get_column()})
 end
 require('hardline').setup {
   sections = {
@@ -138,6 +156,9 @@ require('hardline').setup {
 -- hop
 require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
 map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
+-- indent-blankline
+g.indentLine_fileTypeExclude = {"json"}
+g.indentLine_char = "│"
 -- kommentary
 g['kommentary_create_default_mappings'] = false
 map('n', '<leader>cc', '<Plug>kommentary_line_default', { noremap = false })
@@ -150,7 +171,7 @@ require('bufferline').setup{highlights = {buffer_selected = {gui = ""}}}
 require('terminal').setup()
 -- nvim-tree
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
-g['nvim_tree_width'] = 26
+g.nvim_tree_width = 26
 -- vim-bbye
 map('n', 'Q', '<cmd>Bdelete<CR>')
 -- vim-easy-align
@@ -178,11 +199,11 @@ map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 2)<CR>', {silent=true})
 -------------------- OPTIONS -------------------------------
 local indent = 2
 local width = 96
-cmd 'colorscheme onedark'
+cmd 'colorscheme one-nvim'
 -- global options
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse 
-o.completeopt = 'menuone,noinsert,noselect'  -- Completion options
+o.completeopt = 'menuone,noselect'        -- Completion options
 o.ignorecase = true                       -- Ignore case
 o.joinspaces = false                      -- No double spaces with join
 o.pastetoggle = '<F2>'                    -- Paste mode
@@ -194,7 +215,10 @@ o.splitbelow = true                       -- Put new windows below current
 o.splitright = true                       -- Put new windows right of current
 o.updatetime = 200                        -- Delay before swap file is saved
 o.wildmode = 'list:longest'               -- Command-line completion mode
-o.shortmess = 'filnxtToOFc'               -- Avoid showing extra message on completion
+o.shortmess = 'IFc'                       -- Avoid showing extra message on completion
+o.showmode = false
+o.fillchars = "eob: "
+o.inccommand = 'split'
 o.backup = false
 o.writebackup = false
 o.swapfile = false
@@ -220,10 +244,10 @@ bo.textwidth = width                      -- Maximum width of text
 
 -------------------- MAPPINGS ------------------------------
 -- completion
-map('i', '<Tab>', 'pumvisible() ? "\\<C-n>" : "\\<Tab>"', {expr = true})
+--[[ map('i', '<Tab>', 'pumvisible() ? "\\<C-n>" : "\\<Tab>"', {expr = true})
 map('i', '<S-Tab>', 'pumvisible() ? "\\<C-p>" : "\\<S-Tab>"', {expr = true})
 map('i', '<Tab>','<Plug>(completion_smart_tab)', {noremap = false})
-map('i', '<S-Tab>','<Plug>(completion_smart_s_tab)', {noremap = false})
+map('i', '<S-Tab>','<Plug>(completion_smart_s_tab)', {noremap = false}) ]]
 -- common tasks
 map('n', '<C-s>', '<cmd>update<CR>')
 map('n', '<F3>', '<cmd>lua toggle_wrap()<CR>')
@@ -276,31 +300,147 @@ map('v', '>', '>gv')
 map('n', '<leader>r', ':%s//gcI<Left><Left><Left><Left>')
 map('v', '<leader>r', ':s//gcI<Left><Left><Left><Left>')
 
--------------------- LSP -----------------------------------
-local lsp = require('lspconfig')
-local lspfuzzy = require('lspfuzzy')
-local on_attach = function(_, bufnr) require('completion').on_attach() end
-local lspconfigs = {
-  elixirls = {on_attach = on_attach, cmd = {"/home/hvaria/elixir-ls/language_server.sh"}},
-}
-for ls, cfg in pairs(lspconfigs) do lsp[ls].setup(cfg) end
-lspfuzzy.setup {}
-map('n', '<space>,', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
-map('n', '<space>;', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
-map('n', '<space>d', '<cmd>lua vim.lsp.buf.definition()<CR>')
-map('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>')
-map('n', '<space>k', '<cmd>lua vim.lsp.buf.hover()<CR>')
-map('n', '<space>m', '<cmd>lua vim.lsp.buf.rename()<CR>')
-map('n', '<space>r', '<cmd>lua vim.lsp.buf.references()<CR>')
-map('n', '<space>s', '<cmd>lua vim.lsp.buf.document_symbol()<CR>')
-map('n', '<space>t', '<cmd>lua vim.lsp.buf.type_definition()<CR>')
-
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
 ts.setup {
-  ensure_installed = {"css", "erlang", "html", "javascript", "json", "ledger", "lua", "toml"},
+  ensure_installed = {"css", "erlang", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
   highlight = {enable = true}, indent = {enable = true}
 }
+
+-------------------- LSP w/ Compe---------------------------
+g.completion_enable_snippet = 'vim-vsnip'
+local lspconfig = require("lspconfig")
+
+-- Neovim doesn't support snippets out of the box, so we need to mutate the
+-- capabilities we send to the language server to let them know we want snippets.
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+-- Setup our autocompletion. These configuration options are the default ones
+-- copied out of the documentation.
+require "compe".setup {
+  enabled = true,
+  autocomplete = true,
+  debug = false,
+  min_length = 1,
+  preselect = "enable",
+  throttle_time = 80,
+  source_timeout = 200,
+  incomplete_delay = 400,
+  max_abbr_width = 100,
+  max_kind_width = 100,
+  max_menu_width = 100,
+  documentation = true,
+  source = {
+    path = true,
+    buffer = true,
+    calc = true,
+    nvim_lsp = true,
+    nvim_lua = true,
+    vsnip = true,
+    spell = true,
+    tags = true,
+    treesitter = true
+  }
+}
+
+-------------------- LSP -----------------------------------
+-- Tab completion
+local t = function(str)
+  return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
+
+local check_back_space = function()
+    local col = vim.fn.col('.') - 1
+    if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
+        return true
+    else
+        return false
+    end
+end
+
+-- Use (s-)tab to:
+--- move to prev/next item in completion menuone
+--- jump to prev/next snippet's placeholder
+_G.tab_complete = function()
+  if vim.fn.pumvisible() == 1 then
+    return t "<C-n>"
+  elseif vim.fn.call("vsnip#available", {1}) == 1 then
+    return t "<Plug>(vsnip-expand-or-jump)"
+  elseif check_back_space() then
+    return t "<Tab>"
+  else
+    return vim.fn['compe#complete']()
+  end
+end
+_G.s_tab_complete = function()
+  if vim.fn.pumvisible() == 1 then
+    return t "<C-p>"
+  elseif vim.fn.call("vsnip#jumpable", {-1}) == 1 then
+    return t "<Plug>(vsnip-jump-prev)"
+  else
+    -- If <S-Tab> is not working in your terminal, change it to <C-h>
+    return t "<S-Tab>"
+  end
+end
+
+vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+-- A callback that will get called when a buffer connects to the language server.
+-- Here we create any key maps that we want to have on that buffer.
+local on_attach = function(_, bufnr)
+  map('n', '<space>,', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
+  map('n', '<space>;', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
+  map("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<cr>")
+  map("n", "<space>l", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<cr>")
+  map("n", "<space>d", "<cmd>lua vim.lsp.buf.definition()<cr>")
+  map("n", "<space>k", "<cmd>lua vim.lsp.buf.hover()<cr>")
+  map("n", "<space>r", "<cmd>lua vim.lsp.buf.references()<cr>")
+  map("n", "<space>s", "<cmd>lua vim.lsp.buf.document_symbol()<cr>")
+  map("n", "<space>t", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
+  map("n", "<space>i", "<cmd>lua vim.lsp.buf.implementation()<cr>")
+  map("n", "<space>h", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
+  map('n', '<space>m', '<cmd>lua vim.lsp.buf.rename()<CR>')
+
+  cmd "imap <expr> <C-l> vsnip#available(1) ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'"
+  cmd "smap <expr> <C-l> vsnip#available(1) ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'"
+
+  cmd "imap <expr> <Tab> vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<Tab>'"
+  cmd "smap <expr> <Tab> vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<Tab>'"
+  cmd "imap <expr> <S-Tab> vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-Tab>'"
+  cmd "smap <expr> <S-Tab> vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-Tab>'"
+
+  cmd "inoremap <silent><expr> <C-Space> compe#complete()"
+  cmd "inoremap <silent><expr> <CR> compe#confirm('<CR>')"
+  cmd "inoremap <silent><expr> <C-e> compe#close('<C-e>')"
+  cmd "inoremap <silent><expr> <C-f> compe#scroll({ 'delta': +4 })"
+  cmd "inoremap <silent><expr> <C-d> compe#scroll({ 'delta': -4 })"
+end
+
+-- Finally, let's initialize the Elixir language server
+
+-- Replace the following with the path to your installation
+local path_to_elixirls = vim.fn.expand("/home/hvaria/elixir-ls/language_server.sh")
+
+lspconfig.elixirls.setup({
+  cmd = {path_to_elixirls},
+  capabilities = capabilities,
+  on_attach = on_attach,
+  settings = {
+    elixirLS = {
+      dialyzerEnabled = true,
+      fetchDeps = false
+    }
+  }
+})
+-- General purpose language server for formatting various linters like credo
+lspconfig.efm.setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+  filetypes = {"elixir", "javascript", "lua", "zsh", "sh"}
+})
 
 -------------------- COMMANDS ------------------------------
 function init_term()
@@ -322,7 +462,7 @@ vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
   'FileType elixir,eelixir iab pp \\|>',
   'FileType elixir,eelixir setlocal omnifunc=v:lua.vim.lsp.omnifunc',
   'FileType elixir,eelixir nnoremap <silent><buffer> <s-k> :call alchemist#exdoc()<bar>wincmd L<bar>vert res 84<bar>set nonumber<CR>',
-  'BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting_sync()',
+--  'BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting_sync()',
   'FileType sql setlocal omnifunc=vim_dadbod_completion#omni',
-  'BufEnter * lua require\'completion\'.on_attach()'
+-- 'BufEnter * lua require\'completion\'.on_attach()'
 })

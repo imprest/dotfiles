@@ -40,6 +40,7 @@ git config --global user.name  "Hardik Varia"
 # neovim
 mkdir -p ~/.config/nvim
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
+ln -sf ~/dotfiles/config.yaml ~/.config/efm-langserver/config.yaml
 nvim +PlugInstall +qall
 nvim +UpdateRemotePlugins +qall
 
