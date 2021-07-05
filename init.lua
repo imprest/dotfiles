@@ -42,6 +42,7 @@ require('packer').startup{ function()
   use 'junegunn/fzf.vim'
   use 'junegunn/vim-easy-align'
   use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
+  use 'kyazdani42/nvim-web-devicons'
   use {'kristijanhusak/vim-dadbod-completion', 
     requires = {
       {'tpope/vim-dadbod'},
