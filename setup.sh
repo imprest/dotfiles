@@ -23,8 +23,8 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep konsole \
-  yay otf-fira-code erlang elixir fop wxgtk inotify-tools postgresql
+sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep kitty \
+  yay ttf-fira-code erlang elixir fop wxgtk inotify-tools postgresql
 # size 12 in konsole or 9 for fira code light
 # size 12 in gnome-terminal with Inconsolata SemiBold
 # optional
@@ -39,10 +39,10 @@ git config --global user.name  "Hardik Varia"
 
 # neovim
 mkdir -p ~/.config/nvim
+ln -sf ~/dotfiles/kitty.conf ~/.config/kitty/kitty.conf
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
 ln -sf ~/dotfiles/config.yaml ~/.config/efm-langserver/config.yaml
-nvim +PlugInstall +qall
-nvim +UpdateRemotePlugins +qall
+nvim +PackerSync
 
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
