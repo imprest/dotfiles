@@ -23,10 +23,10 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep konsole \
-  yay otf-fira-code erlang elixir fop wxgtk inotify-tools postgresql
-# size 12 in konsole or 9 for fira code light
-# size 12 in gnome-terminal with Inconsolata SemiBold
+sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep qterminal ttf-fira-code\
+  erlang elixir fop wxgtk inotify-tools postgresql
+# size 9 in qterminal for fira mono retina 
+# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'IBM Plex Mono Bold 9.375'"
 # optional
 # weechat pdfarranger
 
@@ -41,8 +41,7 @@ git config --global user.name  "Hardik Varia"
 mkdir -p ~/.config/nvim
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
 ln -sf ~/dotfiles/config.yaml ~/.config/efm-langserver/config.yaml
-nvim +PlugInstall +qall
-nvim +UpdateRemotePlugins +qall
+nvim +PackerSync
 
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc

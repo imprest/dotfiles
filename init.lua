@@ -33,10 +33,9 @@ require('packer').startup{ function()
   use 'airblade/vim-rooter'
   use 'b3nj5m1n/kommentary'
   use 'cohama/lexima.vim'
-  -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
+  use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
-  use 'haya14busa/is.vim'
   use 'Th3Whit3Wolf/one-nvim'
   use 'junegunn/fzf'
   use 'junegunn/fzf.vim'
@@ -54,17 +53,17 @@ require('packer').startup{ function()
   use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
     config = function() require("gitsigns").setup {
       signs = {
-        add = {text = "▎"},
-        change = {text = "▎"},
-        delete = {text = "▎"},
-        topdelete = {text = "▎"},
+        add          = {text = "▎"},
+        change       = {text = "▎"},
+        delete       = {text = "▎"},
+        topdelete    = {text = "▎"},
         changedelete = {text = "▎"}
       },
       sign_priority = 100
     }
     end
   }
-  -- use {'lervag/vimtex'}
+  use 'lervag/vimtex'
   use 'machakann/vim-sandwich'       -- sr({ sd' <select text>sa'
   use 'mattn/emmet-vim'
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
@@ -75,23 +74,23 @@ require('packer').startup{ function()
   use {
     'hrsh7th/nvim-compe',
     requires = {
-      {'hrsh7th/vim-vsnip'},
-      {'hrsh7th/vim-vsnip-integ'},
-      {'rafamadriz/friendly-snippets'},
-      {'GoldsteinE/compe-latex-symbols'},
-      {'ray-x/lsp_signature.nvim'}
+      {'hrsh7th/vim-vsnip'              },
+      {'hrsh7th/vim-vsnip-integ'        },
+      {'rafamadriz/friendly-snippets'   },
+      {'GoldsteinE/compe-latex-symbols' },
+      {'ray-x/lsp_signature.nvim'       }
     }
   }
   use 'norcalli/nvim-colorizer.lua'
   use 'norcalli/nvim-terminal.lua'
-  use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+  -- use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   use 'ojroques/nvim-hardline'
   use 'ojroques/nvim-lspfuzzy'
   use 'pbrisbin/vim-mkdir'           -- :e this/does/not/exist/file.txt then :w
   use 'phaazon/hop.nvim'
   use 'terryma/vim-smooth-scroll'
-  use 'tpope/vim-fugitive'           -- Gdiff Gstatus (then select add via -) Gwrite Gedit
-  use 'yamatsum/nvim-cursorline'
+  use {'TimUntersberger/neogit', requires = {'nvim-lua/plenary.nvim'}}
+  -- use 'yamatsum/nvim-cursorline'
 end,
   config = {
     display = {
@@ -111,18 +110,19 @@ o.termguicolors = true                    -- True color support
 map('n', '<leader>w', '<cmd>BufDel<CR>')
 require('bufdel').setup {next = 'alternate'}
 -- closetag
-g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex'
+g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex, *.svelte'
 -- colorizer
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
 -- emmet
 map('i', '<C-e>', '<C-y>,', {noremap=false, silent=true})
 -- fzf
-map('n', '<C-p>', '<cmd>Files<CR>')
+map('n', '<C-p>', '<cmd>GitFiles<CR>')
+map('n', '<C-g>', '<cmd>Files<CR>')
 map('n', 'gl', '<cmd>BLines<CR>')
 map('n', '<leader>g', '<cmd>Commits<CR>')
 map('n', '<C-f>', '<cmd>Rg<CR>')
 map('n', '<leader>b', '<cmd>Buffers<CR>')
-map('n', '<leader>r', '<cmd>History<CR>')
+map('n', '<C-h>', '<cmd>History<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 -- hardline
 local fmt = string.format
@@ -170,7 +170,7 @@ map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 g.indentLine_fileTypeExclude = {"json"}
 g.indent_blankline_filetype_exclude = {"help", "packer"}
 g.indent_blankline_char = "│"
-g.indent_blankline_use_treesitter = true
+-- g.indent_blankline_use_treesitter = true
 g.indent_blankline_show_current_context = true
 g.indent_blankline_context_patterns = {
   "class",
@@ -215,6 +215,8 @@ config.configure_language("typescriptreact", {
 })
 -- lexima
 g['lexima_enable_basic_rules'] = 0
+-- neogit
+require('neogit').setup {}
 -- nvim-bufferline
 require('bufferline').setup{
   options = {
@@ -236,12 +238,14 @@ require('bufferline').setup{
 -- nvim-terminal
 require('terminal').setup()
 -- nvim-tree
+map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 g.nvim_tree_width = 26
 -- vim-bbye
 map('n', 'Q', '<cmd>Bdelete<CR>')
 -- vim-easy-align
-map('x', 'ga', '<Plug>(EasyAlign)', {noremap=false})
+map('x', 'ga', '<Plug>(EasyAlign)', {noremap = false})
+map('n', 'ga', '<Plug>(EasyAlign)', {noremap = false})
 -- vim-dadbod
 g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
 map('x', '<Plug>(DBExe)', 'db#op_exec()', {expr=true})
@@ -292,7 +296,7 @@ o.undodir = '/home/hvaria/.nvim/undo'
 -- wo.colorcolumn = tostring(width)          -- Line length marker
 wo.cursorline = true                      -- Highlight cursor line
 wo.list = true                            -- Show some invisible characters
-wo.relativenumber = true                  -- Relative line numbers
+wo.relativenumber = false                 -- Relative line numbers
 wo.number = true                          -- Show line numbers
 wo.signcolumn = 'yes'                     -- Show sign column
 wo.wrap = false                           -- Disable line wrap
@@ -368,11 +372,11 @@ map('n', '<leader>r', ':%s//gcI<Left><Left><Left><Left>')
 map('v', '<leader>r', ':s//gcI<Left><Left><Left><Left>')
 
 -------------------- TREE-SITTER ---------------------------
-local ts = require 'nvim-treesitter.configs'
-ts.setup {
-  ensure_installed = {"css", "erlang", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
-  highlight = {enable = true}, indent = {enable = true}, context_commentstring = { enable = true}
-}
+-- local ts = require 'nvim-treesitter.configs'
+-- ts.setup {
+--   ensure_installed = {"css", "erlang", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
+--   highlight = {enable = true}, indent = {enable = true}, context_commentstring = { enable = true}
+-- }
 
 -------------------- LSP w/ Compe---------------------------
 g.completion_enable_snippet = 'vim-vsnip'
@@ -414,7 +418,7 @@ require "compe".setup {
     vsnip = true,
     spell = true,
     tags = true,
-    treesitter = true,
+    -- treesitter = true,
     vim_dadbod_completion = true,
     latex_symbols = true
   }
@@ -572,7 +576,7 @@ end
 
 vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
   'TermOpen * lua init_term()',
-  'TextYankPost * lua vim.highlight.on_yank {on_visual = false, timeout = 200}',
+  'TextYankPost * lua vim.highlight.on_yank { hi_group="IncSearch", timeout=150, on_visual=true }',
   'FileType elixir,eelixir iab pp \\|>',
   'BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting()',
   'FileType svelte,html,markdown setlocal wrap',
