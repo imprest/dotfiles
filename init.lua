@@ -98,8 +98,8 @@ require('packer').startup{ function()
   use 'terryma/vim-smooth-scroll'
   use {'TimUntersberger/neogit', requires = {'nvim-lua/plenary.nvim'}}
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
-  -- use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-  -- use 'lukas-reineke/indent-blankline.nvim'
+  use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+  use 'lukas-reineke/indent-blankline.nvim'
   -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
   -- use 'yamatsum/nvim-cursorline'
 end,
@@ -175,6 +175,9 @@ require('hardline').setup {
 -- hop
 require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
 map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
+-- indent-blankline
+g.indentLine_fileTypeExclude = {"json"}
+g.indentLine_char = "│"
 -- kommentary
 g['kommentary_create_default_mappings'] = false
 map('n', '<leader>cc', '<Plug>kommentary_line_default'  , { noremap = false })
@@ -193,9 +196,6 @@ config.configure_language("typescriptreact", {
   end,
   prefer_single_line_comments = true,
 })
--- lexima
-g['lexima_enable_basic_rules'] = 1
-g['lexima_enable_endwise_rules'] = 1
 -- neogit
 require('neogit').setup {}
 -- nvim-bufferline
@@ -358,6 +358,13 @@ map('v', '>', '>gv')
 map('n', '<leader>r', ':%s//gcI<Left><Left><Left><Left>')
 map('v', '<leader>r', ':s//gcI<Left><Left><Left><Left>')
 
+-------------------- TREE-SITTER ---------------------------
+local ts = require 'nvim-treesitter.configs'
+ts.setup {
+  ensure_installed = {"css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
+  highlight = {enable = true}, indent = {enable = true}
+}
+
 -------------------- LSP w/ Compe---------------------------
 g.completion_enable_snippet = 'vim-vsnip'
 local lspconfig = require("lspconfig")
@@ -386,7 +393,12 @@ local on_attach = function(_, bufnr)
   -- Expand or jump
   cmd "imap <expr> <C-l> vsnip#available(1) ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'"
   cmd "smap <expr> <C-l> vsnip#available(1) ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'"
-
+  -- NOTE: Order is important. You can't lazy load lexima.vim
+  g['lexima_no_defualt_rules'] = true
+  g['lexima_enable_endwise_rules'] = 1
+  -- vim.fn.call('lexima#set_default_rules()')
+  cmd "inoremap <silent><expr> <c-space> compe#complete()"
+  cmd "inoremap <silent><expr> <cr> compe#confirm(lexima#expand('<LT>CR>', 'i'))"
   cmd "inoremap <silent><expr> <C-e> compe#close('<C-e>')"
   cmd "inoremap <silent><expr> <C-f> compe#scroll({ 'delta': +4 })"
   cmd "inoremap <silent><expr> <C-d> compe#scroll({ 'delta': -4 })"
@@ -430,7 +442,8 @@ require "compe".setup {
     spell = true,
     tags = true,
     vim_dadbod_completion = true,
-    latex_symbols = true
+    latex_symbols = true,
+    treesitter = false
   }
 }
 
@@ -441,11 +454,7 @@ end
 
 local check_back_space = function()
   local col = vim.fn.col('.') - 1
-  if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
-      return true
-  else
-      return false
-  end
+  return col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') ~= nil
 end
 
 -- Use (s-)tab to:
@@ -454,7 +463,7 @@ end
 _G.tab_complete = function()
   if vim.fn.pumvisible() == 1 then
     return t "<C-n>"
-  elseif vim.fn.call("vsnip#available", {1}) == 1 then
+  elseif vim.fn['vsnip#available'](1) == 1 then
     return t "<Plug>(vsnip-expand-or-jump)"
   elseif check_back_space() then
     return t "<Tab>"
@@ -465,7 +474,7 @@ end
 _G.s_tab_complete = function()
   if vim.fn.pumvisible() == 1 then
     return t "<C-p>"
-  elseif vim.fn.call("vsnip#jumpable", {-1}) == 1 then
+  elseif vim.fn['vsnip#jumpable'](-1) == 1 then
     return t "<Plug>(vsnip-jump-prev)"
   else
     -- If <S-Tab> is not working in your terminal, change it to <C-h>
@@ -478,14 +487,15 @@ vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
 -- Map compe confirmation and complete functions
-vim.api.nvim_set_keymap("i", '<cr>', 'comple#confirm("<cr>")', { expr = true })
+-- vim.api.nvim_set_keymap("i", '<cr>', 'comple#confirm("<cr>")', { expr = true })
+vim.api.nvim_set_keymap("i", "<CR>", "compe#confirm({ 'keys': '<CR>', 'select': v:true })", { expr = true })
 vim.api.nvim_set_keymap("i", '<c-space>', 'comple#complete()', { expr = true })
 
 -- Finally, let's initialize the Elixir language server
 -- Replace the following with the path to your installation
--- local path_to_elixirls = vim.fn.expand("/home/hvaria/elixir-ls/language_server.sh")
-  -- cmd = {path_to_elixirls},
+local path_to_elixirls = vim.fn.expand("~/.local/share/nvim/lspinstall/elixir/elixir-ls/language_server.sh")
 lspconfig.elixirls.setup({
+  cmd = {path_to_elixirls},
   capabilities = capabilities,
   on_attach = on_attach,
   settings = {
@@ -507,7 +517,10 @@ local function setup_servers()
   require'lspinstall'.setup()
   local servers = require'lspinstall'.installed_servers()
   for _, server in pairs(servers) do 
-    require'lspconfig'[server].setup{}
+    require'lspconfig'[server].setup{
+      on_attach = on_attach,
+      capabilities = capabilities
+    }
   end
 end
 
@@ -533,7 +546,7 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] =
   vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics,
   {
-    virtual_text = { prefix = "" },
+    virtual_text = { prefix = "<" },
     signs = true,
     update_in_insert = false
   }
