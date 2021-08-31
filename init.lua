@@ -99,7 +99,7 @@ require('packer').startup{ function()
   use {'TimUntersberger/neogit', requires = {'nvim-lua/plenary.nvim'}}
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-  use 'lukas-reineke/indent-blankline.nvim'
+  -- use 'lukas-reineke/indent-blankline.nvim'
   -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
   -- use 'yamatsum/nvim-cursorline'
 end,
@@ -176,8 +176,8 @@ require('hardline').setup {
 require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
 map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 -- indent-blankline
-g.indentLine_fileTypeExclude = {"json"}
-g.indentLine_char = "│"
+-- g.indentLine_fileTypeExclude = {"json"}
+-- g.indentLine_char = "│"
 -- kommentary
 g['kommentary_create_default_mappings'] = false
 map('n', '<leader>cc', '<Plug>kommentary_line_default'  , { noremap = false })
