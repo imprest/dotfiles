@@ -47,9 +47,9 @@ require('packer').startup{ function()
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
+  use 'sainnhe/everforest'
   use 'Th3Whit3Wolf/one-nvim'
-  use 'junegunn/fzf'
-  use 'junegunn/fzf.vim'
+  use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'
   use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
   use 'kyazdani42/nvim-tree.lua'
@@ -97,8 +97,8 @@ require('packer').startup{ function()
   use 'phaazon/hop.nvim'
   use 'terryma/vim-smooth-scroll'
   use {'TimUntersberger/neogit', requires = {'nvim-lua/plenary.nvim'}}
-  -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+  -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   -- use 'lukas-reineke/indent-blankline.nvim'
   -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
   -- use 'yamatsum/nvim-cursorline'
@@ -125,13 +125,13 @@ g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex, *.heex, *.svelte'
 -- colorizer
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
 -- fzf
-map('n', '<C-p>', '<cmd>GitFiles<CR>')
-map('n', '<C-g>', '<cmd>Files<CR>')
-map('n', 'gl', '<cmd>BLines<CR>')
-map('n', '<leader>g', '<cmd>Commits<CR>')
-map('n', '<C-f>', '<cmd>Rg<CR>')
-map('n', '<leader>b', '<cmd>Buffers<CR>')
-map('n', '<leader>h', '<cmd>History<CR>')
+map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
+map('n', '<C-g>', '<cmd>lua require("fzf-lua").files()<CR>')
+map('n', 'gl', '<cmd>lua require("fzf-lua").blines()<CR>')
+map('n', '<leader>g', '<cmd>lua require("fzf-lua").git_commits()<CR>')
+map('n', '<C-f>', '<cmd>lua require("fzf-lua").grep()<CR>')
+map('n', '<leader>b', "<cmd>lua require('fzf-lua').buffers()<CR>")
+map('n', '<leader>r', '<cmd>lua require("fzf-lua").oldfiles()<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 -- hardline
 local fmt = string.format
@@ -221,7 +221,6 @@ require('terminal').setup()
 -- nvim-tree
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
-g.nvim_tree_width                 = 20
 g.nvim_tree_gitignore             = 1
 g.nvim_tree_hide_dotfiles         = 1
 g.nvim_tree_auto_close            = 1
@@ -244,17 +243,16 @@ map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
 -- vim-sandwich
 cmd 'runtime macros/sandwich/keymap/surround.vim'
 -- vim-smooth-scroll
-map('n', '<c-e>', ':call smooth_scroll#up(&scroll, 15, 2)<CR>', {silent=true})
-map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 2)<CR>', {silent=true})
+map('n', '<c-e>', ':call smooth_scroll#up(&scroll, 15, 4)<CR>', {silent=true})
+map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 4)<CR>', {silent=true})
 -- vimtex
 g['vimtex_quickfix_mode'] = 0
 g['vimtex_compiler_method'] = 'tectonic'
 g['vimtex_view_general_viewer'] = 'evince'
 
 -------------------- OPTIONS -------------------------------
-local indent = 2
 local width = 96
-cmd 'colorscheme one-nvim'
+cmd 'colorscheme everforest' -- one-nvim'
 -- global options
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse 
@@ -291,9 +289,9 @@ wo.foldlevel = 99
 -- buffer-local options
 bo.expandtab = true                       -- Use spaces instead of tabs
 bo.formatoptions = 'crqnj'                -- Automatic formatting options
-bo.shiftwidth = indent                    -- Size of an indent
+bo.shiftwidth = 2                         -- Size of an indent
 bo.smartindent = true                     -- Insert indents automatically
-bo.tabstop = indent                       -- Number of spaces tabs count for
+bo.tabstop = 2                            -- Number of spaces tabs count for
 bo.textwidth = width                      -- Maximum width of text
 
 -------------------- MAPPINGS ------------------------------
@@ -355,8 +353,8 @@ map('', '<leader>y', '"+y')
 map('v', '<', '<gv')
 map('v', '>', '>gv')
 -- quick substitue
-map('n', '<leader>r', ':%s//gcI<Left><Left><Left><Left>')
-map('v', '<leader>r', ':s//gcI<Left><Left><Left><Left>')
+map('n', '<leader>S', ':%s//gcI<Left><Left><Left><Left>')
+map('v', '<leader>S', ':s//gcI<Left><Left><Left><Left>')
 
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
@@ -427,6 +425,7 @@ require "compe".setup {
   preselect = "enable",
   throttle_time = 80,
   source_timeout = 200,
+  resolve_timeout = 800,
   incomplete_delay = 400,
   max_abbr_width = 100,
   max_kind_width = 100,
