@@ -27,7 +27,7 @@ sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep ttf-fira-code\
   erlang elixir fop wxgtk inotify-tools postgresql
 # size 9 in qterminal for fira mono retina 
 # gnome-terminal text/background Gnome | palette Tango
-# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Fira Code SemiBold 9'"
+# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Fira Code Retina 10'"
 # optional
 # weechat pdfarranger
 
@@ -41,7 +41,6 @@ git config --global user.name  "Hardik Varia"
 # neovim
 mkdir -p ~/.config/nvim
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
-ln -sf ~/dotfiles/config.yaml ~/.config/efm-langserver/config.yaml
 nvim +PackerSync
 
 # psql

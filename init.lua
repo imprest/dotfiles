@@ -47,37 +47,34 @@ require('packer').startup{ function()
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
-  use 'sainnhe/everforest'
-  use 'Th3Whit3Wolf/one-nvim'
+  use 'joshdick/onedark.vim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'
   use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
-  use 'kyazdani42/nvim-tree.lua'
+  use {
+    'kyazdani42/nvim-tree.lua',
+    requires = 'kyazdani42/nvim-web-devicons',
+    config = function() require'nvim-tree'.setup {} end
+  }
   use {'kristijanhusak/vim-dadbod-completion', 
     requires = {
-      {'tpope/vim-dadbod'}
-      -- {'kyazdani42/nvim-web-devicons'}
+      {'tpope/vim-dadbod'},
+      {'kyazdani42/nvim-web-devicons'}
     }
   }
   use 'leafOfTree/vim-svelte-plugin'
-  use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
-    config = function() require("gitsigns").setup {
-      signs = {
-        add          = {text = "▎"},
-        change       = {text = "▎"},
-        delete       = {text = "▎"},
-        topdelete    = {text = "▎"},
-        changedelete = {text = "▎"}
-      },
-      sign_priority = 100
-    }
+  use {
+    'lewis6991/gitsigns.nvim',
+    requires = {'nvim-lua/plenary.nvim'},
+    config = function()
+      require("gitsigns").setup()
     end
   }
   use 'lervag/vimtex'
   use 'machakann/vim-sandwich'       -- sr({ sd' <select text>sa'
   use 'moll/vim-bbye'
   use 'neovim/nvim-lspconfig'
-  use 'kabouzeid/nvim-lspinstall'
+  use 'williamboman/nvim-lsp-installer'
   -- autocomplete and snippets
   use {
     'hrsh7th/nvim-compe',
@@ -89,6 +86,13 @@ require('packer').startup{ function()
       {'ray-x/lsp_signature.nvim'       }
     }
   }
+  use {
+    "folke/trouble.nvim",
+    requires = "kyazdani42/nvim-web-devicons",
+    config = function()
+      require("trouble").setup {}
+    end
+  }
   use 'norcalli/nvim-colorizer.lua'
   use 'norcalli/nvim-terminal.lua'
   use 'ojroques/nvim-hardline'
@@ -96,8 +100,12 @@ require('packer').startup{ function()
   use 'pbrisbin/vim-mkdir'           -- :e this/does/not/exist/file.txt then :w
   use 'phaazon/hop.nvim'
   use 'terryma/vim-smooth-scroll'
-  use {'TimUntersberger/neogit', requires = {'nvim-lua/plenary.nvim'}}
-  use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+  use {
+    'TimUntersberger/neogit', 
+    config = function() require("neogit").setup{} end,
+    requires = {'nvim-lua/plenary.nvim'}
+  }
+  -- use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   -- use 'lukas-reineke/indent-blankline.nvim'
   -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
@@ -196,38 +204,36 @@ config.configure_language("typescriptreact", {
   end,
   prefer_single_line_comments = true,
 })
--- neogit
-require('neogit').setup {}
 -- nvim-bufferline
-require('bufferline').setup{
-  options = {
-    show_close_icon = false,
-    show_buffer_close_icons = false,
-    show_buffer_icons = false,
-    separator_style = {"", ""},
-    offsets = {{filetype = "NvimTree", text = "File Explorer", text_align = "center" }},
-  },
-  highlights = {
-    buffer_selected = { guifg = "", guibg = "" },
-    fill = { guibg = "#282c34" , guifg = "#282c34" },
-    buffer_selected = { gui = "bold" },
-    pick_visible = { guibg = "#282c34", guifg = "#282c34"},
-    pick= { guibg = "#282c34", guifg = "#282c34"},
-    buffer_visible = { guibg = "#282c34", guifg = "#3e3e3e"}
-  }
-}
+-- require('bufferline').setup{
+--   options = {
+--     show_close_icon = false,
+--     show_buffer_close_icons = false,
+--     show_buffer_icons = false,
+--     separator_style = {"", ""},
+--     offsets = {{filetype = "NvimTree", text = "File Explorer", text_align = "center" }},
+--   },
+--   highlights = {
+--     buffer_selected = { guifg = "", guibg = "" },
+--     fill = { guibg = "#282c34" , guifg = "#282c34" },
+--     buffer_selected = { gui = "bold" },
+--     pick_visible = { guibg = "#282c34", guifg = "#282c34"},
+--     pick= { guibg = "#282c34", guifg = "#282c34"},
+--     buffer_visible = { guibg = "#282c34", guifg = "#3e3e3e"}
+--   }
+-- }
 -- nvim-terminal
 require('terminal').setup()
 -- nvim-tree
+require'nvim-tree'.setup { auto_close = true }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 g.nvim_tree_gitignore             = 1
 g.nvim_tree_hide_dotfiles         = 1
-g.nvim_tree_auto_close            = 1
 g.nvim_tree_group_empty           = 1
 g.nvim_tree_disable_window_picker = 1
 -- vim-bbye
-map('n', 'Q', '<cmd>Bdelete<CR>')
+map('n', '<leader>x', '<cmd>Bdelete<CR>')
 -- vim-easy-align
 map('x', 'ga', '<Plug>(EasyAlign)', {noremap = false})
 map('n', 'ga', '<Plug>(EasyAlign)', {noremap = false})
@@ -252,7 +258,7 @@ g['vimtex_view_general_viewer'] = 'evince'
 
 -------------------- OPTIONS -------------------------------
 local width = 96
-cmd 'colorscheme everforest' -- one-nvim'
+cmd 'colorscheme onedark'
 -- global options
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse 
@@ -357,15 +363,14 @@ map('n', '<leader>S', ':%s//gcI<Left><Left><Left><Left>')
 map('v', '<leader>S', ':s//gcI<Left><Left><Left><Left>')
 
 -------------------- TREE-SITTER ---------------------------
-local ts = require 'nvim-treesitter.configs'
-ts.setup {
-  ensure_installed = {"css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
-  highlight = {enable = true}, indent = {enable = true}
-}
+-- local ts = require 'nvim-treesitter.configs'
+-- ts.setup {
+--   ensure_installed = {"css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
+--   highlight = {enable = true}, indent = {enable = true}
+-- }
 
 -------------------- LSP w/ Compe---------------------------
 g.completion_enable_snippet = 'vim-vsnip'
-local lspconfig = require("lspconfig")
 -- A callback that will get called when a buffer connects to the language server.
 -- Here we create any key maps that we want to have on that buffer.
 local on_attach = function(_, bufnr)
@@ -490,66 +495,22 @@ vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("i", "<CR>", "compe#confirm({ 'keys': '<CR>', 'select': v:true })", { expr = true })
 vim.api.nvim_set_keymap("i", '<c-space>', 'comple#complete()', { expr = true })
 
--- Finally, let's initialize the Elixir language server
--- Replace the following with the path to your installation
-local path_to_elixirls = vim.fn.expand("~/.local/share/nvim/lspinstall/elixir/elixir-ls/language_server.sh")
-lspconfig.elixirls.setup({
-  cmd = {path_to_elixirls},
-  capabilities = capabilities,
-  on_attach = on_attach,
-  settings = {
-    elixirLS = {
-      dialyzerEnabled = true,
-      fetchDeps = false
-    }
-  }
-})
--- General purpose language server for formatting various linters like credo
-lspconfig.efm.setup({
-  capabilities = capabilities,
-  on_attach = on_attach,
-  filetypes = {"elixir", "javascript", "lua", "zsh", "sh"}
-})
-
 ------------------ LSP-INSTALL -----------------------------
-local function setup_servers()
-  require'lspinstall'.setup()
-  local servers = require'lspinstall'.installed_servers()
-  for _, server in pairs(servers) do 
-    require'lspconfig'[server].setup{
-      on_attach = on_attach,
-      capabilities = capabilities
-    }
+local lsp_installer = require("nvim-lsp-installer")
+lsp_installer.on_server_ready(function (server) 
+  local opts = {}
+  if server.name == "elixir" then
+    opts.dialyzerEnabled = true
+    opts.fetchDeps = false
   end
-end
 
-setup_servers()
-
--- Automatically reload after ':LspInstall <server>' so we don't have to restart neovim
-require'lspinstall'.post_install_hook = function ()
-  setup_servers()
-  vim.cmd("bufdo e")
-end
-
--------------------- LSP-DIAG ------------------------------
-cmd "highlight LspDiagnosticsLineNrError guifg=#E06C75 guibg=#4D3840 gui=bold" 
-cmd "highlight LspDiagnosticsLineNrWarning guifg=#E5C07B guibg=#4E4942 gui=bold" 
-cmd "highlight LspDiagnosticsLineNrInformation guifg=#98C379 guibg=#3E4941 gui=bold" 
-cmd "highlight LspDiagnosticsLineNrHint guifg=#61AFEF guibg=#344559 gui=bold" 
-vim.fn.sign_define("LspDiagnosticsSignError", {numhl = "LspDiagnosticsLineNrError"})
-vim.fn.sign_define("LspDiagnosticsSignWarning", {numhl = "LspDiagnosticsLineNrWarning"})
-vim.fn.sign_define("LspDiagnosticsSignInformation", {numhl = "LspDiagnosticsLineNrInformation"})
-vim.fn.sign_define("LspDiagnosticsSignHint", {numhl = "LspDiagnosticsLineNrHint"})
-cmd "autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics()"
-vim.lsp.handlers["textDocument/publishDiagnostics"] =
-  vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics,
-  {
-    virtual_text = { prefix = "<" },
-    signs = true,
-    update_in_insert = false
-  }
-)
+  server:setup({
+    capabilities = capabilities,
+    on_attach = on_attach,
+    settings = { elixirLS = opts }
+  })
+  vim.cmd [[ do User LspAttachBuffers ]]
+end)
 
 -------------------- COMMANDS ------------------------------
 function init_term()
