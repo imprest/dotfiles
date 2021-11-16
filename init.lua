@@ -225,11 +225,10 @@ config.configure_language("typescriptreact", {
 -- nvim-terminal
 require('terminal').setup()
 -- nvim-tree
-require'nvim-tree'.setup { auto_close = true }
+require'nvim-tree'.setup { auto_close = true; nvim_tree_hide_dotfiles = true }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 g.nvim_tree_gitignore             = 1
-g.nvim_tree_hide_dotfiles         = 1
 g.nvim_tree_group_empty           = 1
 g.nvim_tree_disable_window_picker = 1
 -- vim-bbye
