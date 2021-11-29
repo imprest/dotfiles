@@ -1,4 +1,4 @@
-### Added by Zinit's installer
+# Initialise Zinit if not installed
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 ZINIT_DIR="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit"
 if [[ ! -d $ZINIT_HOME ]]; then
@@ -11,27 +11,19 @@ if [[ ! -d $ZINIT_HOME ]]; then
 fi
 
 source "${ZINIT_HOME}/zinit.zsh"
-#autoload -Uz _zinit
-#(( ${+_comps} )) && _comps[zinit]=_zinit
-### End of Zinit's installer chunk
 
+zinit ice wait lucid
 zinit load rupa/z
-zinit light supercrabtree/k
-zinit snippet OMZ::lib/completion.zsh
-zinit snippet PZT::modules/pacman
+zinit ice wait lucid
 zinit light zsh-users/zsh-completions
+zinit ice wait lucid
 zinit light zsh-users/zsh-autosuggestions
+zinit ice wait lucid
 zinit load zdharma-continuum/history-search-multi-word # Ctrl-R to activate
-zstyle :plugin:history-search-multi-word reset-prompt-protect 1
 zinit light starship/starship
+zstyle :plugin:history-search-multi-word reset-prompt-protect 1
+zinit ice wait lucid
 zinit light zsh-users/zsh-history-substring-search
-# Load a few important annexes, without Turbo
-# (this is currently required for annexes)
-zinit light-mode for \
-    zdharma-continuum/zinit-annex-as-monitor \
-    zdharma-continuum/zinit-annex-bin-gem-node \
-    zdharma-continuum/zinit-annex-patch-dl \
-    zdharma-continuum/zinit-annex-rust
 
 # historical backward/forward search with linehead string binded to ^P/^N
 autoload history-search-end
@@ -39,15 +31,18 @@ zle -N history-beginning-search-backward-end history-search-end
 zle -N history-beginning-search-forward-end history-search-end
 bindkey "^P" history-beginning-search-backward-end
 bindkey "^N" history-beginning-search-forward-end
+bindkey -M emacs '^P' history-substring-search-up
+bindkey -M emacs '^N' history-substring-search-down
 
 # Settings
 KEYTIMEOUT=1             # 10ms for key sequences
 HISTFILE=$HOME/.zsh_history
 HISTSIZE=4096
 SAVEHIST=4096
-setopt hist_ignore_dups  # ignore duplication command history list
-setopt hist_ignore_space # ignore when commands starts with space
-setopt share_history     # share command history data
+setopt hist_ignore_dups   # ignore duplication command history list
+setopt hist_ignore_space  # ignore when commands starts with space
+setopt inc_append_history # append history list to the history file
+setopt share_history      # share command history data (important for multiple parallel zsh sessions!)
 
 # Exports
 export VISUAL=nvim
@@ -100,21 +95,31 @@ bindkey '^[[Z' reverse-menu-complete   # Shift-Tab
 
 # Aliases
 alias vim="nvim"
-alias kk="k -h"
-alias ka="k -h -A"
-alias ks="k -h -A -t"
-alias k.="ls -d .* --color"
+alias e="exa --long --git --header --sort=type"
+alias et="exa -T"
 alias gd="git diff"
 alias gs="git status"
 alias gl="git log --oneline --decorate -20"
 alias gla="git log --oneline --decorate --graph --all"
 alias commit="git add -A; git commit -m"
 alias nvimrc="$EDITOR ~/dotfiles/init.lua"
+alias weather="curl wttr.in"
+alias pac="pacman"
+alias paci="sudo pacman --sync"
+alias pacx="sudo pacman --remove"
+alias pacX="sudo pacman --remove --nosave --recursive"
+alias pacq="pacman --sync --info"
+alias pacQ="pacman --query --info"
+alias pacs="pacman --sync --search"
+alias pacS="pacman --query --search"
+alias pacman-list-orphans="sudo pacman --query --deps --unrequired"
+alias pacman-remove-orphans="sudo pacman --remove --recursive \$(pacman --quiet --query --deps --unrequired)"
+alias pacU="sudo pacman --sync --refresh --sysupgrade"
 
 # asdf
 . $HOME/.asdf/asdf.sh
 fpath=(${ASDF_DIR}/completions $fpath) # append completions to fpath
 # initialise completions with ZSH's compinit
-# autoload -Uz compinit
-# compinit
+autoload -Uz compinit
+compinit
 eval "$(starship init zsh)"
