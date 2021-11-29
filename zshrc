@@ -1,15 +1,18 @@
 ### Added by Zinit's installer
-if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-    print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma/zinit%F{220})…%f"
-    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+ZINIT_DIR="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit"
+if [[ ! -d $ZINIT_HOME ]]; then
+    print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
+    command mkdir -p "$ZINIT_DIR"
+    command chmod g-rwX "$ZINIT_DIR"
+    command git clone https://github.com/zdharma-continuum/zinit "$ZINIT_HOME" && \
         print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" || \
         print -P "%F{160}▓▒░ The clone has failed.%f%b"
 fi
 
-source "$HOME/.zinit/bin/zinit.zsh"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
+source "${ZINIT_HOME}/zinit.zsh"
+#autoload -Uz _zinit
+#(( ${+_comps} )) && _comps[zinit]=_zinit
 ### End of Zinit's installer chunk
 
 zinit load rupa/z
@@ -18,17 +21,17 @@ zinit snippet OMZ::lib/completion.zsh
 zinit snippet PZT::modules/pacman
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
-zinit load zdharma/history-search-multi-word # Ctrl-R to activate
+zinit load zdharma-continuum/history-search-multi-word # Ctrl-R to activate
 zstyle :plugin:history-search-multi-word reset-prompt-protect 1
-zinit light denysdovhan/spaceship-prompt
-SPACESHIP_CHAR_SYMBOL='$ '
-SPACESHIP_PROMPT_ADD_NEWLINE=false
-SPACESHIP_PROMPT_SEPARATE_LINE=false
-SPACESHIP_ELIXIR_SHOW=false
-SPACESHIP_PACKAGE_SHOW=false
-SPACESHIP_NODE_SHOW=false
-SPACESHIP_EXEC_TIME_SHOW=false
+zinit light starship/starship
 zinit light zsh-users/zsh-history-substring-search
+# Load a few important annexes, without Turbo
+# (this is currently required for annexes)
+zinit light-mode for \
+    zdharma-continuum/zinit-annex-as-monitor \
+    zdharma-continuum/zinit-annex-bin-gem-node \
+    zdharma-continuum/zinit-annex-patch-dl \
+    zdharma-continuum/zinit-annex-rust
 
 # historical backward/forward search with linehead string binded to ^P/^N
 autoload history-search-end
@@ -112,5 +115,6 @@ alias nvimrc="$EDITOR ~/dotfiles/init.lua"
 . $HOME/.asdf/asdf.sh
 fpath=(${ASDF_DIR}/completions $fpath) # append completions to fpath
 # initialise completions with ZSH's compinit
-autoload -Uz compinit
-compinit
+# autoload -Uz compinit
+# compinit
+eval "$(starship init zsh)"
