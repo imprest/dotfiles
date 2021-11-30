@@ -77,10 +77,13 @@ require('packer').startup{ function()
   use 'williamboman/nvim-lsp-installer'
   -- autocomplete and snippets
   use {
-    'hrsh7th/nvim-compe',
+    'hrsh7th/nvim-cmp',
     requires = {
+      {'hrsh7th/cmp-nvim-lsp'           },
+      {'hrsh7th/cmp-buffer'             },
+      {'hrsh7th/cmp-path'               },
+      {'hrsh7th/cmp-vsnip'              },
       {'hrsh7th/vim-vsnip'              },
-      {'hrsh7th/vim-vsnip-integ'        },
       {'rafamadriz/friendly-snippets'   },
       {'GoldsteinE/compe-latex-symbols' },
       {'ray-x/lsp_signature.nvim'       }
@@ -100,16 +103,17 @@ require('packer').startup{ function()
   use 'pbrisbin/vim-mkdir'           -- :e this/does/not/exist/file.txt then :w
   use 'phaazon/hop.nvim'
   use 'terryma/vim-smooth-scroll'
+  use 'terryma/vim-expand-region'
   use {
     'TimUntersberger/neogit', 
     config = function() require("neogit").setup{} end,
     requires = {'nvim-lua/plenary.nvim'}
   }
-  -- use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+  use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   -- use 'lukas-reineke/indent-blankline.nvim'
   -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
-  -- use 'yamatsum/nvim-cursorline'
+  use 'yamatsum/nvim-cursorline'
 end,
   config = {
     display = {
@@ -134,7 +138,7 @@ g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex, *.heex, *.svelte'
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
 -- fzf
 map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
-map('n', '<C-g>', '<cmd>lua require("fzf-lua").files()<CR>')
+map('n', '<leader>o', '<cmd>lua require("fzf-lua").files()<CR>')
 map('n', 'gl', '<cmd>lua require("fzf-lua").blines()<CR>')
 map('n', '<leader>g', '<cmd>lua require("fzf-lua").git_commits()<CR>')
 map('n', '<C-f>', '<cmd>lua require("fzf-lua").grep()<CR>')
@@ -261,7 +265,7 @@ cmd 'colorscheme onedark'
 -- global options
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse 
-o.completeopt = 'menuone,noinsert,noselect'-- Completion options
+o.completeopt = 'menu,menuone,noselect'   -- Completion options
 o.ignorecase = true                       -- Ignore case
 o.joinspaces = false                      -- No double spaces with join
 o.scrolloff = 5                           -- Lines of context
@@ -288,7 +292,7 @@ wo.list = true                            -- Show some invisible characters
 wo.relativenumber = false                 -- Relative line numbers
 wo.number = true                          -- Show line numbers
 wo.signcolumn = 'yes'                     -- Show sign column
-wo.wrap = false                           -- Disable line wrap
+wo.wrap = true                            -- Disable line wrap
 wo.foldmethod = 'syntax'
 wo.foldlevel = 99
 -- buffer-local options
@@ -352,8 +356,12 @@ map('n', 'g*', 'g*zz', {silent=true})
 map('n', 'g#', 'g#zz', {silent=true})
 map('n', '<C-o>', '<C-o>zz', {silent=true})
 map('n', '<C-i>', '<C-i>zz', {silent=true})
--- yank to system clipboard
-map('', '<leader>y', '"+y')
+-- yank to / paste from system clipboard
+map('v', '<leader>y', '"+y')
+map('n', '<leader>p', '"+p')
+map('n', '<leader>P', '"+P')
+map('v', '<leader>p', '"+p')
+map('v', '<leader>P', '"+P')
 -- reselect visual block after indent
 map('v', '<', '<gv')
 map('v', '>', '>gv')
@@ -421,7 +429,8 @@ end
 
 -- Setup our autocompletion. These configuration options are the default ones
 -- copied out of the documentation.
-require "compe".setup {
+local cmp = require'cmp'
+cmp.setup {
   enabled = true,
   autocomplete = true,
   debug = false,
@@ -435,7 +444,7 @@ require "compe".setup {
   max_kind_width = 100,
   max_menu_width = 100,
   documentation = true,
-  source = {
+  sources = cmp.config.sources{
     path = true,
     buffer = true,
     calc = true,
