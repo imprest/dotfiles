@@ -79,14 +79,14 @@ require('packer').startup{ function()
   use {
     'hrsh7th/nvim-cmp',
     requires = {
-      {'hrsh7th/cmp-nvim-lsp'           },
-      {'hrsh7th/cmp-buffer'             },
-      {'hrsh7th/cmp-path'               },
-      {'hrsh7th/cmp-vsnip'              },
-      {'hrsh7th/vim-vsnip'              },
-      {'rafamadriz/friendly-snippets'   },
-      {'GoldsteinE/compe-latex-symbols' },
-      {'ray-x/lsp_signature.nvim'       }
+      {'hrsh7th/cmp-nvim-lsp'               },
+      {'hrsh7th/cmp-buffer'                 },
+      {'hrsh7th/cmp-path'                   },
+      {'hrsh7th/cmp-vsnip'                  },
+      {'hrsh7th/vim-vsnip'                  },
+      {'rafamadriz/friendly-snippets'       },
+      {'kdheepack/cmp-latex-symbols'      },
+      {'hrsh7th/cmp-nvim-lsp-signature-help'}
     }
   }
   use {
@@ -98,7 +98,7 @@ require('packer').startup{ function()
   }
   use 'norcalli/nvim-colorizer.lua'
   use 'norcalli/nvim-terminal.lua'
-  use 'ojroques/nvim-hardline'
+  use 'nvim-lualine/lualine.nvim'
   use 'ojroques/nvim-lspfuzzy'
   use 'pbrisbin/vim-mkdir'           -- :e this/does/not/exist/file.txt then :w
   use 'phaazon/hop.nvim'
@@ -145,44 +145,37 @@ map('n', '<C-f>', '<cmd>lua require("fzf-lua").grep()<CR>')
 map('n', '<leader>b', "<cmd>lua require('fzf-lua').buffers()<CR>")
 map('n', '<leader>r', '<cmd>lua require("fzf-lua").oldfiles()<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
--- hardline
-local fmt = string.format
-local function pad(c, m)
-  local padch = ' '
-  return string.rep(padch, string.len(tostring(m)) - string.len(tostring(c)))
-end
-local function get_line()
-  local nbline = fn.line('$')
-  local line = fn.line('.')
-  return fmt('%s%d', pad(line, nbline), line)
-end
-local function get_column()
-  local col = fn.col('.')
-  return fmt('%s%d', pad(col, 10), col)
-end
-local function get_item()
-  return table.concat({' ',get_line(), ':', get_column()})
-end
-local function get_mode()
-  local mode = require('hardline.common').modes[fn.mode()] or common.modes['?']
-  return mode.text
-end
-require('hardline').setup {
-  bufferline_settings = {
-    exclude_terminal = false,
+-- lualine
+require'lualine'.setup {
+  options = {
+    icons_enabled = true,
+    theme = 'auto',
+    -- component_separators = { left = '', right = ''},
+    -- section_separators = { left = '', right = ''},
+    component_separators = { "", ""},
+    section_separators = { "", ""},
+    disabled_filetypes = { "NvimTree", "Telescope" },
+    always_divide_middle = true,
   },
   sections = {
-    {class = 'mode', item = get_mode},
-    {class = 'med', item = require('hardline.parts.filename').get_item},
-    {class = 'high', item = require('hardline.parts.git').get_item, hide = 80},
-    '%<',
-    {class = 'med', item ='%='},
-    {class = 'low', item = require('hardline.parts.wordcount').get_item, hide = 80},
-    {class = 'error', item = require('hardline.parts.lsp').get_error},
-    {class = 'warning', item = require('hardline.parts.lsp').get_warning},
-    {class = 'high', item = require('hardline.parts.filetype').get_item, hide = 80},
-    {class = 'mode', item = get_item},
+    lualine_a = {'mode', 
+    lualine_b = {'branch', 'diff',
+                  {'diagnostics', sources={'nvim_lsp'}}},
+    lualine_c = {'filename'},
+    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_y = {'progress'},
+    lualine_z = {'location'}
   },
+  inactive_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = {'filename'},
+    lualine_x = {'location'},
+    lualine_y = {},
+    lualine_z = {}
+  },
+  tabline = {},
+  extensions = {'quickfix', 'nvim-tree', 'fzf'}
 }
 -- hop
 require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
@@ -209,32 +202,35 @@ config.configure_language("typescriptreact", {
   prefer_single_line_comments = true,
 })
 -- nvim-bufferline
--- require('bufferline').setup{
---   options = {
---     show_close_icon = false,
---     show_buffer_close_icons = false,
---     show_buffer_icons = false,
---     separator_style = {"", ""},
---     offsets = {{filetype = "NvimTree", text = "File Explorer", text_align = "center" }},
---   },
---   highlights = {
---     buffer_selected = { guifg = "", guibg = "" },
---     fill = { guibg = "#282c34" , guifg = "#282c34" },
---     buffer_selected = { gui = "bold" },
---     pick_visible = { guibg = "#282c34", guifg = "#282c34"},
---     pick= { guibg = "#282c34", guifg = "#282c34"},
---     buffer_visible = { guibg = "#282c34", guifg = "#3e3e3e"}
---   }
--- }
+require('bufferline').setup{
+  options = {
+    show_close_icon = false,
+    show_buffer_close_icons = false,
+    show_buffer_icons = true,
+    -- separator_style = {"", ""},
+    -- offsets = {{filetype = "NvimTree", text = "File Explorer", text_align = "center" }},
+  },
+  -- highlights = {
+  --   buffer_selected = { guifg = "", guibg = "" },
+  --   fill = { guibg = "#282c34" , guifg = "#282c34" },
+  --   buffer_selected = { gui = "bold" },
+  --   pick_visible = { guibg = "#282c34", guifg = "#282c34"},
+  --   pick= { guibg = "#282c34", guifg = "#282c34"},
+  --   buffer_visible = { guibg = "#282c34", guifg = "#3e3e3e"}
+  -- }
+}
 -- nvim-terminal
 require('terminal').setup()
 -- nvim-tree
-require'nvim-tree'.setup { auto_close = true; nvim_tree_hide_dotfiles = true }
+require'nvim-tree'.setup {
+  auto_close = true;
+  nvim_tree_hide_dotfiles = true;
+  nvim_tree_gitignore             = 1;
+  nvim_tree_group_empty           = 1;
+  nvim_tree_disable_window_picker = 1;
+}
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
-g.nvim_tree_gitignore             = 1
-g.nvim_tree_group_empty           = 1
-g.nvim_tree_disable_window_picker = 1
 -- vim-bbye
 map('n', '<leader>x', '<cmd>Bdelete<CR>')
 -- vim-easy-align
@@ -293,7 +289,8 @@ wo.relativenumber = false                 -- Relative line numbers
 wo.number = true                          -- Show line numbers
 wo.signcolumn = 'yes'                     -- Show sign column
 wo.wrap = true                            -- Disable line wrap
-wo.foldmethod = 'syntax'
+wo.foldmethod = 'expr'
+wo.foldexpr = 'nvim_treesitter#foldexpr()'
 wo.foldlevel = 99
 -- buffer-local options
 bo.expandtab = true                       -- Use spaces instead of tabs
@@ -370,11 +367,11 @@ map('n', '<leader>S', ':%s//gcI<Left><Left><Left><Left>')
 map('v', '<leader>S', ':s//gcI<Left><Left><Left><Left>')
 
 -------------------- TREE-SITTER ---------------------------
--- local ts = require 'nvim-treesitter.configs'
--- ts.setup {
---   ensure_installed = {"css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
---   highlight = {enable = true}, indent = {enable = true}
--- }
+local ts = require 'nvim-treesitter.configs'
+ts.setup {
+  ensure_installed = {"css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
+  highlight = {enable = true}, indent = {enable = false} -- indent is experimental
+}
 
 -------------------- LSP w/ Compe---------------------------
 g.completion_enable_snippet = 'vim-vsnip'
@@ -430,33 +427,56 @@ end
 -- Setup our autocompletion. These configuration options are the default ones
 -- copied out of the documentation.
 local cmp = require'cmp'
-cmp.setup {
-  enabled = true,
-  autocomplete = true,
-  debug = false,
-  min_length = 2,
-  preselect = "enable",
-  throttle_time = 80,
-  source_timeout = 200,
-  resolve_timeout = 800,
-  incomplete_delay = 400,
-  max_abbr_width = 100,
-  max_kind_width = 100,
-  max_menu_width = 100,
-  documentation = true,
-  sources = cmp.config.sources{
-    path = true,
-    buffer = true,
-    calc = true,
-    nvim_lsp = true,
-    nvim_lua = true,
-    vsnip = true,
-    spell = true,
-    tags = true,
-    vim_dadbod_completion = true,
-    latex_symbols = true,
-    treesitter = false
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      vim.fn["vsnip#anonymous"](args.body)
+    end,
+  },
+  mapping = {
+    ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), {'i', 'c'}),
+    ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs( 4), {'i', 'c'}),
+    ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+    ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+    ['<C-e>'] = cmp.mapping({
+      i = cmp.mapping.abort(),
+      c = cmp.mapping.close(),
+    }),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+  },
+  sources = cmp.config.sources({
+    { name = "path" },
+    { name = "buffer" },
+    { name = "nvim_lsp" },
+    { name = "nvim_lua" },
+    { name = "vsnip" },
+    { name = "spell" },
+    { name = "tags" },
+    { name = "vim_dadbod_completion" },
+    { name = "latex_symbols" }
+  })
+})
+-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline('/', {
+  sources = {
+    { name = 'buffer' }
   }
+})
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(':', {
+  sources = cmp.config.sources({
+    { name = 'path' }
+  }, {
+    { name = 'cmdline' }
+  })
+})
+
+-- Setup lspconfig.
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+-- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+require('lspconfig')['elixir'].setup {
+  capabilities = capabilities
 }
 
 -- Tab completion
