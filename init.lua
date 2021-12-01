@@ -28,11 +28,11 @@ end
 
 vim.api.nvim_exec(
   [[
-  augroup Packer
-    autocmd!
-    autocmd BufWritePost init.lua PackerCompile
-  augroup end
-]],
+    augroup Packer
+      autocmd!
+      autocmd BufWritePost init.lua PackerCompile
+    augroup end
+  ]],
   false
 )
 
@@ -48,6 +48,7 @@ require('packer').startup{ function()
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
   use 'joshdick/onedark.vim'
+  use 'marko-cerovac/material.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'
   use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
@@ -67,7 +68,7 @@ require('packer').startup{ function()
     'lewis6991/gitsigns.nvim',
     requires = {'nvim-lua/plenary.nvim'},
     config = function()
-      require("gitsigns").setup()
+      require("gitsigns").setup({ current_line_blame = false })
     end
   }
   use 'lervag/vimtex'
@@ -149,7 +150,8 @@ g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 require'lualine'.setup {
   options = {
     icons_enabled = true,
-    theme = 'auto',
+    -- theme = 'auto',
+    theme = 'material-nvim',
     -- component_separators = { left = '', right = ''},
     -- section_separators = { left = '', right = ''},
     component_separators = { "", ""},
@@ -158,7 +160,7 @@ require'lualine'.setup {
     always_divide_middle = true,
   },
   sections = {
-    lualine_a = {'mode', 
+    lualine_a = {'mode'},
     lualine_b = {'branch', 'diff',
                   {'diagnostics', sources={'nvim_lsp'}}},
     lualine_c = {'filename'},
@@ -257,7 +259,9 @@ g['vimtex_view_general_viewer'] = 'evince'
 
 -------------------- OPTIONS -------------------------------
 local width = 96
-cmd 'colorscheme onedark'
+cmd 'colorscheme material'
+g.material_style = "palenight"
+g.showbreak = '↪'
 -- global options
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse 
@@ -282,7 +286,6 @@ o.swapfile = false
 o.undofile = true
 o.undodir = '/home/hvaria/.nvim/undo'
 -- window-local options
--- wo.colorcolumn = tostring(width)       -- Line length marker
 wo.cursorline = false                     -- Highlight cursor line
 wo.list = true                            -- Show some invisible characters
 wo.relativenumber = false                 -- Relative line numbers
@@ -291,10 +294,10 @@ wo.signcolumn = 'yes'                     -- Show sign column
 wo.wrap = true                            -- Disable line wrap
 wo.foldmethod = 'expr'
 wo.foldexpr = 'nvim_treesitter#foldexpr()'
-wo.foldlevel = 99
+wo.foldlevel = 4
 -- buffer-local options
 bo.expandtab = true                       -- Use spaces instead of tabs
-bo.formatoptions = 'crqnj'                -- Automatic formatting options
+bo.formatoptions = 'crqnj1'               -- Automatic formatting options
 bo.shiftwidth = 2                         -- Size of an indent
 bo.smartindent = true                     -- Insert indents automatically
 bo.tabstop = 2                            -- Number of spaces tabs count for
@@ -528,7 +531,7 @@ local lsp_installer = require("nvim-lsp-installer")
 lsp_installer.on_server_ready(function (server) 
   local opts = {}
   if server.name == "elixir" then
-    opts.dialyzerEnabled = true
+    opts.dialyzerEnabled = false
     opts.fetchDeps = false
   end
 
