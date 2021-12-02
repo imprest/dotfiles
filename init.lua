@@ -252,10 +252,10 @@ g['vimtex_view_general_viewer'] = 'evince'
 local width = 96
 cmd 'colorscheme material'
 g.material_style = "palenight"
-g.showbreak = '↪'
+vim.opt.showbreak = '↪ '
 -- global options
 o.hidden = true                           -- Enable background buffers
-o.mouse = 'a'                             -- Allow the mouse 
+o.mouse = 'a'                             -- Allow the mouse
 o.completeopt = 'menu,menuone,noselect'   -- Completion options
 o.ignorecase = true                       -- Ignore case
 o.joinspaces = false                      -- No double spaces with join
@@ -466,7 +466,7 @@ require('lspconfig')['elixirls'].setup {
 
 ------------------ LSP-INSTALL -----------------------------
 local lsp_installer = require("nvim-lsp-installer")
-lsp_installer.on_server_ready(function (server) 
+lsp_installer.on_server_ready(function (server)
   local opts = {}
   if server.name == "elixir" then
     opts.dialyzerEnabled = false
