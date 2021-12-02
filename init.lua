@@ -57,7 +57,7 @@ require('packer').startup{ function()
     requires = 'kyazdani42/nvim-web-devicons',
     config = function() require'nvim-tree'.setup {} end
   }
-  use {'kristijanhusak/vim-dadbod-completion', 
+  use {'kristijanhusak/vim-dadbod-completion',
     requires = {
       {'tpope/vim-dadbod'},
       {'kyazdani42/nvim-web-devicons'}
@@ -80,14 +80,16 @@ require('packer').startup{ function()
   use {
     'hrsh7th/nvim-cmp',
     requires = {
-      {'hrsh7th/cmp-nvim-lsp'               },
-      {'hrsh7th/cmp-buffer'                 },
-      {'hrsh7th/cmp-path'                   },
-      {'hrsh7th/cmp-vsnip'                  },
-      {'hrsh7th/vim-vsnip'                  },
-      {'rafamadriz/friendly-snippets'       },
-      {'kdheepack/cmp-latex-symbols'      },
-      {'hrsh7th/cmp-nvim-lsp-signature-help'}
+      {'windwp/nvim-autopairs'               },
+      {'hrsh7th/cmp-nvim-lsp'                },
+      {'hrsh7th/cmp-buffer'                  },
+      {'hrsh7th/cmp-path'                    },
+      {'hrsh7th/cmp-vsnip'                   },
+      {'hrsh7th/vim-vsnip'                   },
+      {'rafamadriz/friendly-snippets'        },
+      {'kdheepak/cmp-latex-symbols'          },
+      {'hrsh7th/cmp-nvim-lsp-document-symbol'},
+      {'onsails/lspkind-nvim'}
     }
   }
   use {
@@ -106,7 +108,7 @@ require('packer').startup{ function()
   use 'terryma/vim-smooth-scroll'
   use 'terryma/vim-expand-region'
   use {
-    'TimUntersberger/neogit', 
+    'TimUntersberger/neogit',
     config = function() require("neogit").setup{} end,
     requires = {'nvim-lua/plenary.nvim'}
   }
@@ -140,9 +142,9 @@ require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }
 -- fzf
 map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
 map('n', '<leader>o', '<cmd>lua require("fzf-lua").files()<CR>')
-map('n', 'gl', '<cmd>lua require("fzf-lua").blines()<CR>')
+map('n', '<leader>l', '<cmd>lua require("fzf-lua").blines()<CR>')
 map('n', '<leader>g', '<cmd>lua require("fzf-lua").git_commits()<CR>')
-map('n', '<C-f>', '<cmd>lua require("fzf-lua").grep()<CR>')
+map('n', '<leader>f', '<cmd>lua require("fzf-lua").grep()<CR>')
 map('n', '<leader>b', "<cmd>lua require('fzf-lua').buffers()<CR>")
 map('n', '<leader>r', '<cmd>lua require("fzf-lua").oldfiles()<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
@@ -150,12 +152,9 @@ g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 require'lualine'.setup {
   options = {
     icons_enabled = true,
-    -- theme = 'auto',
-    theme = 'material-nvim',
-    -- component_separators = { left = '', right = ''},
-    -- section_separators = { left = '', right = ''},
-    component_separators = { "", ""},
-    section_separators = { "", ""},
+    theme = 'palenight',
+    component_separators = { left = '', right = ''},
+    section_separators = { left = '', right = ''},
     disabled_filetypes = { "NvimTree", "Telescope" },
     always_divide_middle = true,
   },
@@ -203,23 +202,15 @@ config.configure_language("typescriptreact", {
   end,
   prefer_single_line_comments = true,
 })
+-- nvim-autopairs
+require('nvim-autopairs').setup()
 -- nvim-bufferline
 require('bufferline').setup{
   options = {
     show_close_icon = false,
     show_buffer_close_icons = false,
-    show_buffer_icons = true,
-    -- separator_style = {"", ""},
-    -- offsets = {{filetype = "NvimTree", text = "File Explorer", text_align = "center" }},
-  },
-  -- highlights = {
-  --   buffer_selected = { guifg = "", guibg = "" },
-  --   fill = { guibg = "#282c34" , guifg = "#282c34" },
-  --   buffer_selected = { gui = "bold" },
-  --   pick_visible = { guibg = "#282c34", guifg = "#282c34"},
-  --   pick= { guibg = "#282c34", guifg = "#282c34"},
-  --   buffer_visible = { guibg = "#282c34", guifg = "#3e3e3e"}
-  -- }
+    show_buffer_icons = true
+  }
 }
 -- nvim-terminal
 require('terminal').setup()
@@ -250,8 +241,8 @@ map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
 -- vim-sandwich
 cmd 'runtime macros/sandwich/keymap/surround.vim'
 -- vim-smooth-scroll
-map('n', '<c-e>', ':call smooth_scroll#up(&scroll, 15, 4)<CR>', {silent=true})
-map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 4)<CR>', {silent=true})
+map('n', '<c-e>', ':call smooth_scroll#up(&scroll, 15, 4)<CR>zz', {silent=true})
+map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 4)<CR>zz', {silent=true})
 -- vimtex
 g['vimtex_quickfix_mode'] = 0
 g['vimtex_compiler_method'] = 'tectonic'
@@ -377,12 +368,9 @@ ts.setup {
 }
 
 -------------------- LSP w/ Compe---------------------------
-g.completion_enable_snippet = 'vim-vsnip'
 -- A callback that will get called when a buffer connects to the language server.
 -- Here we create any key maps that we want to have on that buffer.
 local on_attach = function(_, bufnr)
-  require 'lsp_signature'.on_attach()
-
   map('n', '<space>,', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
   map('n', '<space>;', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
   map("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<cr>")
@@ -396,41 +384,31 @@ local on_attach = function(_, bufnr)
   map("n", "<space>h", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
   map('n', '<space>re', '<cmd>lua vim.lsp.buf.rename()<CR>')
   map('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
-
-  -- Expand
-  cmd "imap <expr> <C-j> vsnip#expandable() ? '<Plug>(vsnip-expand)' : '<C-j>'"
-  cmd "smap <expr> <C-j> vsnip#expandable() ? '<Plug>(vsnip-expand)' : '<C-j>'"
-  -- Expand or jump
-  cmd "imap <expr> <C-l> vsnip#available(1) ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'"
-  cmd "smap <expr> <C-l> vsnip#available(1) ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'"
   -- NOTE: Order is important. You can't lazy load lexima.vim
   g['lexima_no_defualt_rules'] = true
   g['lexima_enable_endwise_rules'] = 1
-  -- vim.fn.call('lexima#set_default_rules()')
-  cmd "inoremap <silent><expr> <c-space> compe#complete()"
-  cmd "inoremap <silent><expr> <cr> compe#confirm(lexima#expand('<LT>CR>', 'i'))"
-  cmd "inoremap <silent><expr> <C-e> compe#close('<C-e>')"
-  cmd "inoremap <silent><expr> <C-f> compe#scroll({ 'delta': +4 })"
-  cmd "inoremap <silent><expr> <C-d> compe#scroll({ 'delta': -4 })"
-  
-  -- Neovim doesn't support snippets out of the box, so we need to mutate the
-  -- capabilities we send to the language server to let them know we want snippets.
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  capabilities.textDocument.completion.completionItem.resolveSupport = {
-    properties = {
-      'documentation',
-      'detail',
-      'additionalTextEdits'
-    }
-  }
 end
 
 
 -- Setup our autocompletion. These configuration options are the default ones
 -- copied out of the documentation.
+local has_words_before = function()
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
+local feedkey = function(key, mode)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+end
+
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local cmp = require'cmp'
+cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
+local lspkind = require('lspkind')
 cmp.setup({
+  formatting = {
+    format = lspkind.cmp_format()
+  },
   snippet = {
     expand = function(args)
       vim.fn["vsnip#anonymous"](args.body)
@@ -446,9 +424,29 @@ cmp.setup({
       c = cmp.mapping.close(),
     }),
     ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif vim.fn["vsnip#available"](1) == 1 then
+        feedkey("<Plug>(vsnip-expand-or-jump)", "")
+      elseif has_words_before() then
+        cmp.complete()
+      else
+        fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
+      end
+    end, { "i", "s" }),
+
+    ["<S-Tab>"] = cmp.mapping(function()
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+        feedkey("<Plug>(vsnip-jump-prev)", "")
+      end
+    end, { "i", "s" }),
   },
   sources = cmp.config.sources({
     { name = "path" },
+    { name = "nvim_lsp_document_symbol" },
     { name = "buffer" },
     { name = "nvim_lsp" },
     { name = "nvim_lua" },
@@ -459,72 +457,12 @@ cmp.setup({
     { name = "latex_symbols" }
   })
 })
--- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline('/', {
-  sources = {
-    { name = 'buffer' }
-  }
-})
-
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline(':', {
-  sources = cmp.config.sources({
-    { name = 'path' }
-  }, {
-    { name = 'cmdline' }
-  })
-})
 
 -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
--- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-require('lspconfig')['elixir'].setup {
+require('lspconfig')['elixirls'].setup {
   capabilities = capabilities
 }
-
--- Tab completion
-local t = function(str)
-  return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
-
-local check_back_space = function()
-  local col = vim.fn.col('.') - 1
-  return col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') ~= nil
-end
-
--- Use (s-)tab to:
---- move to prev/next item in completion menuone
---- jump to prev/next snippet's placeholder
-_G.tab_complete = function()
-  if vim.fn.pumvisible() == 1 then
-    return t "<C-n>"
-  elseif vim.fn['vsnip#available'](1) == 1 then
-    return t "<Plug>(vsnip-expand-or-jump)"
-  elseif check_back_space() then
-    return t "<Tab>"
-  else
-    return vim.fn['compe#complete']()
-  end
-end
-_G.s_tab_complete = function()
-  if vim.fn.pumvisible() == 1 then
-    return t "<C-p>"
-  elseif vim.fn['vsnip#jumpable'](-1) == 1 then
-    return t "<Plug>(vsnip-jump-prev)"
-  else
-    -- If <S-Tab> is not working in your terminal, change it to <C-h>
-    return t "<S-Tab>"
-  end
-end
-
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
--- Map compe confirmation and complete functions
--- vim.api.nvim_set_keymap("i", '<cr>', 'comple#confirm("<cr>")', { expr = true })
-vim.api.nvim_set_keymap("i", "<CR>", "compe#confirm({ 'keys': '<CR>', 'select': v:true })", { expr = true })
-vim.api.nvim_set_keymap("i", '<c-space>', 'comple#complete()', { expr = true })
 
 ------------------ LSP-INSTALL -----------------------------
 local lsp_installer = require("nvim-lsp-installer")
@@ -562,9 +500,5 @@ vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
   'TextYankPost * lua vim.highlight.on_yank { hi_group="IncSearch", timeout=150, on_visual=true }',
   'FileType elixir,eelixir iab pp \\|>',
   'BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting()',
-  'FileType svelte,html,markdown setlocal wrap',
-  "FileType html,markdown,text nnoremap <expr> j v:count ? 'j' : 'gj'",
-  "FileType html,markdown,text nnoremap <expr> k v:count ? 'k' : 'gk'",
-  "FileType html,markdown,text vnoremap <expr> j v:count ? 'j' : 'gj'",
-  "FileType html,markdown,text vnoremap <expr> k v:count ? 'k' : 'gk'"
+  "FileType sql,mysql,plsql lua require('cmp').setup.buffer({ sources = {{ name = 'vim-dadbod-completion' }} })"
 })
