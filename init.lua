@@ -50,7 +50,7 @@ require('packer').startup{ function()
   use 'joshdick/onedark.vim'
   use 'marko-cerovac/material.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
-  use 'junegunn/vim-easy-align'
+  use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
   use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
   use {
     'kyazdani42/nvim-tree.lua',
@@ -73,7 +73,6 @@ require('packer').startup{ function()
   }
   use 'lervag/vimtex'
   use 'machakann/vim-sandwich'       -- sr({ sd' <select text>sa'
-  use 'moll/vim-bbye'
   use 'neovim/nvim-lspconfig'
   use 'williamboman/nvim-lsp-installer'
   -- autocomplete and snippets
@@ -100,13 +99,12 @@ require('packer').startup{ function()
     end
   }
   use 'norcalli/nvim-colorizer.lua'
-  use 'norcalli/nvim-terminal.lua'
   use 'nvim-lualine/lualine.nvim'
+  use 'olambo/vi-viz'
   use 'ojroques/nvim-lspfuzzy'
   use 'pbrisbin/vim-mkdir'           -- :e this/does/not/exist/file.txt then :w
   use 'phaazon/hop.nvim'
   use 'terryma/vim-smooth-scroll'
-  use 'terryma/vim-expand-region'
   use {
     'TimUntersberger/neogit',
     config = function() require("neogit").setup{} end,
@@ -212,8 +210,6 @@ require('bufferline').setup{
     show_buffer_icons = true
   }
 }
--- nvim-terminal
-require('terminal').setup()
 -- nvim-tree
 require'nvim-tree'.setup {
   auto_close = true;
@@ -224,8 +220,11 @@ require'nvim-tree'.setup {
 }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
+-- vi-viz
+map('x','v', "<cmd>lua require('vi-viz').vizExpand()<CR>", {noremap = true})
+map('x','V', "<cmd>lua require('vi-viz').vizContract()<CR>", {noremap = true})
 -- vim-bbye
-map('n', '<leader>x', '<cmd>Bdelete<CR>')
+map('n', '<leader>x', '<cmd>BufDel<CR>')
 -- vim-easy-align
 map('x', 'ga', '<Plug>(EasyAlign)', {noremap = false})
 map('n', 'ga', '<Plug>(EasyAlign)', {noremap = false})
@@ -238,11 +237,13 @@ map('x', '<leader>p', '<Plug>(DBExe)', {noremap=false})
 map('n', '<leader>p', '<Plug>(DBExe)', {noremap=false})
 map('o', '<leader>p', '<Plug>(DBExe)', {noremap=false})
 map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
--- vim-sandwich
-cmd 'runtime macros/sandwich/keymap/surround.vim'
 -- vim-smooth-scroll
 map('n', '<c-e>', ':call smooth_scroll#up(&scroll, 15, 4)<CR>zz', {silent=true})
 map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 4)<CR>zz', {silent=true})
+-- vim-svelte
+g['vim_svelte_plugin_load_full_syntax'] = 1
+-- vim-sandwich
+cmd 'runtime macros/sandwich/keymap/surround.vim'
 -- vimtex
 g['vimtex_quickfix_mode'] = 0
 g['vimtex_compiler_method'] = 'tectonic'
@@ -468,7 +469,7 @@ require('lspconfig')['elixirls'].setup {
 local lsp_installer = require("nvim-lsp-installer")
 lsp_installer.on_server_ready(function (server)
   local opts = {}
-  if server.name == "elixir" then
+  if server.name == "elixirls" then
     opts.dialyzerEnabled = false
     opts.fetchDeps = false
   end
