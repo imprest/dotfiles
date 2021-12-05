@@ -515,9 +515,9 @@ function toggle_wrap()
 end
 
 vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
-  'TermOpen * :lua init_term()',
-  'TextYankPost * :lua vim.highlight.on_yank { hi_group="IncSearch", timeout=150, on_visual=true }',
+  'TermOpen * lua init_term()',
+  'TextYankPost * lua vim.highlight.on_yank { hi_group="IncSearch", timeout=150, on_visual=true }',
   'FileType elixir,eelixir iab pp \\|>',
   'BufWritePre *.{ex,exs} :lua vim.lsp.buf.formatting()',
-  "FileType sql,mysql,plsql :lua require('cmp').setup.buffer({ sources = {{ name = 'vim-dadbod-completion' }} })"
+  "FileType sql,mysql,plsql lua require('cmp').setup.buffer({ sources = {{ name = 'vim-dadbod-completion' }} })"
 })
