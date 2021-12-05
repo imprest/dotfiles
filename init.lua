@@ -86,6 +86,7 @@ require('packer').startup{ function()
       {'hrsh7th/cmp-vsnip'                   },
       {'hrsh7th/vim-vsnip'                   },
       {'rafamadriz/friendly-snippets'        },
+      {'ray-x/lsp_signature.nvim'            },
       {'kdheepak/cmp-latex-symbols'          },
       {'hrsh7th/cmp-nvim-lsp-document-symbol'},
       {'onsails/lspkind-nvim'}
@@ -368,29 +369,63 @@ ts.setup {
   highlight = {enable = true}, indent = {enable = false} -- indent is experimental
 }
 
--------------------- LSP w/ Compe---------------------------
--- A callback that will get called when a buffer connects to the language server.
--- Here we create any key maps that we want to have on that buffer.
-local on_attach = function(_, bufnr)
-  map('n', '<space>,', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
-  map('n', '<space>;', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
-  map("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<cr>")
-  map("n", "<space>l", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<cr>")
-  map("n", "<space>d", "<cmd>lua vim.lsp.buf.definition()<cr>")
-  map("n", "<space>k", "<cmd>lua vim.lsp.buf.hover()<cr>")
-  map("n", "<space>r", "<cmd>lua vim.lsp.buf.references()<cr>")
-  map("n", "<space>s", "<cmd>lua vim.lsp.buf.document_symbol()<cr>")
-  map("n", "<space>t", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
-  map("n", "<space>i", "<cmd>lua vim.lsp.buf.implementation()<cr>")
-  map("n", "<space>h", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
-  map('n', '<space>re', '<cmd>lua vim.lsp.buf.rename()<CR>')
-  map('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
+------------------ LSP-INSTALL & CONFIG --------------------
+-- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
+-- Customize LSP behavior
+local on_attach = function(client, bufnr)
+  -- Always use signcolumn for the current buffer
+  vim.wo.signcolumn = 'yes:1'
+
+  -- keybindings
+  -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local opts = { noremap=true, silent=true }
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  -- map("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<cr>")
+  -- map("n", "<space>s", "<cmd>lua vim.lsp.buf.document_symbol()<cr>")
+  -- map("n", "<space>t", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
+  -- map("n", "<space>h", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
+  -- map('n', '<space>re', '<cmd>lua vim.lsp.buf.rename()<CR>')
+  -- map('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
   -- NOTE: Order is important. You can't lazy load lexima.vim
   g['lexima_no_defualt_rules'] = true
   g['lexima_enable_endwise_rules'] = 1
 end
 
+local lsp_setup_opts = {}
+lsp_setup_opts['elixirls'] = {
+  settings = {
+    elixirLS = {
+      dialyzerEnabled = false,
+      fetchDeps = false
+    }
+  }
+}
 
+local lsp_installer = require("nvim-lsp-installer")
+lsp_installer.on_server_ready(function(server)
+  local opts = {
+    on_attach = on_attach,
+    -- Suggested configuration by nvim-cmp
+    capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  }
+
+  -- Customize the options passed to the server
+  opts = vim.tbl_extend("error", opts, lsp_setup_opts[server.name] or {})
+
+  -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
+  server:setup(opts)
+  vim.cmd [[ do User LspAttachBuffers ]]
+end)
+
+-------------------- LSP w/ Cmp-----------------------------
 -- Setup our autocompletion. These configuration options are the default ones
 -- copied out of the documentation.
 local has_words_before = function()
@@ -408,7 +443,13 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = 
 local lspkind = require('lspkind')
 cmp.setup({
   formatting = {
-    format = lspkind.cmp_format()
+    format = lspkind.cmp_format({with_text = true, menu = ({
+      buffer = "[Buffer]",
+      nvim_lsp = "[LSP]",
+      luasnip = "[LuaSnip]",
+      nvim_lua = "[Lua]",
+      latex_symbols = "[Latex]",
+    })})
   },
   snippet = {
     expand = function(args)
@@ -459,29 +500,6 @@ cmp.setup({
   })
 })
 
--- Setup lspconfig.
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-require('lspconfig')['elixirls'].setup {
-  capabilities = capabilities
-}
-
------------------- LSP-INSTALL -----------------------------
-local lsp_installer = require("nvim-lsp-installer")
-lsp_installer.on_server_ready(function (server)
-  local opts = {}
-  if server.name == "elixirls" then
-    opts.dialyzerEnabled = false
-    opts.fetchDeps = false
-  end
-
-  server:setup({
-    capabilities = capabilities,
-    on_attach = on_attach,
-    settings = { elixirLS = opts }
-  })
-  vim.cmd [[ do User LspAttachBuffers ]]
-end)
-
 -------------------- COMMANDS ------------------------------
 function init_term()
   cmd 'setlocal nonumber norelativenumber'
@@ -497,9 +515,9 @@ function toggle_wrap()
 end
 
 vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
-  'TermOpen * lua init_term()',
-  'TextYankPost * lua vim.highlight.on_yank { hi_group="IncSearch", timeout=150, on_visual=true }',
+  'TermOpen * :lua init_term()',
+  'TextYankPost * :lua vim.highlight.on_yank { hi_group="IncSearch", timeout=150, on_visual=true }',
   'FileType elixir,eelixir iab pp \\|>',
-  'BufWritePre *.{ex,exs} lua vim.lsp.buf.formatting()',
-  "FileType sql,mysql,plsql lua require('cmp').setup.buffer({ sources = {{ name = 'vim-dadbod-completion' }} })"
+  'BufWritePre *.{ex,exs} :lua vim.lsp.buf.formatting()',
+  "FileType sql,mysql,plsql :lua require('cmp').setup.buffer({ sources = {{ name = 'vim-dadbod-completion' }} })"
 })
