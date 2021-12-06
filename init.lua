@@ -410,10 +410,10 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
   buf_set_keymap('n', '<space>r', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<space>c', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap("n", "<space>t", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+  buf_set_keymap("n", "<space>h", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   -- map("n", "<space>s", "<cmd>lua vim.lsp.buf.document_symbol()<cr>")
-  -- map("n", "<space>t", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
-  -- map("n", "<space>h", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
-  -- map('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
   -- NOTE: Order is important. You can't lazy load lexima.vim
   g['lexima_no_defualt_rules'] = true
   g['lexima_enable_endwise_rules'] = 1
