@@ -113,7 +113,7 @@ require('packer').startup{ function()
   }
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
-  -- use 'lukas-reineke/indent-blankline.nvim'
+  use 'lukas-reineke/indent-blankline.nvim'
   -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
   use 'yamatsum/nvim-cursorline'
 end,
@@ -181,7 +181,7 @@ require'lualine'.setup {
 require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
 map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 -- indent-blankline
--- g.indentLine_fileTypeExclude = {"json"}
+g.indentLine_fileTypeExclude = {"json"}
 -- g.indentLine_char = "│"
 -- kommentary
 g['kommentary_create_default_mappings'] = false
@@ -254,22 +254,24 @@ g['vimtex_view_general_viewer'] = 'evince'
 local width = 96
 cmd 'colorscheme material'
 g.material_style = "palenight"
-vim.opt.showbreak = '↪ '
 -- global options
+o.timeoutlen = 300                        -- mapping timeout
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse
 o.completeopt = 'menu,menuone,noselect'   -- Completion options
 o.ignorecase = true                       -- Ignore case
 o.joinspaces = false                      -- No double spaces with join
-o.scrolloff = 5                           -- Lines of context
+o.scrolloff = 1                           -- Lines of context
+o.scrolljump = 5                          -- min. lines to scroll
 o.shiftround = true                       -- Round indent
 o.sidescrolloff = 8                       -- Columns of context
 o.smartcase = true                        -- Don't ignore case with capitals
 o.splitbelow = true                       -- Put new windows below current
 o.splitright = true                       -- Put new windows right of current
 o.updatetime = 200                        -- Delay before swap file is saved
-o.wildmode = 'list:longest'               -- Command-line completion mode
+o.wildmode = 'list:full'                  -- Command-line completion mode
 o.shortmess = 'IFc'                       -- Avoid showing extra message on completion
+o.showbreak = '↪ '
 o.showmode = false
 o.fillchars = "eob: "
 o.inccommand = 'split'
@@ -289,12 +291,12 @@ wo.foldmethod = 'expr'
 wo.foldexpr = 'nvim_treesitter#foldexpr()'
 wo.foldlevel = 4
 -- buffer-local options
-bo.expandtab = true                       -- Use spaces instead of tabs
-bo.formatoptions = 'crqnj1'               -- Automatic formatting options
-bo.shiftwidth = 2                         -- Size of an indent
-bo.smartindent = true                     -- Insert indents automatically
-bo.tabstop = 2                            -- Number of spaces tabs count for
-bo.textwidth = width                      -- Maximum width of text
+o.tabstop = 2                             -- Number of spaces tabs count for
+o.expandtab = true                        -- Use spaces instead of tabs
+o.formatoptions = 'crqnj1'                -- Automatic formatting options
+o.shiftwidth = 2                          -- Size of an indent
+o.smartindent = true                      -- Insert indents automatically
+o.textwidth = width                       -- Maximum width of text
 
 -------------------- MAPPINGS ------------------------------
 -- common tasks
@@ -303,8 +305,8 @@ map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('n', '<F3>', '<cmd>lua toggle_wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
 map('n', '<leader>t', '<cmd>split<bar>res 10 <bar>terminal<CR>')
-map('i', '<C-u>', '<C-g>u<C-u>')
-map('i', '<C-w>', '<C-g>u<C-w>')
+map('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
+map('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
 -- move lines up/down
 map('n', '<A-j>', ':m .+1<CR>==')
 map('n', '<A-k>', ':m .-2<CR>==')
@@ -371,10 +373,28 @@ ts.setup {
 
 ------------------ LSP-INSTALL & CONFIG --------------------
 -- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
+-- lsp_signature
+local on_attach_lsp_signature = function(_, _)
+  require('lsp_signature').on_attach({
+      bind = true, -- This is mandatory, otherwise border config won't get registered.
+      floating_window = true,
+      handler_opts = {
+        border = "single"
+      },
+      zindex = 99,     -- <100 so that it does not hide completion popup.
+      fix_pos = false, -- Let signature window change its position when needed, see GH-53
+      toggle_key = '<M-x>',  -- Press <Alt-x> to toggle signature on and off.
+    })
+end
+
 -- Customize LSP behavior
 local on_attach = function(client, bufnr)
   -- Always use signcolumn for the current buffer
   vim.wo.signcolumn = 'yes:1'
+
+  
+  -- Activate LSP signature on attach.
+  on_attach_lsp_signature(client, bufnr)
 
   -- keybindings
   -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
@@ -388,11 +408,11 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
   buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
   buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-  -- map("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<cr>")
+  buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  buf_set_keymap('n', '<space>r', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
   -- map("n", "<space>s", "<cmd>lua vim.lsp.buf.document_symbol()<cr>")
   -- map("n", "<space>t", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
   -- map("n", "<space>h", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
-  -- map('n', '<space>re', '<cmd>lua vim.lsp.buf.rename()<CR>')
   -- map('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
   -- NOTE: Order is important. You can't lazy load lexima.vim
   g['lexima_no_defualt_rules'] = true
@@ -424,6 +444,23 @@ lsp_installer.on_server_ready(function(server)
   server:setup(opts)
   vim.cmd [[ do User LspAttachBuffers ]]
 end)
+
+-------------------------
+-- LSP Handlers (general)
+-------------------------
+-- :help lsp-method
+-- :help lsp-handler
+
+local lsp_handlers_hover = vim.lsp.with(vim.lsp.handlers.hover, {
+  border = 'single'
+})
+vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
+  local bufnr, winnr = lsp_handlers_hover(err, result, ctx, config)
+  if winnr ~= nil then
+    vim.api.nvim_win_set_option(winnr, "winblend", 20)  -- opacity for hover
+  end
+  return bufnr, winnr
+end
 
 -------------------- LSP w/ Cmp-----------------------------
 -- Setup our autocompletion. These configuration options are the default ones
@@ -516,8 +553,10 @@ end
 
 vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
   'TermOpen * lua init_term()',
-  'TextYankPost * lua vim.highlight.on_yank { hi_group="IncSearch", timeout=150, on_visual=true }',
+  'TextYankPost * silent! lua vim.highlight.on_yank({ hi_group="IncSearch", timeout=150, on_visual=true })',
   'FileType elixir,eelixir iab pp \\|>',
-  'BufWritePre *.{ex,exs} :lua vim.lsp.buf.formatting()',
+  'BufWritePre *.{ex,exs,heex} lua vim.lsp.buf.formatting_sync()',
+  'BufWritePre *.svelte lua vim.lsp.buf.formatting_sync()',
+  'BufWritePre *.{js,ts,json} lua vim.lsp.buf.formatting_sync()',
   "FileType sql,mysql,plsql lua require('cmp').setup.buffer({ sources = {{ name = 'vim-dadbod-completion' }} })"
 })
