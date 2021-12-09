@@ -73,6 +73,7 @@ require('packer').startup{ function()
   }
   use 'lervag/vimtex'
   use 'machakann/vim-sandwich'       -- sr({ sd' <select text>sa'
+  -- lsp
   use 'neovim/nvim-lspconfig'
   use 'williamboman/nvim-lsp-installer'
   -- autocomplete and snippets
@@ -92,6 +93,7 @@ require('packer').startup{ function()
       {'onsails/lspkind-nvim'}
     }
   }
+  -- lsp-diagnostics
   use {
     "folke/trouble.nvim",
     requires = "kyazdani42/nvim-web-devicons",
@@ -113,7 +115,7 @@ require('packer').startup{ function()
   }
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
-  use 'lukas-reineke/indent-blankline.nvim'
+  -- use 'lukas-reineke/indent-blankline.nvim'
   -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
   use 'yamatsum/nvim-cursorline'
 end,
@@ -181,7 +183,7 @@ require'lualine'.setup {
 require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
 map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 -- indent-blankline
-g.indentLine_fileTypeExclude = {"json"}
+-- g.indentLine_fileTypeExclude = {"json"}
 -- g.indentLine_char = "│"
 -- kommentary
 g['kommentary_create_default_mappings'] = false
@@ -221,6 +223,8 @@ require'nvim-tree'.setup {
 }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
+-- trouble
+map('n','<leader>tt', '<cmd>TroubleToggle<CR>', {noremap = true, silent = true})
 -- vi-viz
 map('x','v', "<cmd>lua require('vi-viz').vizExpand()<CR>", {noremap = true})
 map('x','V', "<cmd>lua require('vi-viz').vizContract()<CR>", {noremap = true})
