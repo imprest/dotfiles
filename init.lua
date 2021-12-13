@@ -82,6 +82,7 @@ require('packer').startup{ function()
     requires = {
       {'windwp/nvim-autopairs'               },
       {'hrsh7th/cmp-nvim-lsp'                },
+      {'hrsh7th/cmp-nvim-lua'                },
       {'hrsh7th/cmp-buffer'                  },
       {'hrsh7th/cmp-path'                    },
       {'hrsh7th/cmp-vsnip'                   },
@@ -528,12 +529,12 @@ cmp.setup({
     end, { "i", "s" }),
   },
   sources = cmp.config.sources({
-    { name = "path" },
-    { name = "nvim_lsp_document_symbol" },
-    { name = "buffer" },
     { name = "nvim_lsp" },
     { name = "nvim_lua" },
+    { name = "nvim_lsp_document_symbol" },
     { name = "vsnip" },
+    { name = "path" },
+    { name = "buffer", keyword_length = 5 },
     { name = "spell" },
     { name = "tags" },
     { name = "vim_dadbod_completion" },
