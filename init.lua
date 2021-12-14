@@ -42,7 +42,6 @@ require('packer').startup{ function()
   use 'alvan/vim-closetag'          -- Close html tags
   use {'akinsho/nvim-bufferline.lua', requires = {'ojroques/nvim-bufdel'}}
   use 'airblade/vim-rooter'
-  use 'b3nj5m1n/kommentary'
   use 'cohama/lexima.vim'
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
@@ -75,6 +74,11 @@ require('packer').startup{ function()
   use 'machakann/vim-sandwich'       -- sr({ sd' <select text>sa'
   -- lsp
   use 'neovim/nvim-lspconfig'
+  use {'numToStr/Comment.nvim',
+    config = function()
+      require('Comment').setup()
+    end
+  }
   use 'williamboman/nvim-lsp-installer'
   -- autocomplete and snippets
   use {
@@ -163,7 +167,7 @@ require'lualine'.setup {
   sections = {
     lualine_a = {'mode'},
     lualine_b = {'branch', 'diff',
-                  {'diagnostics', sources={'nvim_lsp'}}},
+                  {'diagnostics', sources={'nvim_diagnostic'}}},
     lualine_c = {'filename'},
     lualine_x = {'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
@@ -186,24 +190,6 @@ map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 -- indent-blankline
 -- g.indentLine_fileTypeExclude = {"json"}
 -- g.indentLine_char = "│"
--- kommentary
-g['kommentary_create_default_mappings'] = false
-map('n', '<leader>cc', '<Plug>kommentary_line_default'  , { noremap = false })
-map('n', '<leader>c' , '<Plug>kommentary_motion_default', { noremap = false })
-map('v', '<leader>c' , '<Plug>kommentary_visual_default', { noremap = false })
-local config = require('kommentary.config')
-config.configure_language(
-  "default",
-  {
-    prefer_single_line_comments = true
-  }
-)
-config.configure_language("typescriptreact", {
-  hook_function = function()
-    pre_comment_hook = require('ts_context_commentstring.internal').update_commentstring()
-  end,
-  prefer_single_line_comments = true,
-})
 -- nvim-autopairs
 require('nvim-autopairs').setup()
 -- nvim-bufferline
@@ -214,6 +200,8 @@ require('bufferline').setup{
     show_buffer_icons = true
   }
 }
+-- nvim-cursorline
+vim.g.cursorline_timeout = 30000
 -- nvim-tree
 require'nvim-tree'.setup {
   auto_close = true;
