@@ -549,7 +549,7 @@ vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
   'TextYankPost * silent! lua vim.highlight.on_yank({ hi_group="IncSearch", timeout=150, on_visual=true })',
   'FileType elixir,eelixir iab pp \\|>',
   'BufWritePre *.{ex,exs,heex} lua vim.lsp.buf.formatting_sync()',
-  'BufWritePre *.svelte lua vim.lsp.buf.formatting_sync()',
+  'BufWritePre *.{svelte,css,scss} lua vim.lsp.buf.formatting_sync()',
   'BufWritePre *.{js,ts,json} lua vim.lsp.buf.formatting_sync()',
   "FileType sql,mysql,plsql lua require('cmp').setup.buffer({ sources = {{ name = 'vim-dadbod-completion' }} })"
 })
