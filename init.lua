@@ -203,12 +203,10 @@ require('bufferline').setup{
 -- nvim-cursorline
 vim.g.cursorline_timeout = 30000
 -- nvim-tree
+g.nvim_tree_group_empty           = 1;
+g.nvim_tree_disable_window_picker = 1;
 require'nvim-tree'.setup {
   auto_close = true;
-  nvim_tree_hide_dotfiles = true;
-  nvim_tree_gitignore             = 1;
-  nvim_tree_group_empty           = 1;
-  nvim_tree_disable_window_picker = 1;
 }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
