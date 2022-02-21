@@ -34,6 +34,9 @@ sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep ttf-fira-code exa starship
 # yay packages
 # yay -S tectonic
 
+# starship.toml
+ln -sf `pwd`/starship.toml ~/.config/starship.toml
+
 # git
 git config --global user.email "hardikvaria@gmail.com"
 git config --global user.name  "Hardik Varia"
