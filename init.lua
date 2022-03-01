@@ -13,7 +13,7 @@ end
 
 g['loaded_python_provider'] = 1
 g['python3_host_prog'] = '/usr/bin/python3'
-g['mapleader'] = ","
+g['mapleader'] = ' '
 g['maplocalleader'] = ";"
 
 -------------------- PACKER  -------------------------------
@@ -121,8 +121,9 @@ require('packer').startup{ function()
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   -- use 'lukas-reineke/indent-blankline.nvim'
-  -- use 'dstein64/nvim-scrollview'    -- Show a terminal scroll line on right side
-  use 'yamatsum/nvim-cursorline'
+  -- use 'dstein64/nvim-scrollview'       -- Show a terminal scroll line on right side
+  use 'simrat39/symbols-outline.nvim'
+  use 'folke/which-key.nvim'
 end,
   config = {
     display = {
@@ -148,7 +149,7 @@ require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }
 -- fzf
 map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
 map('n', '<leader>o', '<cmd>lua require("fzf-lua").files()<CR>')
-map('n', '<leader>l', '<cmd>lua require("fzf-lua").blines()<CR>')
+map('n', '<leader>bl', '<cmd>lua require("fzf-lua").blines()<CR>')
 map('n', '<leader>g', '<cmd>lua require("fzf-lua").git_commits()<CR>')
 map('n', '<leader>f', '<cmd>lua require("fzf-lua").grep()<CR>')
 map('n', '<leader>b', "<cmd>lua require('fzf-lua').buffers()<CR>")
@@ -200,8 +201,6 @@ require('bufferline').setup{
     show_buffer_icons = true
   }
 }
--- nvim-cursorline
-vim.g.cursorline_timeout = 30000
 -- nvim-tree
 g.nvim_tree_group_empty           = 1;
 g.nvim_tree_disable_window_picker = 1;
@@ -383,7 +382,6 @@ local on_attach = function(client, bufnr)
   -- Always use signcolumn for the current buffer
   vim.wo.signcolumn = 'yes:1'
 
-  
   -- Activate LSP signature on attach.
   on_attach_lsp_signature(client, bufnr)
 
@@ -392,19 +390,19 @@ local on_attach = function(client, bufnr)
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local opts = { noremap=true, silent=true }
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-  buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-  buf_set_keymap('n', '<space>r', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  buf_set_keymap('n', '<space>c', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  buf_set_keymap("n", "<space>t", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-  buf_set_keymap("n", "<space>h", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-  -- map("n", "<space>s", "<cmd>lua vim.lsp.buf.document_symbol()<cr>")
+  buf_set_keymap('n', '<leader>lD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', '<leader>ld', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', '<leader>li', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<leader>lK', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', '<leader>lp', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  buf_set_keymap('n', '<leader>ln', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  buf_set_keymap("n", "<leader>lf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  buf_set_keymap('n', '<leader>lR', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<leader>lc', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap("n", "<leader>lt", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+  buf_set_keymap("n", "<leader>lh", "<cmd>lua vim.lsp.buf.signture_help()<CR>", opts)
+  buf_set_keymap("n", "<leader>ls", "<cmd>lua vim.lsp.buf.document_symbol()<CR>", opts)
   -- NOTE: Order is important. You can't lazy load lexima.vim
   g['lexima_no_defualt_rules'] = true
   g['lexima_enable_endwise_rules'] = 1
