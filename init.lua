@@ -74,9 +74,26 @@ require('packer').startup{ function()
   use 'machakann/vim-sandwich'       -- sr({ sd' <select text>sa'
   -- lsp
   use 'neovim/nvim-lspconfig'
+  use 'JoosepAlviste/nvim-ts-context-commentstring'
   use {'numToStr/Comment.nvim',
     config = function()
-      require('Comment').setup()
+      require('Comment').setup {
+        pre_hook = function(ctx)
+          local U = require 'Comment.utils'
+
+          local location = nil
+          if ctx.ctype == U.ctype.block then
+            location = require('ts_context_commentstring.utils').get_cursor_location()
+          elseif ctx.cmotion == U.cmotion.v or ctx.cmotion == U.cmotion.V then
+            location = require('ts_context_commentstring.utils').get_visual_start_location()
+          end
+
+          return require('ts_context_commentstring.internal').calculate_commentstring {
+            key = ctx.ctype == U.ctype.line and '__default' or '__multiline',
+            location = location,
+          }
+        end,
+      }
     end
   }
   use 'williamboman/nvim-lsp-installer'
@@ -119,6 +136,7 @@ require('packer').startup{ function()
   }
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
+  use 'akinsho/toggleterm.nvim'
   use 'simrat39/symbols-outline.nvim'
   use 'folke/which-key.nvim'
   use {
@@ -359,6 +377,7 @@ map('v', '<leader>S', ':s//gcI<Left><Left><Left><Left>')
 local ts = require 'nvim-treesitter.configs'
 ts.setup {
   ensure_installed = {"css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
+  context_commentstring = { enable = true, enable_autocmd = false },
   highlight = {enable = true}, indent = {enable = false} -- indent is experimental
 }
 
