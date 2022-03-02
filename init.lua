@@ -14,7 +14,7 @@ end
 g['loaded_python_provider'] = 1
 g['python3_host_prog'] = '/usr/bin/python3'
 g['mapleader'] = ' '
-g['maplocalleader'] = ";"
+g['maplocalleader'] = ","
 
 -------------------- PACKER  -------------------------------
 local execute = vim.api.nvim_command
@@ -46,7 +46,7 @@ require('packer').startup{ function()
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
-  use 'joshdick/onedark.vim'
+  -- use 'olimorris/onedarkpro.nvim'
   use 'marko-cerovac/material.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
@@ -106,13 +106,12 @@ require('packer').startup{ function()
       require("trouble").setup {}
     end
   }
-  use 'norcalli/nvim-colorizer.lua'
+  use 'NvChad/nvim-colorizer.lua'
   use 'nvim-lualine/lualine.nvim'
   use 'olambo/vi-viz'
   use 'ojroques/nvim-lspfuzzy'
   use 'pbrisbin/vim-mkdir'           -- :e this/does/not/exist/file.txt then :w
   use 'phaazon/hop.nvim'
-  use 'terryma/vim-smooth-scroll'
   use {
     'TimUntersberger/neogit',
     config = function() require("neogit").setup{} end,
@@ -120,10 +119,14 @@ require('packer').startup{ function()
   }
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
-  -- use 'lukas-reineke/indent-blankline.nvim'
-  -- use 'dstein64/nvim-scrollview'       -- Show a terminal scroll line on right side
   use 'simrat39/symbols-outline.nvim'
   use 'folke/which-key.nvim'
+  use {
+    'max397574/better-escape.nvim',
+    config = function()
+      require("better_escape").setup()
+    end
+  }
 end,
   config = {
     display = {
@@ -159,7 +162,7 @@ g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 require'lualine'.setup {
   options = {
     icons_enabled = true,
-    theme = 'palenight',
+    theme = 'auto',
     component_separators = { left = '', right = ''},
     section_separators = { left = '', right = ''},
     disabled_filetypes = { "NvimTree", "Telescope" },
@@ -188,9 +191,6 @@ require'lualine'.setup {
 -- hop
 require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
 map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
--- indent-blankline
--- g.indentLine_fileTypeExclude = {"json"}
--- g.indentLine_char = "│"
 -- nvim-autopairs
 require('nvim-autopairs').setup()
 -- nvim-bufferline
@@ -202,10 +202,13 @@ require('bufferline').setup{
   }
 }
 -- nvim-tree
-g.nvim_tree_group_empty           = 1;
-g.nvim_tree_disable_window_picker = 1;
 require'nvim-tree'.setup {
   auto_close = true;
+  actions = {
+    open_file = {
+      window_picker = { enable = false }
+    }
+  }
 }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
@@ -228,9 +231,6 @@ map('x', '<leader>p', '<Plug>(DBExe)', {noremap=false})
 map('n', '<leader>p', '<Plug>(DBExe)', {noremap=false})
 map('o', '<leader>p', '<Plug>(DBExe)', {noremap=false})
 map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
--- vim-smooth-scroll
-map('n', '<c-e>', ':call smooth_scroll#up(&scroll, 15, 4)<CR>zz', {silent=true})
-map('n', '<c-d>', ':call smooth_scroll#down(&scroll, 15, 4)<CR>zz', {silent=true})
 -- vim-svelte
 g['vim_svelte_plugin_load_full_syntax'] = 1
 -- vim-sandwich
@@ -239,11 +239,13 @@ cmd 'runtime macros/sandwich/keymap/surround.vim'
 g['vimtex_quickfix_mode'] = 0
 g['vimtex_compiler_method'] = 'tectonic'
 g['vimtex_view_general_viewer'] = 'evince'
-
+-- material colorsheme setup
+require('material').setup({ italics = { comments = true }, lualine_style = 'stealth' })
 -------------------- OPTIONS -------------------------------
 local width = 96
 cmd 'colorscheme material'
-g.material_style = "palenight"
+g.material_style = "deep ocean"
+o.background = 'dark'
 -- global options
 o.timeoutlen = 300                        -- mapping timeout
 o.hidden = true                           -- Enable background buffers
@@ -279,7 +281,7 @@ wo.signcolumn = 'yes'                     -- Show sign column
 wo.wrap = true                            -- Disable line wrap
 wo.foldmethod = 'expr'
 wo.foldexpr = 'nvim_treesitter#foldexpr()'
-wo.foldlevel = 4
+wo.foldlevel = 6
 -- buffer-local options
 o.tabstop = 2                             -- Number of spaces tabs count for
 o.expandtab = true                        -- Use spaces instead of tabs
@@ -305,7 +307,6 @@ map('i', '<A-k>', '<Esc>:m .-2<CR>==gi')
 map('v', '<A-j>', ':m \'>+1<CR>gv=gv')
 map('v', '<A-k>', ':m \'<-2<CR>gv=gv')
 -- Escape
-map('i', 'jk', '<ESC>')
 map('t', 'jk', '<ESC>', {noremap = false})
 map('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"' , {expr = true})
 -- Navigation & Window management
