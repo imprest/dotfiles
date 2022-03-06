@@ -46,8 +46,7 @@ require('packer').startup{ function()
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
-  -- use 'olimorris/onedarkpro.nvim'
-  use 'marko-cerovac/material.nvim'
+  use 'LunarVim/onedarker.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
   use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
@@ -211,14 +210,6 @@ require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
 map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 -- nvim-autopairs
 require('nvim-autopairs').setup()
--- nvim-bufferline
-require('bufferline').setup{
-  options = {
-    show_close_icon = false,
-    show_buffer_close_icons = false,
-    show_buffer_icons = true
-  }
-}
 -- nvim-tree
 require'nvim-tree'.setup {
   auto_close = true;
@@ -257,12 +248,9 @@ cmd 'runtime macros/sandwich/keymap/surround.vim'
 g['vimtex_quickfix_mode'] = 0
 g['vimtex_compiler_method'] = 'tectonic'
 g['vimtex_view_general_viewer'] = 'evince'
--- material colorsheme setup
-require('material').setup({ italics = { comments = true }, lualine_style = 'stealth' })
 -------------------- OPTIONS -------------------------------
 local width = 96
-cmd 'colorscheme material'
-g.material_style = "deep ocean"
+cmd 'colorscheme onedarker'
 o.background = 'dark'
 -- global options
 o.timeoutlen = 300                        -- mapping timeout
@@ -291,7 +279,7 @@ o.swapfile = false
 o.undofile = true
 o.undodir = '/home/hvaria/.nvim/undo'
 -- window-local options
-wo.cursorline = false                     -- Highlight cursor line
+wo.cursorline = true                      -- Highlight cursor line
 wo.list = true                            -- Show some invisible characters
 wo.relativenumber = false                 -- Relative line numbers
 wo.number = true                          -- Show line numbers
