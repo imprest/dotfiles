@@ -17,7 +17,7 @@ zinit for \
   light-mode agkozak/zsh-z \
   light-mode zsh-users/zsh-autosuggestions \
   light-mode zsh-users/zsh-completions \
-  light-mode zdharma-continuum/history-search-multi-word \  # Ctrl-R activate
+  light-mode zdharma-continuum/history-search-multi-word \
   light-mode zsh-users/zsh-history-substring-search
 
 zinit ice wait lucid
