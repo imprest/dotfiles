@@ -23,11 +23,11 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep ttf-fira-code ttf-jetbrains-mono ttf-fonts-noto-sans-mono exa starship trash-cli lazygit\
+sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep ttf-fira-code ttf-jetbrains-mono ttf-fonts-noto-sans-mono exa starship trash-cli lazygit fd\
   erlang elixir fop wxgtk inotify-tools postgresql
 # size 9 in qterminal for fira mono retina 
 # gnome-terminal text/background Gnome | palette Tango
-# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Fira Code Retina 10'"
+# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'FiraCode Bold 10'"
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'JetBrainsMono 10'"
 # optional
 # weechat pdfarranger

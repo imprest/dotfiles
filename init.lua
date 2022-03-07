@@ -176,29 +176,167 @@ map('n', '<leader>b', "<cmd>lua require('fzf-lua').buffers()<CR>")
 map('n', '<leader>r', '<cmd>lua require("fzf-lua").oldfiles()<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 -- lualine
+local colors = {
+  bg = "#282c34",
+  fg = "#bbc2cf",
+  yellow = "#ECBE7B",
+  cyan = "#008080",
+  darkblue = "#081633",
+  green = "#98be65",
+  orange = "#FF8800",
+  violet = "#a9a1e1",
+  magenta = "#c678dd",
+  purple = "#c678dd",
+  blue = "#51afef",
+  red = "#ec5f67",
+}
+local window_width_limit = 70
+local conditions = {
+  buffer_not_empty = function()
+    return vim.fn.empty(vim.fn.expand "%:t") ~= 1
+  end,
+  hide_in_width = function()
+    return vim.fn.winwidth(0) > window_width_limit
+  end,
+  -- check_git_workspace = function()
+  --   local filepath = vim.fn.expand "%:p:h"
+  --   local gitdir = vim.fn.finddir(".git", filepath .. ";")
+  --   return gitdir and #gitdir > 0 and #gitdir < #filepath
+  -- end,
+}
+local function diff_source()
+  local gitsigns = vim.b.gitsigns_status_dict
+  if gitsigns then
+    return {
+      added = gitsigns.added,
+      modified = gitsigns.changed,
+      removed = gitsigns.removed,
+    }
+  end
+end
 require'lualine'.setup {
   options = {
     icons_enabled = true,
     theme = 'auto',
-    component_separators = { left = '', right = ''},
-    section_separators = { left = '', right = ''},
-    disabled_filetypes = { "NvimTree", "Telescope" },
+    component_separators = { left = '', right = ''},
+    section_separators = { left = '', right = ''},
+    disabled_filetypes = { "NvimTree", "Telescope", "Outline", "dashboard" },
     always_divide_middle = true,
   },
   sections = {
-    lualine_a = {'mode'},
-    lualine_b = {'branch', 'diff',
-                  {'diagnostics', sources={'nvim_diagnostic'}}},
-    lualine_c = {'filename'},
-    lualine_x = {'encoding', 'fileformat', 'filetype'},
-    lualine_y = {'progress'},
-    lualine_z = {'location'}
+    lualine_a = {{ -- mode
+      function() return " " end,
+      padding = { left = 0, right = 0 },
+      color = {},
+      cond = nil,
+    }},
+    lualine_b = {
+      { -- 'branch'
+        "b:gitsigns_head",
+        icon = " ",
+        color = { gui = "bold" },
+        cond = conditions.hide_in_width,
+      },
+      { -- 'filename' 
+        "filename",
+        color = {},
+        cond = nil,
+      }
+    },
+    -- {'diagnostics', sources={'nvim_diagnostic'}}},
+    lualine_c = {
+      { -- 'diff' 
+        "diff",
+        source = diff_source,
+        symbols = { added = "  ", modified = " ", removed = " " },
+        diff_color = {
+          added = { fg = colors.green, bg = colors.bg },
+          modified = { fg = colors.yellow, bg = colors.bg },
+          removed = { fg = colors.red, bg = colors.bg },
+        },
+        color = {},
+        cond = nil,
+      }
+    },
+    lualine_x = {
+      { -- 'diagnostics'
+        "diagnostics",
+        sources = { "nvim_diagnostic" },
+        symbols = { error = " ", warn = " ", info = " ", hint = " " },
+        color = { bg = colors.bg },
+        cond = conditions.hide_in_width,
+      },
+      { -- 'treesitter'
+        function()
+          local b = vim.api.nvim_get_current_buf()
+          if next(vim.treesitter.highlighter.active[b]) then
+            return ""
+          end
+          return ""
+        end,
+        color = { fg = colors.green },
+        cond = conditions.hide_in_width,
+      },
+      { -- 'lsp'
+      	function(msg)
+          msg = msg or "LSP"
+          local buf_clients = vim.lsp.buf_get_clients()
+          if next(buf_clients) == nil then
+            -- TODO: clean up this if statement
+            if type(msg) == "boolean" or #msg == 0 then
+              return ""
+            end
+            return msg
+          end
+          local buf_ft = vim.bo.filetype
+          local buf_client_names = {}
+
+          -- add client
+          for _, client in pairs(buf_clients) do
+            if client.name ~= "null-ls" then
+              table.insert(buf_client_names, client.name)
+            end
+          end
+
+          -- add formatter
+          -- local formatters = require "lvim.lsp.null-ls.formatters"
+          -- local supported_formatters = formatters.list_registered(buf_ft)
+          -- vim.list_extend(buf_client_names, supported_formatters)
+
+          -- add linter
+          -- local linters = require "lvim.lsp.null-ls.linters"
+          -- local supported_linters = linters.list_registered(buf_ft)
+          -- vim.list_extend(buf_client_names, supported_linters)
+
+          return "[" .. table.concat(buf_client_names, ", ") .. "]"
+        end,
+        color = { bg = colors.bg, gui = "bold" },
+        cond = conditions.hide_in_width,
+      },
+      { "filetype", cond = conditions.hide_in_width, color = { bg = colors.bg } },
+    },
+    lualine_y = {},
+    lualine_z = {
+      {
+        function()
+          local current_line = vim.fn.line "."
+          local total_lines = vim.fn.line "$"
+          local chars = { "__", "▁▁", "▂▂", "▃▃", "▄▄", "▅▅", "▆▆", "▇▇", "██" }
+          local line_ratio = current_line / total_lines
+          local index = math.ceil(line_ratio * #chars)
+          return chars[index]
+        end,
+        padding = { left = 0, right = 0 },
+        color = { fg = colors.yellow, bg = colors.bg },
+        cond = nil,
+      },
+    }
   },
   inactive_sections = {
-    lualine_a = {},
+    lualine_a = { 'filename' },
     lualine_b = {},
-    lualine_c = {'filename'},
-    lualine_x = {'location'},
+    lualine_c = {},
+    lualine_x = {},
     lualine_y = {},
     lualine_z = {}
   },
@@ -212,11 +350,114 @@ map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 require('nvim-autopairs').setup()
 -- nvim-tree
 require'nvim-tree'.setup {
-  auto_close = true;
+  disable_netrw = true,
+  hijack_netrw = true,
+  open_on_setup = false,
+  ignore_buffer_on_setup = false,
+  ignore_ft_on_setup = {
+    "startify",
+    "dashboard",
+    "alpha",
+  },
+  auto_reload_on_write = true,
+  hijack_unnamed_buffer_when_opening = false,
+  hijack_directories = {
+    enable = true,
+    auto_open = true,
+  },
+  update_to_buf_dir = {
+    enable = true,
+    auto_open = true,
+  },
+  auto_close = false,
+  open_on_tab = false,
+  hijack_cursor = false,
+  update_cwd = false,
+  diagnostics = {
+    enable = true,
+    icons = {
+      hint = "",
+      info = "",
+      warning = "",
+      error = "",
+    },
+  },
+  update_focused_file = {
+    enable = true,
+    update_cwd = true,
+    ignore_list = {},
+  },
+  system_open = {
+    cmd = nil,
+    args = {},
+  },
+  git = {
+    enable = true,
+    ignore = false,
+    timeout = 200,
+  },
+  view = {
+    width = 30,
+    height = 30,
+    hide_root_folder = false,
+    side = "left",
+    auto_resize = false,
+    mappings = {
+      custom_only = false,
+      list = {},
+    },
+    number = false,
+    relativenumber = false,
+    signcolumn = "yes",
+  },
+  filters = {
+    dotfiles = false,
+    custom = { "node_modules", ".cache" },
+  },
+  trash = {
+    cmd = "trash",
+    require_confirm = true,
+  },
   actions = {
+    change_dir = {
+      global = false,
+    },
     open_file = {
-      window_picker = { enable = false }
-    }
+      quit_on_open = false,
+    },
+    window_picker = {
+      enable = false,
+      chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+      exclude = {},
+    },
+  },
+  show_icons = {
+    git = 1,
+    folders = 1,
+    files = 1,
+    folder_arrows = 1,
+  },
+  git_hl = 1,
+  root_folder_modifier = ":t",
+  icons = {
+    default = "",
+    symlink = "",
+    git = {
+      unstaged = "",
+      staged = "S",
+      unmerged = "",
+      renamed = "➜",
+      deleted = "",
+      untracked = "U",
+      ignored = "◌",
+    },
+    folder = {
+      default = "",
+      open = "",
+      empty = "",
+      empty_open = "",
+      symlink = "",
+    },
   }
 }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
@@ -287,7 +528,7 @@ wo.signcolumn = 'yes'                     -- Show sign column
 wo.wrap = true                            -- Disable line wrap
 wo.foldmethod = 'expr'
 wo.foldexpr = 'nvim_treesitter#foldexpr()'
-wo.foldlevel = 6
+wo.foldlevel = 9
 -- buffer-local options
 o.tabstop = 2                             -- Number of spaces tabs count for
 o.expandtab = true                        -- Use spaces instead of tabs
