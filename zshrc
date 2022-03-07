@@ -13,18 +13,16 @@ fi
 source "${ZINIT_HOME}/zinit.zsh"
 
 zinit ice wait lucid
-zinit load rupa/z
-zinit ice wait lucid
-zinit light zsh-users/zsh-completions
-zinit ice wait lucid
-zinit light zsh-users/zsh-autosuggestions
-zinit ice wait lucid
-zinit load zdharma-continuum/history-search-multi-word # Ctrl-R to activate
-zinit light starship/starship
-zstyle :plugin:history-search-multi-word reset-prompt-protect 1
-zinit ice wait lucid
-zinit light zsh-users/zsh-history-substring-search
+zinit for \
+  light-mode agkozak/zsh-z \
+  light-mode zsh-users/zsh-autosuggestions \
+  light-mode zsh-users/zsh-completions \
+  light-mode zdharma-continuum/history-search-multi-word \  # Ctrl-R activate
+  light-mode zsh-users/zsh-history-substring-search
 
+zinit ice wait lucid
+zstyle :plugin:history-search-multi-word reset-prompt-protect 1
+  
 # historical backward/forward search with linehead string binded to ^P/^N
 autoload history-search-end
 zle -N history-beginning-search-backward-end history-search-end
@@ -95,8 +93,10 @@ bindkey '^[[Z' reverse-menu-complete   # Shift-Tab
 
 # Aliases
 alias vim="nvim"
+alias ls='ls --color=auto'
 alias e="exa --long --git --header --sort=type"
 alias et="exa -T"
+alias g="lazygit"
 alias gd="git diff"
 alias gs="git status"
 alias gl="git log --oneline --decorate -20"
@@ -115,6 +115,18 @@ alias pacS="pacman --query --search"
 alias pacman-list-orphans="sudo pacman --query --deps --unrequired"
 alias pacman-remove-orphans="sudo pacman --remove --recursive \$(pacman --quiet --query --deps --unrequired)"
 alias pacU="sudo pacman --sync --refresh --sysupgrade"
+# confirm before overwriting something
+alias cp="cp -i"
+alias mv='mv -i'
+alias rm='rm -i'
+# easier to read disk
+alias df='df -h'     # human-readable sizes
+# get top process eating memory
+alias psmem='ps auxf | sort -nr -k 4 | head -5'
+# get top process eating cpu ##
+alias pscpu='ps auxf | sort -nr -k 3 | head -5'
+# systemd
+alias mach_list_systemctl="systemctl list-unit-files --state=enabled"
 
 # asdf
 . $HOME/.asdf/asdf.sh
