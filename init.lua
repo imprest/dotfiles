@@ -237,7 +237,7 @@ require'lualine'.setup {
         color = { gui = "bold" },
         cond = conditions.hide_in_width,
       },
-      { -- 'filename' 
+      { -- 'filename'
         "filename",
         color = {},
         cond = nil,
@@ -245,7 +245,7 @@ require'lualine'.setup {
     },
     -- {'diagnostics', sources={'nvim_diagnostic'}}},
     lualine_c = {
-      { -- 'diff' 
+      { -- 'diff'
         "diff",
         source = diff_source,
         symbols = { added = "  ", modified = " ", removed = " " },
@@ -288,7 +288,7 @@ require'lualine'.setup {
             end
             return msg
           end
-          local buf_ft = vim.bo.filetype
+          -- local buf_ft = vim.bo.filetype
           local buf_client_names = {}
 
           -- add client
@@ -520,10 +520,10 @@ o.swapfile = false
 o.undofile = true
 o.undodir = '/home/hvaria/.nvim/undo'
 -- window-local options
-wo.cursorline = true                      -- Highlight cursor line
+wo.cursorline = false                     -- Highlight cursor line
 wo.list = true                            -- Show some invisible characters
 wo.relativenumber = false                 -- Relative line numbers
-wo.number = true                          -- Show line numbers
+wo.number = false                         -- Show line numbers
 wo.signcolumn = 'yes'                     -- Show sign column
 wo.wrap = true                            -- Disable line wrap
 wo.foldmethod = 'expr'
