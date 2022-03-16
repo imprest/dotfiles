@@ -46,6 +46,7 @@ require('packer').startup{ function()
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
+  use 'tanvirtin/monokai.nvim'
   use 'LunarVim/onedarker.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
