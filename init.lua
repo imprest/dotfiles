@@ -494,6 +494,7 @@ local width = 96
 cmd 'colorscheme onedarker'
 o.background = 'dark'
 -- global options
+o.guicursor='n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175,a:blinkon1'
 o.timeoutlen = 300                        -- mapping timeout
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse
@@ -508,7 +509,6 @@ o.smartcase = true                        -- Don't ignore case with capitals
 o.splitbelow = true                       -- Put new windows below current
 o.splitright = true                       -- Put new windows right of current
 o.updatetime = 200                        -- Delay before swap file is saved
-o.wildmode = 'list:full'                  -- Command-line completion mode
 o.shortmess = 'IFc'                       -- Avoid showing extra message on completion
 o.showbreak = '↪ '
 o.showmode = false
@@ -523,7 +523,7 @@ o.undodir = '/home/hvaria/.nvim/undo'
 wo.cursorline = false                     -- Highlight cursor line
 wo.list = true                            -- Show some invisible characters
 wo.relativenumber = false                 -- Relative line numbers
-wo.number = false                         -- Show line numbers
+wo.number = true                          -- Show line numbers
 wo.signcolumn = 'yes'                     -- Show sign column
 wo.wrap = true                            -- Disable line wrap
 wo.foldmethod = 'expr'
