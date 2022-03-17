@@ -47,12 +47,7 @@ require('packer').startup{ function()
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
   use 'Shatur/neovim-session-manager'
-  use {'goolord/alpha-nvim',
-    config = function ()
-      require'alpha'.setup(require'alpha.themes.dashboard'.config)
-    end
-  }
-  -- use 'tanvirtin/monokai.nvim'
+  use 'tanvirtin/monokai.nvim'
   -- use 'navarasu/onedark.nvim'
   use 'LunarVim/onedarker.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
@@ -145,7 +140,46 @@ require('packer').startup{ function()
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   use 'akinsho/toggleterm.nvim'
   use 'simrat39/symbols-outline.nvim'
-  use 'folke/which-key.nvim'
+  use {'folke/which-key.nvim',
+    config = function()
+      require("which-key").setup {
+        plugins = {
+          marks = true, -- shows a list of your marks on ' and `
+          registers = true, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
+          -- the presets plugin, adds help for a bunch of default keybindings in Neovim
+          -- No actual key bindings are created
+          presets = {
+            operators = false, -- adds help for operators like d, y, ...
+            motions = false, -- adds help for motions
+            text_objects = false, -- help for text objects triggered after entering an operator
+            windows = true, -- default bindings on <c-w>
+            nav = true, -- misc bindings to work with windows
+            z = true, -- bindings for folds, spelling and others prefixed with z
+            g = true, -- bindings for prefixed with g
+          },
+          spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints
+        },
+        icons = {
+          breadcrumb = "»", -- symbol used in the command line area that shows your active key combo
+          separator = "➜", -- symbol used between a key and it's label
+          group = "+", -- symbol prepended to a group
+        },
+        window = {
+          border = "single", -- none, single, double, shadow
+          position = "bottom", -- bottom, top
+          margin = { 1, 0, 1, 0 }, -- extra window margin [top, right, bottom, left]
+          padding = { 2, 2, 2, 2 }, -- extra window padding [top, right, bottom, left]
+        },
+        layout = {
+          height = { min = 4, max = 25 }, -- min and max height of the columns
+          width = { min = 20, max = 50 }, -- min and max width of the columns
+          spacing = 3, -- spacing between columns
+        },
+        hidden = { "<silent>", "<cmd>", "<Cmd>", "<CR>", "call", "lua", "^:", "^ " }, -- hide mapping boilerplate
+        show_help = true, -- show help message on the command line when the popup is visible
+      }
+    end
+  }
   use {
     'max397574/better-escape.nvim',
     config = function()
@@ -154,19 +188,62 @@ require('packer').startup{ function()
   }
 end,
   config = {
-    display = {
-      open_fn = function()
-        return require("packer.util").float({border = {"╭", "─", "╮", "│", "╯", "─", "╰", "│"}})
-      end,
-      working_sym = "",
-      error_sym = "",
-      done_sym = "",
-      moved_sym = ""
-    }
+    display = { open_fn = function() return require("packer.util").float() end }
   }
 }
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true                    -- True color support
+-- which-key
+local wk = require('which-key')
+wk.register({
+  ["/"] = { "<ESC><CMD>lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>", "Comment" }
+}, { prefix = "<leader>", mode = 'v' })
+wk.register({
+  ["w"] = { "<cmd>w!<CR>", "Save" },
+  ["q"] = { "<cmd>q!<CR>", "Quit" },
+  ["/"] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
+  ["c"] = { "<cmd>BufferKill<CR>", "Close Buffer" },
+  p = {
+    name = "Packer",
+    c = { "<cmd>PackerCompile<cr>", "Compile" },
+    i = { "<cmd>PackerInstall<cr>", "Install" },
+    r = { "<cmd>lua require('lvim.plugin-loader').recompile()<cr>", "Re-compile" },
+    s = { "<cmd>PackerSync<cr>", "Sync" },
+    S = { "<cmd>PackerStatus<cr>", "Status" },
+    u = { "<cmd>PackerUpdate<cr>", "Update" },
+  },
+  l = {
+    name = "LSP",
+    a = { "<cmd>lua require('lvim.core.telescope').code_actions()<cr>", "Code Action" },
+    d = { "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", "Buffer Diagnostics" },
+    w = { "<cmd>Telescope diagnostics<cr>", "Diagnostics" },
+    f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
+    i = { "<cmd>LspInfo<cr>", "Info" },
+    I = { "<cmd>LspInstallInfo<cr>", "Installer Info" },
+    j = {
+      "<cmd>lua vim.diagnostic.goto_next()<cr>",
+      "Next Diagnostic",
+    },
+    k = {
+      "<cmd>lua vim.diagnostic.goto_prev()<cr>",
+      "Prev Diagnostic",
+    },
+    l = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
+    p = {
+      name = "Peek",
+      d = { "<cmd>lua require('lvim.lsp.peek').Peek('definition')<cr>", "Definition" },
+      t = { "<cmd>lua require('lvim.lsp.peek').Peek('typeDefinition')<cr>", "Type Definition" },
+      i = { "<cmd>lua require('lvim.lsp.peek').Peek('implementation')<cr>", "Implementation" },
+    },
+    q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
+    r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+    s = { "<cmd>Telescope lsp_document_symbols<cr>", "Document Symbols" },
+    S = {
+      "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",
+      "Workspace Symbols",
+    },
+  },
+}, { prefix = "<leader>" })
 -- bufdel
 map('n', '<leader>w', '<cmd>BufDel<CR>')
 require('bufdel').setup {next = 'alternate'}
@@ -491,10 +568,10 @@ g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
 map('x', '<Plug>(DBExe)', 'db#op_exec()', {expr=true})
 map('n', '<Plug>(DBExe)', 'db#op_exec()', {expr=true})
 map('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', {expr=true})
-map('x', '<leader>p', '<Plug>(DBExe)', {noremap=false})
-map('n', '<leader>p', '<Plug>(DBExe)', {noremap=false})
-map('o', '<leader>p', '<Plug>(DBExe)', {noremap=false})
-map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
+-- map('x', '<leader>p', '<Plug>(DBExe)', {noremap=false})
+-- map('n', '<leader>p', '<Plug>(DBExe)', {noremap=false})
+-- map('o', '<leader>p', '<Plug>(DBExe)', {noremap=false})
+-- map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
 -- vim-svelte
 g['vim_svelte_plugin_load_full_syntax'] = 1
 -- vim-sandwich
@@ -557,6 +634,7 @@ map('n', '<C-s>', '<cmd>update<CR>')
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('n', '<F3>', '<cmd>lua toggle_wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
+map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
 map('n', '<leader>t', '<cmd>split<bar>res 10 <bar>terminal<CR>')
 map('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
 map('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
@@ -626,6 +704,12 @@ ts.setup {
 
 ------------------ LSP-INSTALL & CONFIG --------------------
 -- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
+-- lsp_diagnostics
+local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+for type, icon in pairs(signs) do
+  local hl = "DiagnosticSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
 -- lsp_signature
 local on_attach_lsp_signature = function(_, _)
   require('lsp_signature').on_attach({
@@ -653,19 +737,7 @@ local on_attach = function(client, bufnr)
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local opts = { noremap=true, silent=true }
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  buf_set_keymap('n', '<leader>lD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  buf_set_keymap('n', '<leader>ld', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  buf_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  buf_set_keymap('n', '<leader>li', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  buf_set_keymap('n', '<leader>lK', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  buf_set_keymap('n', '<leader>lp', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  buf_set_keymap('n', '<leader>ln', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-  buf_set_keymap("n", "<leader>lf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-  buf_set_keymap('n', '<leader>lR', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  buf_set_keymap('n', '<leader>lc', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  buf_set_keymap("n", "<leader>lt", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-  buf_set_keymap("n", "<leader>lh", "<cmd>lua vim.lsp.buf.signture_help()<CR>", opts)
-  buf_set_keymap("n", "<leader>ls", "<cmd>lua vim.lsp.buf.document_symbol()<CR>", opts)
+  -- Moved bindings to whick-key
   -- NOTE: Order is important. You can't lazy load lexima.vim
   g['lexima_no_defualt_rules'] = true
   g['lexima_enable_endwise_rules'] = 1
@@ -732,13 +804,9 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = 
 local lspkind = require('lspkind')
 cmp.setup({
   formatting = {
-    format = lspkind.cmp_format({with_text = true, menu = ({
-      buffer = "[Buffer]",
-      nvim_lsp = "[LSP]",
-      luasnip = "[LuaSnip]",
-      nvim_lua = "[Lua]",
-      latex_symbols = "[Latex]",
-    })})
+    format = lspkind.cmp_format({
+      mode = 'symbol'
+    })
   },
   snippet = {
     expand = function(args)
