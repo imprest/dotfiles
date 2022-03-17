@@ -46,7 +46,14 @@ require('packer').startup{ function()
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
-  use 'tanvirtin/monokai.nvim'
+  use 'Shatur/neovim-session-manager'
+  use {'goolord/alpha-nvim',
+    config = function ()
+      require'alpha'.setup(require'alpha.themes.dashboard'.config)
+    end
+  }
+  -- use 'tanvirtin/monokai.nvim'
+  -- use 'navarasu/onedark.nvim'
   use 'LunarVim/onedarker.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
@@ -215,10 +222,16 @@ local function diff_source()
     }
   end
 end
+local custom_auto = require'lualine.themes.auto'
+-- Change the background of lualine_c section for all modes
+custom_auto.normal.c.bg = colors.bg
+custom_auto.insert.c.bg = colors.bg
+custom_auto.visual.c.bg = colors.bg
+custom_auto.command.c.bg = colors.bg
 require'lualine'.setup {
   options = {
     icons_enabled = true,
-    theme = 'auto',
+    theme = custom_auto,
     component_separators = { left = '', right = ''},
     section_separators = { left = '', right = ''},
     disabled_filetypes = { "NvimTree", "Telescope", "Outline", "dashboard" },
@@ -234,13 +247,13 @@ require'lualine'.setup {
     lualine_b = {
       { -- 'branch'
         "b:gitsigns_head",
-        icon = " ",
-        color = { gui = "bold" },
+        icon = "",
+        color = { gui = "bold", bg = colors.bg },
         cond = conditions.hide_in_width,
       },
       { -- 'filename'
         "filename",
-        color = {},
+        color = { bg = colors.bg },
         cond = nil,
       }
     },
@@ -249,7 +262,7 @@ require'lualine'.setup {
       { -- 'diff'
         "diff",
         source = diff_source,
-        symbols = { added = "  ", modified = " ", removed = " " },
+        symbols = { added = " ", modified = " ", removed = " " },
         diff_color = {
           added = { fg = colors.green, bg = colors.bg },
           modified = { fg = colors.yellow, bg = colors.bg },
@@ -275,7 +288,7 @@ require'lualine'.setup {
           end
           return ""
         end,
-        color = { fg = colors.green },
+        color = { fg = colors.green, bg = colors.bg },
         cond = conditions.hide_in_width,
       },
       { -- 'lsp'
@@ -314,7 +327,7 @@ require'lualine'.setup {
         color = { bg = colors.bg, gui = "bold" },
         cond = conditions.hide_in_width,
       },
-      { "filetype", cond = conditions.hide_in_width, color = { bg = colors.bg } },
+      { "filetype", cond = conditions.hide_in_width, color = { fg = colors.fg, bg = colors.bg } },
     },
     lualine_y = {},
     lualine_z = {
