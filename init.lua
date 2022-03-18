@@ -2,8 +2,10 @@
 -- git clone https://github.com/savq/paq-nvim.git \
 --    "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/pack/paqs/opt/paq-nvim
 -------------------- HELPERS -------------------------------
-local api, cmd, fn, g = vim.api, vim.cmd, vim.fn, vim.g
-local o, wo, bo = vim.o, vim.wo, vim.bo
+local vim = vim
+local api, cmd, fn, g, lsp = vim.api, vim.cmd, vim.fn, vim.g, vim.lsp
+local o, wo, b = vim.o, vim.wo, vim.b
+-- local bo = vim.bo
 
 local function map(mode, lhs, rhs, opts)
   local options = {noremap = true}
@@ -17,7 +19,7 @@ g['mapleader'] = ' '
 g['maplocalleader'] = ","
 
 -------------------- PACKER  -------------------------------
-local execute = vim.api.nvim_command
+local execute = api.nvim_command
 
 local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
 
@@ -26,7 +28,7 @@ if fn.empty(fn.glob(install_path)) > 0 then
   execute 'packadd packer.nvim'
 end
 
-vim.api.nvim_exec(
+api.nvim_exec(
   [[
     augroup Packer
       autocmd!
@@ -37,6 +39,8 @@ vim.api.nvim_exec(
 )
 
 -------------------- PLUGINS -------------------------------
+local packer = require('packer')
+local use = packer.use
 require('packer').startup{ function()
   use 'wbthomason/packer.nvim'      -- Let packer manage packer
   use 'alvan/vim-closetag'          -- Close html tags
@@ -144,8 +148,7 @@ require('packer').startup{ function()
     config = function()
       require("which-key").setup {
         plugins = {
-          marks = true, -- shows a list of your marks on ' and `
-          registers = true, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
+          spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints i.e. z=
           -- the presets plugin, adds help for a bunch of default keybindings in Neovim
           -- No actual key bindings are created
           presets = {
@@ -157,26 +160,7 @@ require('packer').startup{ function()
             z = true, -- bindings for folds, spelling and others prefixed with z
             g = true, -- bindings for prefixed with g
           },
-          spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints
         },
-        icons = {
-          breadcrumb = "»", -- symbol used in the command line area that shows your active key combo
-          separator = "➜", -- symbol used between a key and it's label
-          group = "+", -- symbol prepended to a group
-        },
-        window = {
-          border = "single", -- none, single, double, shadow
-          position = "bottom", -- bottom, top
-          margin = { 1, 0, 1, 0 }, -- extra window margin [top, right, bottom, left]
-          padding = { 2, 2, 2, 2 }, -- extra window padding [top, right, bottom, left]
-        },
-        layout = {
-          height = { min = 4, max = 25 }, -- min and max height of the columns
-          width = { min = 20, max = 50 }, -- min and max width of the columns
-          spacing = 3, -- spacing between columns
-        },
-        hidden = { "<silent>", "<cmd>", "<Cmd>", "<CR>", "call", "lua", "^:", "^ " }, -- hide mapping boilerplate
-        show_help = true, -- show help message on the command line when the popup is visible
       }
     end
   }
@@ -202,7 +186,7 @@ wk.register({
   ["w"] = { "<cmd>w!<CR>", "Save" },
   ["q"] = { "<cmd>q!<CR>", "Quit" },
   ["/"] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
-  ["c"] = { "<cmd>BufferKill<CR>", "Close Buffer" },
+  ["c"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
   p = {
     name = "Packer",
     c = { "<cmd>PackerCompile<cr>", "Compile" },
@@ -214,20 +198,15 @@ wk.register({
   },
   l = {
     name = "LSP",
-    a = { "<cmd>lua require('lvim.core.telescope').code_actions()<cr>", "Code Action" },
-    d = { "<cmd>Telescope diagnostics bufnr=0 theme=get_ivy<cr>", "Buffer Diagnostics" },
-    w = { "<cmd>Telescope diagnostics<cr>", "Diagnostics" },
+    a = { "<cmd>FzfLua lsp_code_actions<cr>", "Code Action" },
+    d = { "<cmd>FzfLua lsp_document_diagnostics<cr>", "Buffer Diagnostics" },
+    w = { "<cmd>FzfLua lsp_workspace_diagnostics<cr>", "Diagnostics" },
+    t = { "<cmd>TroubleToggle<cr>", "Trouble" },
     f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
     i = { "<cmd>LspInfo<cr>", "Info" },
     I = { "<cmd>LspInstallInfo<cr>", "Installer Info" },
-    j = {
-      "<cmd>lua vim.diagnostic.goto_next()<cr>",
-      "Next Diagnostic",
-    },
-    k = {
-      "<cmd>lua vim.diagnostic.goto_prev()<cr>",
-      "Prev Diagnostic",
-    },
+    j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
+    k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
     l = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
     p = {
       name = "Peek",
@@ -237,11 +216,24 @@ wk.register({
     },
     q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
     r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
-    s = { "<cmd>Telescope lsp_document_symbols<cr>", "Document Symbols" },
-    S = {
-      "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",
-      "Workspace Symbols",
-    },
+    s = { "<cmd>FzfLua lsp_document_symbols<cr>", "Document Symbols" },
+    S = { "<cmd>FzfLua lsp_workspace_symbols<cr>", "Workspace Symbols" },
+  },
+  g = {
+    name = "Git",
+    c = { "<cmd>FzfLua git_commits<cr>", "Commits" },
+    b = { "<cmd>FzfLua git_bcommits<cr>", "Buffer Commits" },
+    B = { "<cmd>FzfLua git_branches<cr>", "Branches" },
+    s = { "<cmd>FzfLua git_status<cr>", "Status" },
+  },
+  m = {
+    name = "Misc [FzfLua]",
+    c = { "<cmd>PackerCompile<cr>", "Compile" },
+    i = { "<cmd>PackerInstall<cr>", "Install" },
+    r = { "<cmd>lua require('lvim.plugin-loader').recompile()<cr>", "Re-compile" },
+    s = { "<cmd>PackerSync<cr>", "Sync" },
+    S = { "<cmd>PackerStatus<cr>", "Status" },
+    u = { "<cmd>PackerUpdate<cr>", "Update" },
   },
 }, { prefix = "<leader>" })
 -- bufdel
@@ -252,13 +244,6 @@ g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex, *.heex, *.svelte'
 -- colorizer
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
 -- fzf
-map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
-map('n', '<leader>o', '<cmd>lua require("fzf-lua").files()<CR>')
-map('n', '<leader>bl', '<cmd>lua require("fzf-lua").blines()<CR>')
-map('n', '<leader>g', '<cmd>lua require("fzf-lua").git_commits()<CR>')
-map('n', '<leader>f', '<cmd>lua require("fzf-lua").grep()<CR>')
-map('n', '<leader>b', "<cmd>lua require('fzf-lua').buffers()<CR>")
-map('n', '<leader>r', '<cmd>lua require("fzf-lua").oldfiles()<CR>')
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
 -- lualine
 local colors = {
@@ -278,10 +263,10 @@ local colors = {
 local window_width_limit = 70
 local conditions = {
   buffer_not_empty = function()
-    return vim.fn.empty(vim.fn.expand "%:t") ~= 1
+    return fn.empty(fn.expand "%:t") ~= 1
   end,
   hide_in_width = function()
-    return vim.fn.winwidth(0) > window_width_limit
+    return fn.winwidth(0) > window_width_limit
   end,
   -- check_git_workspace = function()
   --   local filepath = vim.fn.expand "%:p:h"
@@ -290,7 +275,7 @@ local conditions = {
   -- end,
 }
 local function diff_source()
-  local gitsigns = vim.b.gitsigns_status_dict
+  local gitsigns = b.gitsigns_status_dict
   if gitsigns then
     return {
       added = gitsigns.added,
@@ -359,7 +344,7 @@ require'lualine'.setup {
       },
       { -- 'treesitter'
         function()
-          local b = vim.api.nvim_get_current_buf()
+          -- local b = vim.api.nvim_get_current_buf()
           if next(vim.treesitter.highlighter.active[b]) then
             return ""
           end
@@ -369,7 +354,7 @@ require'lualine'.setup {
         cond = conditions.hide_in_width,
       },
       { -- 'lsp'
-      	function(msg)
+        function(msg)
           msg = msg or "LSP"
           local buf_clients = vim.lsp.buf_get_clients()
           if next(buf_clients) == nil then
@@ -410,8 +395,8 @@ require'lualine'.setup {
     lualine_z = {
       {
         function()
-          local current_line = vim.fn.line "."
-          local total_lines = vim.fn.line "$"
+          local current_line = fn.line "."
+          local total_lines = fn.line "$"
           local chars = { "__", "▁▁", "▂▂", "▃▃", "▄▄", "▅▅", "▆▆", "▇▇", "██" }
           local line_ratio = current_line / total_lines
           local index = math.ceil(line_ratio * #chars)
@@ -558,8 +543,6 @@ map('n','<leader>tt', '<cmd>TroubleToggle<CR>', {noremap = true, silent = true})
 -- vi-viz
 map('x','v', "<cmd>lua require('vi-viz').vizExpand()<CR>", {noremap = true})
 map('x','V', "<cmd>lua require('vi-viz').vizContract()<CR>", {noremap = true})
--- vim-bbye
-map('n', '<leader>x', '<cmd>BufDel<CR>')
 -- vim-easy-align
 map('x', 'ga', '<Plug>(EasyAlign)', {noremap = false})
 map('n', 'ga', '<Plug>(EasyAlign)', {noremap = false})
@@ -616,7 +599,7 @@ wo.list = true                            -- Show some invisible characters
 wo.relativenumber = false                 -- Relative line numbers
 wo.number = true                          -- Show line numbers
 wo.signcolumn = 'yes'                     -- Show sign column
-wo.wrap = true                            -- Disable line wrap
+wo.wrap = false                           -- Disable line wrap
 wo.foldmethod = 'expr'
 wo.foldexpr = 'nvim_treesitter#foldexpr()'
 wo.foldlevel = 9
@@ -632,7 +615,7 @@ o.textwidth = width                       -- Maximum width of text
 -- common tasks
 map('n', '<C-s>', '<cmd>update<CR>')
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
-map('n', '<F3>', '<cmd>lua toggle_wrap()<CR>')
+map('n', '<F3>', '<cmd>lua Toggle_Wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
 map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
 map('n', '<leader>t', '<cmd>split<bar>res 10 <bar>terminal<CR>')
@@ -693,7 +676,14 @@ map('v', '>', '>gv')
 -- quick substitue
 map('n', '<leader>S', ':%s//gcI<Left><Left><Left><Left>')
 map('v', '<leader>S', ':s//gcI<Left><Left><Left><Left>')
-
+-- To be moved to which-key
+map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
+map('n', '<leader>o', '<cmd>lua require("fzf-lua").files()<CR>')
+map('n', '<leader>bl', '<cmd>lua require("fzf-lua").blines()<CR>')
+map('n', '<leader>g', '<cmd>lua require("fzf-lua").git_commits()<CR>')
+map('n', '<leader>f', '<cmd>lua require("fzf-lua").grep()<CR>')
+map('n', '<leader>b', "<cmd>lua require('fzf-lua').buffers()<CR>")
+map('n', '<leader>r', '<cmd>lua require("fzf-lua").oldfiles()<CR>')
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
 ts.setup {
@@ -708,7 +698,7 @@ ts.setup {
 local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
 for type, icon in pairs(signs) do
   local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+  fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
 -- lsp_signature
 local on_attach_lsp_signature = function(_, _)
@@ -727,17 +717,17 @@ end
 -- Customize LSP behavior
 local on_attach = function(client, bufnr)
   -- Always use signcolumn for the current buffer
-  vim.wo.signcolumn = 'yes:1'
+  wo.signcolumn = 'yes:1'
 
   -- Activate LSP signature on attach.
   on_attach_lsp_signature(client, bufnr)
 
   -- keybindings
   -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
-  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-  local opts = { noremap=true, silent=true }
+  -- local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  -- local opts = { noremap=true, silent=true }
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  -- Moved bindings to whick-key
+  -- Moved bindings to which-key
   -- NOTE: Order is important. You can't lazy load lexima.vim
   g['lexima_no_defualt_rules'] = true
   g['lexima_enable_endwise_rules'] = 1
@@ -758,7 +748,7 @@ lsp_installer.on_server_ready(function(server)
   local opts = {
     on_attach = on_attach,
     -- Suggested configuration by nvim-cmp
-    capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+    capabilities = require('cmp_nvim_lsp').update_capabilities(lsp.protocol.make_client_capabilities())
   }
 
   -- Customize the options passed to the server
@@ -766,7 +756,7 @@ lsp_installer.on_server_ready(function(server)
 
   -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
   server:setup(opts)
-  vim.cmd [[ do User LspAttachBuffers ]]
+  cmd [[ do User LspAttachBuffers ]]
 end)
 
 -------------------------
@@ -775,13 +765,13 @@ end)
 -- :help lsp-method
 -- :help lsp-handler
 
-local lsp_handlers_hover = vim.lsp.with(vim.lsp.handlers.hover, {
+local lsp_handlers_hover = lsp.with(lsp.handlers.hover, {
   border = 'single'
 })
-vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
+lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
   local bufnr, winnr = lsp_handlers_hover(err, result, ctx, config)
   if winnr ~= nil then
-    vim.api.nvim_win_set_option(winnr, "winblend", 20)  -- opacity for hover
+    api.nvim_win_set_option(winnr, "winblend", 20)  -- opacity for hover
   end
   return bufnr, winnr
 end
@@ -790,12 +780,12 @@ end
 -- Setup our autocompletion. These configuration options are the default ones
 -- copied out of the documentation.
 local has_words_before = function()
-  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+  local line, col = vim.table.unpack(api.nvim_win_get_cursor(0))
+  return col ~= 0 and api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
 local feedkey = function(key, mode)
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+  api.nvim_feedkeys(api.nvim_replace_termcodes(key, true, true, true), mode, true)
 end
 
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
@@ -810,7 +800,7 @@ cmp.setup({
   },
   snippet = {
     expand = function(args)
-      vim.fn["vsnip#anonymous"](args.body)
+      fn["vsnip#anonymous"](args.body)
     end,
   },
   mapping = {
@@ -826,7 +816,7 @@ cmp.setup({
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
-      elseif vim.fn["vsnip#available"](1) == 1 then
+      elseif fn["vsnip#available"](1) == 1 then
         feedkey("<Plug>(vsnip-expand-or-jump)", "")
       elseif has_words_before() then
         cmp.complete()
@@ -838,7 +828,7 @@ cmp.setup({
     ["<S-Tab>"] = cmp.mapping(function()
       if cmp.visible() then
         cmp.select_prev_item()
-      elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+      elseif fn["vsnip#jumpable"](-1) == 1 then
         feedkey("<Plug>(vsnip-jump-prev)", "")
       end
     end, { "i", "s" }),
@@ -849,7 +839,7 @@ cmp.setup({
     { name = "nvim_lsp_document_symbol" },
     { name = "vsnip" },
     { name = "path" },
-    { name = "buffer", keyword_length = 5 },
+    { name = "buffer", keyword_length = 3 },
     { name = "spell" },
     { name = "tags" },
     { name = "vim_dadbod_completion" },
@@ -857,22 +847,23 @@ cmp.setup({
   })
 })
 
+
 -------------------- COMMANDS ------------------------------
-function init_term()
+function Init_Term()
   cmd 'setlocal nonumber norelativenumber'
   cmd 'setlocal nospell'
   cmd 'setlocal signcolumn=auto'
   cmd 'startinsert'
 end
 
-function toggle_wrap()
+function Toggle_Wrap()
   wo.breakindent = not wo.breakindent
   wo.linebreak = not wo.linebreak
   wo.wrap = not wo.wrap
 end
 
 vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
-  'TermOpen * lua init_term()',
+  'TermOpen * lua Init_Term()',
   'TextYankPost * silent! lua vim.highlight.on_yank({ hi_group="IncSearch", timeout=150, on_visual=true })',
   'FileType elixir,eelixir iab pp \\|>',
   'BufWritePre *.{ex,exs,heex} lua vim.lsp.buf.formatting_sync()',
