@@ -8,7 +8,7 @@ local o, wo, b = vim.o, vim.wo, vim.b
 -- local bo = vim.bo
 
 local function map(mode, lhs, rhs, opts)
-  local options = {noremap = true}
+  local options = {noremap = true, silent = true}
   if opts then options = vim.tbl_extend('force', options, opts) end
   api.nvim_set_keymap(mode, lhs, rhs, options)
 end
@@ -41,7 +41,7 @@ api.nvim_exec(
 -------------------- PLUGINS -------------------------------
 local packer = require('packer')
 local use = packer.use
-require('packer').startup{ function()
+packer.startup{ function()
   use 'wbthomason/packer.nvim'      -- Let packer manage packer
   use 'alvan/vim-closetag'          -- Close html tags
   use {'akinsho/nvim-bufferline.lua', requires = {'ojroques/nvim-bufdel'}}
@@ -177,6 +177,13 @@ end,
 }
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true                    -- True color support
+-- toggleterm
+local terminal = require('toggleterm')
+terminal.setup{
+  open_mapping = [[<c-t>]],
+  shading_factor = 2,
+  direction = 'float',
+}
 -- which-key
 local wk = require('which-key')
 wk.register({
@@ -237,7 +244,6 @@ wk.register({
   },
 }, { prefix = "<leader>" })
 -- bufdel
-map('n', '<leader>w', '<cmd>BufDel<CR>')
 require('bufdel').setup {next = 'alternate'}
 -- closetag
 g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex, *.heex, *.svelte'
@@ -644,6 +650,14 @@ map('n', 'S', '<cmd>bn<CR>')
 map('n', 'X', '<cmd>bp<CR>')
 map('n', '<Right>', '<cmd>bn<CR>')
 map('n', '<Left>', '<cmd>bp<CR>')
+map('t', '<C-h>', '<C-\\><C-N><C-w>h')
+map('t', '<C-j>', '<C-\\><C-N><C-w>j')
+map('t', '<C-k>', '<C-\\><C-N><C-w>k')
+map('t', '<C-l>', '<C-\\><C-N><C-w>l')
+map('i', '<C-h>', '<C-\\><C-N><C-w>h')
+map('i', '<C-j>', '<C-\\><C-N><C-w>j')
+map('i', '<C-k>', '<C-\\><C-N><C-w>k')
+map('i', '<C-l>', '<C-\\><C-N><C-w>l')
 map('n', '<C-h>', '<C-w>h')
 map('n', '<C-j>', '<C-w>j')
 map('n', '<C-k>', '<C-w>k')
@@ -656,14 +670,15 @@ map('n', '<leader><Down>', '<cmd>cclose<CR>')
 map('n', '<leader><Left>', '<cmd>cprev<CR>')
 map('n', '<leader><Right>', '<cmd>cnext<CR>')
 map('n', '<leader><Up>', '<cmd>copen<CR>')
-map('n', 'n', 'nzz', {silent=true})
-map('n', 'N', 'Nzz', {silent=true})
-map('n', '*', '*zz', {silent=true})
-map('n', '#', '#zz', {silent=true})
-map('n', 'g*', 'g*zz', {silent=true})
-map('n', 'g#', 'g#zz', {silent=true})
-map('n', '<C-o>', '<C-o>zz', {silent=true})
-map('n', '<C-i>', '<C-i>zz', {silent=true})
+map('n', 'n', 'nzz')
+map('n', 'N', 'Nzz')
+map('n', '*', '*zz')
+map('n', '#', '#zz')
+map('n', 'g*', 'g*zz')
+map('n', 'g#', 'g#zz')
+map('n', '<C-o>', '<C-o>zz')
+map('n', '<C-i>', '<C-i>zz')
+
 -- yank to / paste from system clipboard
 map('v', '<leader>y', '"+y')
 map('n', '<leader>p', '"+p')
