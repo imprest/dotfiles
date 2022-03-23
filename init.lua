@@ -194,6 +194,7 @@ wk.register({
   ["q"] = { "<cmd>q!<CR>", "Quit" },
   ["/"] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
   ["c"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
+  ["gg"] = { '<cmd>TermExec cmd="lazygit" direction=float<CR>', "LazyGit" },
   p = {
     name = "Packer",
     c = { "<cmd>PackerCompile<cr>", "Compile" },
