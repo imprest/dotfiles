@@ -182,6 +182,8 @@ terminal.setup{
 -- which-key
 local wk = require('which-key')
 wk.register({
+  ["S"] = { ':s//gcI<Left><Left><Left><Left>', "Substitue" },
+  ["y"] = { '"+y', "Yank System Clipboard" },
   ["/"] = { "<ESC><CMD>lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>", "Comment" }
 }, { prefix = "<leader>", mode = 'v' })
 wk.register({
@@ -193,8 +195,14 @@ wk.register({
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
   ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
   ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
+  ["j"] = { '<cmd>HopChar2<CR>', "Hop" },
+  ["S"] = { ':%s//gcI<Left><Left><Left><Left>', "Substitue" },
+  ["<leader>"] = { '<C-^>', 'Last buffer' },
+  ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
+  ["v"] = { '<C-w>v<C-w>l', 'Split vertical' },
+  ["t"] = { '<cmd>split<bar>res 10 <bar>terminal<CR>', 'Terminal bottom' },
   p = {
-    name = "Packer",
+    name = 'Packer',
     c = { "<cmd>PackerCompile<cr>", "Compile" },
     i = { "<cmd>PackerInstall<cr>", "Install" },
     s = { "<cmd>PackerSync<cr>", "Sync" },
@@ -239,8 +247,13 @@ require('bufdel').setup {next = 'alternate'}
 g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex, *.heex, *.svelte'
 -- colorizer
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
--- fzf
+-- fzf-lua
 g['fzf_action'] = {['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit'}
+require('fzf-lua').setup({
+  winopts = {
+    preview = { default = 'bat_native' }
+  }
+})
 -- lualine
 local colors = {
   bg = "#282c34",
@@ -417,7 +430,6 @@ require'lualine'.setup {
 }
 -- hop
 require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
-map('n', 's', '<cmd>HopChar2<CR>', {noremap=false})
 -- nvim-autopairs
 require('nvim-autopairs').setup()
 -- nvim-tree
@@ -534,8 +546,6 @@ require'nvim-tree'.setup {
 }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
--- trouble
-map('n','<leader>tt', '<cmd>TroubleToggle<CR>', {noremap = true, silent = true})
 -- vi-viz
 map('x','v', "<cmd>lua require('vi-viz').vizExpand()<CR>", {noremap = true})
 map('x','V', "<cmd>lua require('vi-viz').vizContract()<CR>", {noremap = true})
@@ -553,8 +563,6 @@ map('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', {expr=true})
 -- map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
 -- vim-svelte
 g['vim_svelte_plugin_load_full_syntax'] = 1
--- vim-sandwich
-cmd 'runtime macros/sandwich/keymap/surround.vim'
 -- vimtex
 g['vimtex_quickfix_mode'] = 0
 g['vimtex_compiler_method'] = 'tectonic'
@@ -610,12 +618,11 @@ o.textwidth = width                       -- Maximum width of text
 -------------------- MAPPINGS ------------------------------
 -- common tasks
 map('n', '<C-s>', '<cmd>update<CR>')
-map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
+map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('n', '<F3>', '<cmd>lua Toggle_Wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
 map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
-map('n', '<leader>t', '<cmd>split<bar>res 10 <bar>terminal<CR>')
 map('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
 map('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
 map('n', '<C-f>', '<cmd>FzfLua grep<CR>')
@@ -633,13 +640,10 @@ map('t', 'jk', '<ESC>', {noremap = false})
 map('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"' , {expr = true})
 -- Navigation & Window management
 map('n', 'q', '<C-w>c')
-map('n', '<leader>s', '<cmd>split<CR>')
-map('n', '<leader>v', '<C-w>v<C-w>l')
 map('n', 'H', '^')
 map('n', 'L', 'g_')
 map('n', 'F', '%')
 map('v', 'L', 'g_')
-map('n', '<leader><leader>', '<C-^>')
 map('n', 'S', '<cmd>bn<CR>')
 map('n', 'X', '<cmd>bp<CR>')
 map('n', '<Right>', '<cmd>bn<CR>')
@@ -656,10 +660,6 @@ map('n', '<S-Right>', '<C-w>2<')
 map('n', '<S-Up>', '<C-w>2-')
 map('n', '<S-Down>', '<C-w>2+')
 map('n', '<S-Left>', '<C-w>2>')
-map('n', '<leader><Down>', '<cmd>cclose<CR>')
-map('n', '<leader><Left>', '<cmd>cprev<CR>')
-map('n', '<leader><Right>', '<cmd>cnext<CR>')
-map('n', '<leader><Up>', '<cmd>copen<CR>')
 map('n', 'n', 'nzz')
 map('n', 'N', 'Nzz')
 map('n', '*', '*zz')
@@ -668,19 +668,9 @@ map('n', 'g*', 'g*zz')
 map('n', 'g#', 'g#zz')
 map('n', '<C-o>', '<C-o>zz')
 map('n', '<C-i>', '<C-i>zz')
--- yank to / paste from system clipboard
-map('v', '<leader>y', '"+y')
-map('n', '<leader>p', '"+p')
-map('n', '<leader>P', '"+P')
-map('v', '<leader>p', '"+p')
-map('v', '<leader>P', '"+P')
 -- reselect visual block after indent
 map('v', '<', '<gv')
 map('v', '>', '>gv')
--- quick substitue
-map('n', '<leader>S', ':%s//gcI<Left><Left><Left><Left>')
-map('v', '<leader>S', ':s//gcI<Left><Left><Left><Left>')
--- To be moved to which-key
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
 ts.setup {
@@ -721,33 +711,29 @@ local on_attach = function(client, bufnr)
 
   -- keybindings
   -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
-  -- local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-  -- local opts = { noremap=true, silent=true }
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
-  -- Moved bindings to which-key
   -- NOTE: Order is important. You can't lazy load lexima.vim
   g['lexima_no_defualt_rules'] = true
   g['lexima_enable_endwise_rules'] = 1
 end
 
-local lsp_setup_opts = {}
-lsp_setup_opts['jsonls'] = {
-  settings = {
-    json = {
-      schemas = require('schemastore').json.schemas()
-    }
-  }
-}
-lsp_setup_opts['elixirls'] = {
-  settings = {
-    elixirLS = {
-      dialyzerEnabled = false,
-      fetchDeps = false
-    }
-  }
-}
-
 local lsp_installer = require("nvim-lsp-installer")
+local enhance_server_opts = {
+  ["elixirls"] = function(opts)
+    opts.settings = {
+      elixirLS = {
+        dialyzerEnabled = false,
+        fetchDeps = false
+      }
+    }
+  end,
+  ["jsonls"] = function(opts)
+    opts.settings = {
+      json = {
+        schemas = require('schemastore').json.schemas()
+      }
+    }
+  end
+}
 lsp_installer.on_server_ready(function(server)
   local opts = {
     on_attach = on_attach,
@@ -755,8 +741,10 @@ lsp_installer.on_server_ready(function(server)
     capabilities = require('cmp_nvim_lsp').update_capabilities(lsp.protocol.make_client_capabilities())
   }
 
-  -- Customize the options passed to the server
-  opts = vim.tbl_extend("error", opts, lsp_setup_opts[server.name] or {})
+  if enhance_server_opts[server.name] then
+    -- Enhance the default opts with the server-specific ones
+    enhance_server_opts[server.name](opts)
+  end
 
   -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
   server:setup(opts)
@@ -784,7 +772,7 @@ end
 -- Setup our autocompletion. These configuration options are the default ones
 -- copied out of the documentation.
 local has_words_before = function()
-  local line, col = vim.table.unpack(api.nvim_win_get_cursor(0))
+  local line, col = unpack(api.nvim_win_get_cursor(0))
   return col ~= 0 and api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
