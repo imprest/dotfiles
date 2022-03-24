@@ -80,6 +80,7 @@ packer.startup{ function()
   use 'machakann/vim-sandwich'       -- sr({ sd' <select text>sa'
   -- lsp
   use 'neovim/nvim-lspconfig'
+  use 'b0o/SchemaStore.nvim'
   use 'JoosepAlviste/nvim-ts-context-commentstring'
   use {'numToStr/Comment.nvim',
     config = function()
@@ -162,12 +163,6 @@ packer.startup{ function()
           },
         },
       }
-    end
-  }
-  use {
-    'max397574/better-escape.nvim',
-    config = function()
-      require("better_escape").setup()
     end
   }
 end,
@@ -633,6 +628,7 @@ map('i', '<A-k>', '<Esc>:m .-2<CR>==gi')
 map('v', '<A-j>', ':m \'>+1<CR>gv=gv')
 map('v', '<A-k>', ':m \'<-2<CR>gv=gv')
 -- Escape
+map('i', 'jk', '<ESC>', {noremap = false})
 map('t', 'jk', '<ESC>', {noremap = false})
 map('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"' , {expr = true})
 -- Navigation & Window management
@@ -652,10 +648,6 @@ map('t', '<C-h>', '<C-\\><C-N><C-w>h')
 map('t', '<C-j>', '<C-\\><C-N><C-w>j')
 map('t', '<C-k>', '<C-\\><C-N><C-w>k')
 map('t', '<C-l>', '<C-\\><C-N><C-w>l')
-map('i', '<C-h>', '<C-\\><C-N><C-w>h')
-map('i', '<C-j>', '<C-\\><C-N><C-w>j')
-map('i', '<C-k>', '<C-\\><C-N><C-w>k')
-map('i', '<C-l>', '<C-\\><C-N><C-w>l')
 map('n', '<C-h>', '<C-w>h')
 map('n', '<C-j>', '<C-w>j')
 map('n', '<C-k>', '<C-w>k')
@@ -739,6 +731,13 @@ local on_attach = function(client, bufnr)
 end
 
 local lsp_setup_opts = {}
+lsp_setup_opts['jsonls'] = {
+  settings = {
+    json = {
+      schemas = require('schemastore').json.schemas()
+    }
+  }
+}
 lsp_setup_opts['elixirls'] = {
   settings = {
     elixirLS = {
