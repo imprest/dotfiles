@@ -195,11 +195,13 @@ wk.register({
   ["/"] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
   ["c"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
   ["gg"] = { '<cmd>TermExec cmd="lazygit" direction=float<CR>', "LazyGit" },
+  ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
+  ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
+  ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
   p = {
     name = "Packer",
     c = { "<cmd>PackerCompile<cr>", "Compile" },
     i = { "<cmd>PackerInstall<cr>", "Install" },
-    r = { "<cmd>lua require('lvim.plugin-loader').recompile()<cr>", "Re-compile" },
     s = { "<cmd>PackerSync<cr>", "Sync" },
     S = { "<cmd>PackerStatus<cr>", "Status" },
     u = { "<cmd>PackerUpdate<cr>", "Update" },
@@ -218,9 +220,9 @@ wk.register({
     l = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
     p = {
       name = "Peek",
-      d = { "<cmd>lua require('lvim.lsp.peek').Peek('definition')<cr>", "Definition" },
-      t = { "<cmd>lua require('lvim.lsp.peek').Peek('typeDefinition')<cr>", "Type Definition" },
-      i = { "<cmd>lua require('lvim.lsp.peek').Peek('implementation')<cr>", "Implementation" },
+      d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
+      t = { "<cmd>lua vim.lsp.buf.type_definition()<cr>", "Type Definition" },
+      i = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Implementation" },
     },
     q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
     r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
@@ -229,19 +231,11 @@ wk.register({
   },
   g = {
     name = "Git",
+    f = { "<cmd>FzfLua git_files<cr>", "Git Files" },
     c = { "<cmd>FzfLua git_commits<cr>", "Commits" },
     b = { "<cmd>FzfLua git_bcommits<cr>", "Buffer Commits" },
     B = { "<cmd>FzfLua git_branches<cr>", "Branches" },
     s = { "<cmd>FzfLua git_status<cr>", "Status" },
-  },
-  m = {
-    name = "Misc [FzfLua]",
-    c = { "<cmd>PackerCompile<cr>", "Compile" },
-    i = { "<cmd>PackerInstall<cr>", "Install" },
-    r = { "<cmd>lua require('lvim.plugin-loader').recompile()<cr>", "Re-compile" },
-    s = { "<cmd>PackerSync<cr>", "Sync" },
-    S = { "<cmd>PackerStatus<cr>", "Status" },
-    u = { "<cmd>PackerUpdate<cr>", "Update" },
   },
 }, { prefix = "<leader>" })
 -- bufdel
@@ -621,6 +615,7 @@ o.textwidth = width                       -- Maximum width of text
 -------------------- MAPPINGS ------------------------------
 -- common tasks
 map('n', '<C-s>', '<cmd>update<CR>')
+map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('n', '<F3>', '<cmd>lua Toggle_Wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
@@ -628,6 +623,8 @@ map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
 map('n', '<leader>t', '<cmd>split<bar>res 10 <bar>terminal<CR>')
 map('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
 map('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
+map('n', '<C-f>', '<cmd>FzfLua grep<CR>')
+map('n', '<C-b>', '<cmd>FzfLua blines<CR>')
 -- move lines up/down
 map('n', '<A-j>', ':m .+1<CR>==')
 map('n', '<A-k>', ':m .-2<CR>==')
@@ -679,7 +676,6 @@ map('n', 'g*', 'g*zz')
 map('n', 'g#', 'g#zz')
 map('n', '<C-o>', '<C-o>zz')
 map('n', '<C-i>', '<C-i>zz')
-
 -- yank to / paste from system clipboard
 map('v', '<leader>y', '"+y')
 map('n', '<leader>p', '"+p')
@@ -693,13 +689,6 @@ map('v', '>', '>gv')
 map('n', '<leader>S', ':%s//gcI<Left><Left><Left><Left>')
 map('v', '<leader>S', ':s//gcI<Left><Left><Left><Left>')
 -- To be moved to which-key
-map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
-map('n', '<leader>o', '<cmd>lua require("fzf-lua").files()<CR>')
-map('n', '<leader>bl', '<cmd>lua require("fzf-lua").blines()<CR>')
-map('n', '<leader>g', '<cmd>lua require("fzf-lua").git_commits()<CR>')
-map('n', '<leader>f', '<cmd>lua require("fzf-lua").grep()<CR>')
-map('n', '<leader>b', "<cmd>lua require('fzf-lua').buffers()<CR>")
-map('n', '<leader>r', '<cmd>lua require("fzf-lua").oldfiles()<CR>')
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
 ts.setup {
