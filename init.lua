@@ -46,28 +46,19 @@ packer.startup{ function()
   use 'alvan/vim-closetag'          -- Close html tags
   use {'akinsho/nvim-bufferline.lua', requires = {'ojroques/nvim-bufdel'}}
   use 'airblade/vim-rooter'
-  use 'cohama/lexima.vim'
+  -- use 'cohama/lexima.vim'
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
   use 'Shatur/neovim-session-manager'
-  use 'tanvirtin/monokai.nvim'
+  -- use 'tanvirtin/monokai.nvim'
   -- use 'navarasu/onedark.nvim'
   use 'LunarVim/onedarker.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
   use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
-  use {
-    'kyazdani42/nvim-tree.lua',
-    requires = 'kyazdani42/nvim-web-devicons',
-    config = function() require'nvim-tree'.setup {} end
-  }
-  use {'kristijanhusak/vim-dadbod-completion',
-    requires = {
-      {'tpope/vim-dadbod'},
-      {'kyazdani42/nvim-web-devicons'}
-    }
-  }
+  use { 'kyazdani42/nvim-tree.lua', requires = 'kyazdani42/nvim-web-devicons' }
+  use {'kristijanhusak/vim-dadbod-completion', requires = 'tpope/vim-dadbod' }
   use 'leafOfTree/vim-svelte-plugin'
   use {
     'lewis6991/gitsigns.nvim',
@@ -232,6 +223,7 @@ wk.register({
     s = { "<cmd>FzfLua lsp_document_symbols<cr>", "Document Symbols" },
     S = { "<cmd>FzfLua lsp_workspace_symbols<cr>", "Workspace Symbols" },
   },
+  ["G"] = { "<cmd>Neogit<CR>", "Neogit" },
   g = {
     name = "Git",
     f = { "<cmd>FzfLua git_files<cr>", "Git Files" },
@@ -435,84 +427,27 @@ require('nvim-autopairs').setup()
 -- nvim-tree
 require'nvim-tree'.setup {
   disable_netrw = true,
-  hijack_netrw = true,
-  open_on_setup = false,
-  ignore_buffer_on_setup = false,
-  ignore_ft_on_setup = {
-    "startify",
-    "dashboard",
-    "alpha",
-  },
-  auto_reload_on_write = true,
-  hijack_unnamed_buffer_when_opening = false,
-  hijack_directories = {
-    enable = true,
-    auto_open = true,
-  },
-  update_to_buf_dir = {
-    enable = true,
-    auto_open = true,
-  },
-  auto_close = false,
-  open_on_tab = false,
-  hijack_cursor = false,
-  update_cwd = false,
-  diagnostics = {
-    enable = true,
-    icons = {
-      hint = "",
-      info = "",
-      warning = "",
-      error = "",
-    },
-  },
+  ignore_ft_on_setup = { "startify","dashboard", "alpha" },
   update_focused_file = {
     enable = true,
     update_cwd = true,
     ignore_list = {},
-  },
-  system_open = {
-    cmd = nil,
-    args = {},
   },
   git = {
     enable = true,
     ignore = false,
     timeout = 200,
   },
-  view = {
-    width = 30,
-    height = 30,
-    hide_root_folder = false,
-    side = "left",
-    auto_resize = false,
-    mappings = {
-      custom_only = false,
-      list = {},
-    },
-    number = false,
-    relativenumber = false,
-    signcolumn = "yes",
-  },
+  view = { width = 24 },
   filters = {
     dotfiles = false,
-    custom = { "node_modules", ".cache" },
-  },
-  trash = {
-    cmd = "trash",
-    require_confirm = true,
+    custom = { "node_modules", ".cache" , ".git"},
   },
   actions = {
-    change_dir = {
-      global = false,
-    },
     open_file = {
-      quit_on_open = false,
-    },
-    window_picker = {
-      enable = false,
-      chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
-      exclude = {},
+      window_picker = {
+        enable = false
+      },
     },
   },
   show_icons = {
@@ -562,7 +497,9 @@ map('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', {expr=true})
 -- map('o', '<leader>p', '<Plug>(DBExe)', {noremap=false})
 -- map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
 -- vim-svelte
-g['vim_svelte_plugin_load_full_syntax'] = 1
+g['vim_svelte_plugin_use_typescript'] = 1
+g['vim_svelte_plugin_use_sass']       = 1
+g['vim_svelte_plugin_use_foldexpr']   = 1
 -- vimtex
 g['vimtex_quickfix_mode'] = 0
 g['vimtex_compiler_method'] = 'tectonic'
@@ -620,6 +557,7 @@ o.textwidth = width                       -- Maximum width of text
 map('n', '<C-s>', '<cmd>update<CR>')
 map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
+map('v', '<BS>', '<ESC>')
 map('n', '<F3>', '<cmd>lua Toggle_Wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
 map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
@@ -712,8 +650,8 @@ local on_attach = function(client, bufnr)
   -- keybindings
   -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
   -- NOTE: Order is important. You can't lazy load lexima.vim
-  g['lexima_no_defualt_rules'] = true
-  g['lexima_enable_endwise_rules'] = 1
+  -- g['lexima_no_defualt_rules'] = true
+  -- g['lexima_enable_endwise_rules'] = 1
 end
 
 local lsp_installer = require("nvim-lsp-installer")
