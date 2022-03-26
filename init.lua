@@ -43,16 +43,17 @@ local packer = require('packer')
 local use = packer.use
 packer.startup{ function()
   use 'wbthomason/packer.nvim'      -- Let packer manage packer
+  -- use 'dstein64/vim-startuptime' -- :StartupTime
+  -- use 'Shatur/neovim-session-manager'
+  -- use 'tanvirtin/monokai.nvim'
+  -- use 'navarasu/onedark.nvim'
+  -- use 'cohama/lexima.vim'
   use 'alvan/vim-closetag'          -- Close html tags
   use {'akinsho/nvim-bufferline.lua', requires = {'ojroques/nvim-bufdel'}}
   use 'airblade/vim-rooter'
-  -- use 'cohama/lexima.vim'
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
   use 'haya14busa/is.vim'
-  use 'Shatur/neovim-session-manager'
-  -- use 'tanvirtin/monokai.nvim'
-  -- use 'navarasu/onedark.nvim'
   use 'LunarVim/onedarker.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
