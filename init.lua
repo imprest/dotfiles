@@ -114,24 +114,12 @@ packer.startup{ function()
     }
   }
   -- lsp-diagnostics
-  use {
-    "folke/trouble.nvim",
-    requires = "kyazdani42/nvim-web-devicons",
-    config = function()
-      require("trouble").setup {}
-    end
-  }
   use 'NvChad/nvim-colorizer.lua'
   use 'nvim-lualine/lualine.nvim'
   use 'olambo/vi-viz'
   use 'ojroques/nvim-lspfuzzy'
   use 'pbrisbin/vim-mkdir'           -- :e this/does/not/exist/file.txt then :w
   use 'phaazon/hop.nvim'
-  use {
-    'TimUntersberger/neogit',
-    config = function() require("neogit").setup{} end,
-    requires = {'nvim-lua/plenary.nvim'}
-  }
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   use 'akinsho/toggleterm.nvim'
@@ -163,6 +151,34 @@ end,
 }
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true                    -- True color support
+-- bufferline
+local function diagnostics_indicator(_, _, diagnostics)
+  local result = {}
+  local symbols = { error = "", warning = "", info = "" }
+  for name, count in pairs(diagnostics) do
+    if symbols[name] and count > 0 then
+      table.insert(result, symbols[name] .. " " .. count)
+    end
+  end
+  result = table.concat(result, " ")
+  return #result > 0 and result or ""
+end
+require('bufferline').setup{
+  options = {
+    close_command = "BufDel",
+    diagnostics = 'nvim_lsp',
+    diagnostics_indicator = diagnostics_indicator,
+    show_close_icon = false,
+    seperator_style = 'thin',
+    offsets = {
+      {
+        filetype = "NvimTree",
+        text = "",
+        padding = 1,
+      }
+    }
+  }
+}
 -- toggleterm
 local terminal = require('toggleterm')
 terminal.setup{
@@ -182,7 +198,7 @@ wk.register({
   ["q"] = { "<cmd>q!<CR>", "Quit" },
   ["/"] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
   ["c"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
-  ["gg"] = { '<cmd>TermExec cmd="lazygit" direction=float<CR>', "LazyGit" },
+  ["gg"] = { '<cmd>TermExec cmd="gitui" direction=float<CR>', "Gitui" },
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
   ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
   ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
@@ -205,7 +221,6 @@ wk.register({
     a = { "<cmd>FzfLua lsp_code_actions<cr>", "Code Action" },
     d = { "<cmd>FzfLua lsp_document_diagnostics<cr>", "Buffer Diagnostics" },
     w = { "<cmd>FzfLua lsp_workspace_diagnostics<cr>", "Diagnostics" },
-    t = { "<cmd>TroubleToggle<cr>", "Trouble" },
     f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
     i = { "<cmd>LspInfo<cr>", "Info" },
     I = { "<cmd>LspInstallInfo<cr>", "Installer Info" },
@@ -223,7 +238,6 @@ wk.register({
     s = { "<cmd>FzfLua lsp_document_symbols<cr>", "Document Symbols" },
     S = { "<cmd>FzfLua lsp_workspace_symbols<cr>", "Workspace Symbols" },
   },
-  ["G"] = { "<cmd>Neogit<CR>", "Neogit" },
   g = {
     name = "Git",
     f = { "<cmd>FzfLua git_files<cr>", "Git Files" },
@@ -269,11 +283,11 @@ local conditions = {
   hide_in_width = function()
     return fn.winwidth(0) > window_width_limit
   end,
-  -- check_git_workspace = function()
-  --   local filepath = vim.fn.expand "%:p:h"
-  --   local gitdir = vim.fn.finddir(".git", filepath .. ";")
-  --   return gitdir and #gitdir > 0 and #gitdir < #filepath
-  -- end,
+  check_git_workspace = function()
+    local filepath = vim.fn.expand "%:p:h"
+    local gitdir = vim.fn.finddir(".git", filepath .. ";")
+    return gitdir and #gitdir > 0 and #gitdir < #filepath
+  end,
 }
 local function diff_source()
   local gitsigns = b.gitsigns_status_dict
@@ -333,7 +347,8 @@ require'lualine'.setup {
         },
         color = {},
         cond = nil,
-      }
+      },
+      { 'filesize', cond = conditions.buffer_not_empty },
     },
     lualine_x = {
       { -- 'diagnostics'
@@ -341,7 +356,7 @@ require'lualine'.setup {
         sources = { "nvim_diagnostic" },
         symbols = { error = " ", warn = " ", info = " ", hint = " " },
         color = { bg = colors.bg },
-        cond = conditions.hide_in_width,
+        cond = nil
       },
       { -- 'treesitter'
         function()
@@ -355,38 +370,22 @@ require'lualine'.setup {
         cond = conditions.hide_in_width,
       },
       { -- 'lsp'
-        function(msg)
-          msg = msg or "LSP"
-          local buf_clients = vim.lsp.buf_get_clients()
-          if next(buf_clients) == nil then
-            -- TODO: clean up this if statement
-            if type(msg) == "boolean" or #msg == 0 then
-              return ""
-            end
+        function()
+          local msg = 'No Active Lsp'
+          local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
+          local clients = vim.lsp.get_active_clients()
+          if next(clients) == nil then
             return msg
           end
-          -- local buf_ft = vim.bo.filetype
-          local buf_client_names = {}
-
-          -- add client
-          for _, client in pairs(buf_clients) do
-            if client.name ~= "null-ls" then
-              table.insert(buf_client_names, client.name)
+          for _, client in ipairs(clients) do
+            local filetypes = client.config.filetypes
+            if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+              return client.name
             end
           end
-
-          -- add formatter
-          -- local formatters = require "lvim.lsp.null-ls.formatters"
-          -- local supported_formatters = formatters.list_registered(buf_ft)
-          -- vim.list_extend(buf_client_names, supported_formatters)
-
-          -- add linter
-          -- local linters = require "lvim.lsp.null-ls.linters"
-          -- local supported_linters = linters.list_registered(buf_ft)
-          -- vim.list_extend(buf_client_names, supported_linters)
-
-          return "[" .. table.concat(buf_client_names, ", ") .. "]"
+          return msg
         end,
+        icon = '',
         color = { bg = colors.bg, gui = "bold" },
         cond = conditions.hide_in_width,
       },
@@ -403,7 +402,7 @@ require'lualine'.setup {
           local index = math.ceil(line_ratio * #chars)
           return chars[index]
         end,
-        padding = { left = 0, right = 0 },
+        padding = { left = 1, right = 0 },
         color = { fg = colors.yellow, bg = colors.bg },
         cond = nil,
       },
@@ -509,7 +508,7 @@ local width = 96
 cmd 'colorscheme onedarker'
 o.background = 'dark'
 -- global options
-o.guicursor='n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175,a:blinkon1'
+o.guicursor = 'i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1'
 o.timeoutlen = 300                        -- mapping timeout
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse
@@ -561,6 +560,7 @@ map('v', '<BS>', '<ESC>')
 map('n', '<F3>', '<cmd>lua Toggle_Wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
 map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
+map('n', '<F6>', '<cmd>SymbolsOutline<CR>')
 map('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
 map('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
 map('n', '<C-f>', '<cmd>FzfLua grep<CR>')
@@ -625,6 +625,12 @@ for type, icon in pairs(signs) do
   local hl = "DiagnosticSign" .. type
   fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
+o.updatetime = 250
+vim.diagnostic.config({
+  virtual_text = false
+  -- virtual_text = { prefix = '●'}
+})
+cmd [[autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
 -- lsp_signature
 local on_attach_lsp_signature = function(_, _)
   require('lsp_signature').on_attach({
