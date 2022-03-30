@@ -613,7 +613,7 @@ map('v', '>', '>gv')
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
 ts.setup {
-  ensure_installed = {"css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "toml", "zig"},
+  ensure_installed = {"css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "svelte", "toml", "typescript", "zig"},
   context_commentstring = { enable = true, enable_autocmd = false },
   highlight = {enable = true}, indent = {enable = false} -- indent is experimental
 }
