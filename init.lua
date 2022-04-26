@@ -49,7 +49,7 @@ packer.startup{ function()
   -- use 'navarasu/onedark.nvim'
   -- use 'cohama/lexima.vim'
   use 'alvan/vim-closetag'          -- Close html tags
-  use {'akinsho/nvim-bufferline.lua', requires = {'ojroques/nvim-bufdel'}}
+  use {'akinsho/nvim-bufferline.lua', tag = "v1.*", requires = {'ojroques/nvim-bufdel'}}
   use 'airblade/vim-rooter'
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
