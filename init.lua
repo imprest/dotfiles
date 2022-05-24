@@ -449,34 +449,6 @@ require'nvim-tree'.setup {
         enable = false
       },
     },
-  },
-  show_icons = {
-    git = 1,
-    folders = 1,
-    files = 1,
-    folder_arrows = 1,
-  },
-  git_hl = 1,
-  root_folder_modifier = ":t",
-  icons = {
-    default = "",
-    symlink = "",
-    git = {
-      unstaged = "",
-      staged = "S",
-      unmerged = "",
-      renamed = "➜",
-      deleted = "",
-      untracked = "U",
-      ignored = "◌",
-    },
-    folder = {
-      default = "",
-      open = "",
-      empty = "",
-      empty_open = "",
-      symlink = "",
-    },
   }
 }
 map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
