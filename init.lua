@@ -51,7 +51,7 @@ packer.startup{ function()
   use 'farmergreg/vim-lastplace'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
-  use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
+  use 'justinmk/vim-gtfo'            -- gof open file in filemanager
   use { 'kyazdani42/nvim-tree.lua', requires = 'kyazdani42/nvim-web-devicons' }
   use {'kristijanhusak/vim-dadbod-completion', requires = 'tpope/vim-dadbod' }
   use 'leafOfTree/vim-svelte-plugin'
@@ -150,7 +150,7 @@ require('onedark').setup {
 }
 -- neoscroll
 require('neoscroll').setup()
--- bufferlinei
+-- bufferline
 require('bufferline').setup{
   options = {
     show_buffer_close_icons = false,
@@ -167,7 +167,7 @@ require('bufferline').setup{
 -- toggleterm
 local terminal = require('toggleterm')
 terminal.setup{
-  open_mapping = [[<c-t>]],
+  open_mapping = [[<A-t>]],
   shading_factor = 2,
   direction = 'float',
 }
@@ -202,21 +202,18 @@ wk.register({
   },
   l = {
     name = "LSP",
-    a = { "<cmd>FzfLua lsp_code_actions<cr>", "Code Action" },
-    d = { "<cmd>FzfLua lsp_document_diagnostics<cr>", "Buffer Diagnostics" },
-    w = { "<cmd>FzfLua lsp_workspace_diagnostics<cr>", "Diagnostics" },
-    f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
-    i = { "<cmd>LspInfo<cr>", "Info" },
     I = { "<cmd>LspInstallInfo<cr>", "Installer Info" },
+    a = { "<cmd>FzfLua lsp_code_actions<cr>", "Code Action" },
+    c = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
+    d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
+    D = { "<cmd>FzfLua lsp_document_diagnostics<cr>", "Buffer Diagnostics" },
+    f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
+    i = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Implementation" },
     j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
     k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
-    l = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-    p = {
-      name = "Peek",
-      d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
-      t = { "<cmd>lua vim.lsp.buf.type_definition()<cr>", "Type Definition" },
-      i = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Implementation" },
-    },
+    l = { "<cmd>LspInfo<cr>", "Info" },
+    t = { "<cmd>lua vim.lsp.buf.type_definition()<cr>", "Type Definition" },
+    w = { "<cmd>FzfLua lsp_workspace_diagnostics<cr>", "Diagnostics" },
     q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
     r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
     s = { "<cmd>FzfLua lsp_document_symbols<cr>", "Document Symbols" },
@@ -429,7 +426,7 @@ o.completeopt = 'menu,menuone,noselect'   -- Completion options
 o.ignorecase = true                       -- Ignore case
 o.joinspaces = false                      -- No double spaces with join
 o.scrolloff = 1                           -- Lines of context
-o.scrolljump = 5                          -- min. lines to scroll
+o.scrolljump = 1                          -- min. lines to scroll
 o.shiftround = true                       -- Round indent
 o.sidescrolloff = 8                       -- Columns of context
 o.smartcase = true                        -- Don't ignore case with capitals
@@ -478,6 +475,7 @@ map('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
 map('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
 map('n', '<C-f>', '<cmd>FzfLua grep<CR>')
 map('n', '<C-b>', '<cmd>FzfLua blines<CR>')
+map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
 -- move lines up/down
 map('n', '<A-j>', ':m .+1<CR>==')
 map('n', '<A-k>', ':m .-2<CR>==')
