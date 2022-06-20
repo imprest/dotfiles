@@ -4,14 +4,8 @@
 -------------------- HELPERS -------------------------------
 local vim = vim
 local api, cmd, fn, g, lsp = vim.api, vim.cmd, vim.fn, vim.g, vim.lsp
-local o, wo, b = vim.o, vim.wo, vim.b
+local o, wo, b, map, autocmd = vim.o, vim.wo, vim.b, vim.keymap.set, vim.api.nvim_create_autocmd
 -- local bo = vim.bo
-
-local function map(mode, lhs, rhs, opts)
-  local options = {noremap = true, silent = true}
-  if opts then options = vim.tbl_extend('force', options, opts) end
-  api.nvim_set_keymap(mode, lhs, rhs, options)
-end
 
 g['loaded_python_provider'] = 1
 g['python3_host_prog'] = '/usr/bin/python3'
@@ -46,15 +40,15 @@ packer.startup{ function()
   -- use 'dstein64/vim-startuptime' -- :StartupTime
   -- use 'Shatur/neovim-session-manager'
   -- use 'tanvirtin/monokai.nvim'
-  -- use 'navarasu/onedark.nvim'
+  -- use 'LunarVim/onedarker.nvim'
   -- use 'cohama/lexima.vim'
+  use 'navarasu/onedark.nvim'
+  use 'karb94/neoscroll.nvim'
   use 'alvan/vim-closetag'          -- Close html tags
-  use {'akinsho/nvim-bufferline.lua', tag = "v1.*", requires = {'ojroques/nvim-bufdel'}}
+  use {'akinsho/nvim-bufferline.lua', tag = "v2.*", requires = {'ojroques/nvim-bufdel'}}
   use 'airblade/vim-rooter'
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
-  use 'haya14busa/is.vim'
-  use 'LunarVim/onedarker.nvim'
   use {'ibhagwan/fzf-lua', requires = {'vijaymarupudi/nvim-fzf'}}
   use 'junegunn/vim-easy-align'      -- visual select then ga<char> to align
   use 'justinmk/vim-gtfo'            -- ,gof open file in filemanager
@@ -120,7 +114,6 @@ packer.startup{ function()
   use 'olambo/vi-viz'
   use 'ojroques/nvim-lspfuzzy'
   use 'pbrisbin/vim-mkdir'           -- :e this/does/not/exist/file.txt then :w
-  use 'phaazon/hop.nvim'
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
   use 'akinsho/toggleterm.nvim'
@@ -152,32 +145,23 @@ end,
 }
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true                    -- True color support
--- bufferline
-local function diagnostics_indicator(_, _, diagnostics)
-  local result = {}
-  local symbols = { error = "", warning = "", info = "" }
-  for name, count in pairs(diagnostics) do
-    if symbols[name] and count > 0 then
-      table.insert(result, symbols[name] .. " " .. count)
-    end
-  end
-  result = table.concat(result, " ")
-  return #result > 0 and result or ""
-end
+require('onedark').setup {
+    style = 'darker'
+}
+-- neoscroll
+require('neoscroll').setup()
+-- bufferlinei
 require('bufferline').setup{
   options = {
-    close_command = "BufDel",
-    diagnostics = 'nvim_lsp',
-    diagnostics_indicator = diagnostics_indicator,
+    show_buffer_close_icons = false,
     show_close_icon = false,
     seperator_style = 'thin',
-    offsets = {
-      {
-        filetype = "NvimTree",
-        text = "",
-        padding = 1,
-      }
-    }
+    offsets = {{ filetype = "NvimTree", padding = 1 }},
+    custom_filter = function(buf_number, _) -- hide shell and other unknown ft
+      if vim.bo[buf_number].filetype ~= "" then
+        return true
+      end
+    end
   }
 }
 -- toggleterm
@@ -203,7 +187,6 @@ wk.register({
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
   ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
   ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
-  ["j"] = { '<cmd>HopChar2<CR>', "Hop" },
   ["S"] = { ':%s//gcI<Left><Left><Left><Left>', "Substitue" },
   ["<leader>"] = { '<C-^>', 'Last buffer' },
   ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
@@ -251,7 +234,7 @@ wk.register({
 -- bufdel
 require('bufdel').setup {next = 'alternate'}
 -- closetag
-g['closetag_filenames'] = '*.html, *.vue, *.ex, *.eex, *.leex, *.heex, *.svelte'
+g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
 -- colorizer
 require('colorizer').setup {'css'; 'javascript'; html = { mode = 'foreground'; }}
 -- fzf-lua
@@ -262,20 +245,6 @@ require('fzf-lua').setup({
   }
 })
 -- lualine
-local colors = {
-  bg = "#282c34",
-  fg = "#bbc2cf",
-  yellow = "#ECBE7B",
-  cyan = "#008080",
-  darkblue = "#081633",
-  green = "#98be65",
-  orange = "#FF8800",
-  violet = "#a9a1e1",
-  magenta = "#c678dd",
-  purple = "#c678dd",
-  blue = "#51afef",
-  red = "#ec5f67",
-}
 local window_width_limit = 70
 local conditions = {
   buffer_not_empty = function()
@@ -300,16 +269,10 @@ local function diff_source()
     }
   end
 end
-local custom_auto = require'lualine.themes.auto'
--- Change the background of lualine_c section for all modes
-custom_auto.normal.c.bg = colors.bg
-custom_auto.insert.c.bg = colors.bg
-custom_auto.visual.c.bg = colors.bg
-custom_auto.command.c.bg = colors.bg
 require'lualine'.setup {
   options = {
     icons_enabled = true,
-    theme = custom_auto,
+    theme = 'onedark',
     component_separators = { left = '', right = ''},
     section_separators = { left = '', right = ''},
     disabled_filetypes = { "NvimTree", "Telescope", "Outline", "dashboard" },
@@ -318,36 +281,23 @@ require'lualine'.setup {
   sections = {
     lualine_a = {{ -- mode
       function() return " " end,
-      padding = { left = 0, right = 0 },
-      color = {},
-      cond = nil,
+      padding = { left = 0, right = 0 }
     }},
     lualine_b = {
       { -- 'branch'
         "b:gitsigns_head",
         icon = "",
-        color = { gui = "bold", bg = colors.bg },
-        cond = conditions.hide_in_width,
+        cond = conditions.hide_in_width
       },
       { -- 'filename'
-        "filename",
-        color = { bg = colors.bg },
-        cond = nil,
+        "filename"
       }
     },
     -- {'diagnostics', sources={'nvim_diagnostic'}}},
     lualine_c = {
       { -- 'diff'
-        "diff",
-        source = diff_source,
-        symbols = { added = " ", modified = " ", removed = " " },
-        diff_color = {
-          added = { fg = colors.green, bg = colors.bg },
-          modified = { fg = colors.yellow, bg = colors.bg },
-          removed = { fg = colors.red, bg = colors.bg },
-        },
-        color = {},
-        cond = nil,
+        "diff", source = diff_source,
+        symbols = { added = " ", modified = " ", removed = " " }
       },
       { 'filesize', cond = conditions.buffer_not_empty },
     },
@@ -355,19 +305,15 @@ require'lualine'.setup {
       { -- 'diagnostics'
         "diagnostics",
         sources = { "nvim_diagnostic" },
-        symbols = { error = " ", warn = " ", info = " ", hint = " " },
-        color = { bg = colors.bg },
-        cond = nil
+        symbols = { error = " ", warn = " ", info = " ", hint = " " }
       },
       { -- 'treesitter'
         function()
-          -- local b = vim.api.nvim_get_current_buf()
-          if next(vim.treesitter.highlighter.active[b]) then
+          if next(vim.treesitter.highlighter.active[api.nvim_get_current_buf()]) then
             return ""
           end
           return ""
         end,
-        color = { fg = colors.green, bg = colors.bg },
         cond = conditions.hide_in_width,
       },
       { -- 'lsp'
@@ -387,10 +333,9 @@ require'lualine'.setup {
           return msg
         end,
         icon = '',
-        color = { bg = colors.bg, gui = "bold" },
         cond = conditions.hide_in_width,
       },
-      { "filetype", cond = conditions.hide_in_width, color = { fg = colors.fg, bg = colors.bg } },
+      { "filetype", cond = conditions.hide_in_width} -- color = { fg = colors.fg, bg = colors.bg } },
     },
     lualine_y = {},
     lualine_z = {
@@ -398,14 +343,12 @@ require'lualine'.setup {
         function()
           local current_line = fn.line "."
           local total_lines = fn.line "$"
-          local chars = { "__", "▁▁", "▂▂", "▃▃", "▄▄", "▅▅", "▆▆", "▇▇", "██" }
+          local chars = { "██", "▇▇", "▆▆", "▆▆", "▄▄","▃▃", "▂▂", "▁▁", "  "}
           local line_ratio = current_line / total_lines
           local index = math.ceil(line_ratio * #chars)
           return chars[index]
         end,
-        padding = { left = 1, right = 0 },
-        color = { fg = colors.yellow, bg = colors.bg },
-        cond = nil,
+        padding = { left = 0, right = 0 }
       },
     }
   },
@@ -420,14 +363,12 @@ require'lualine'.setup {
   tabline = {},
   extensions = {'quickfix', 'nvim-tree', 'fzf'}
 }
--- hop
-require('hop').setup { keys = 'etovxqpdygfblzhckisuran', term_seq_bias = 0.5 }
 -- nvim-autopairs
 require('nvim-autopairs').setup()
 -- nvim-tree
 require'nvim-tree'.setup {
   disable_netrw = true,
-  ignore_ft_on_setup = { "startify","dashboard", "alpha" },
+  ignore_ft_on_setup = { "startify", "dashboard", "alpha" },
   update_focused_file = {
     enable = true,
     update_cwd = true,
@@ -438,11 +379,9 @@ require'nvim-tree'.setup {
     ignore = false,
     timeout = 200,
   },
-  view = { width = 24 },
-  filters = {
-    dotfiles = false,
-    custom = { "node_modules", ".cache" , ".git"},
-  },
+  view = { width = 26 },
+  renderer = { group_empty = true, icons = { git_placement = "after" } },
+  filters = { custom = { "node_modules", ".cache" , ".git"} },
   actions = {
     open_file = {
       window_picker = {
@@ -451,11 +390,11 @@ require'nvim-tree'.setup {
     },
   }
 }
-map('n', '<F2>'  , '<cmd>NvimTreeToggle<CR>')
+map('n', '<F2>', '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 -- vi-viz
-map('x','v', "<cmd>lua require('vi-viz').vizExpand()<CR>", {noremap = true})
-map('x','V', "<cmd>lua require('vi-viz').vizContract()<CR>", {noremap = true})
+map('x','v', "<cmd>lua require('vi-viz').vizExpand()<CR>")
+map('x','V', "<cmd>lua require('vi-viz').vizContract()<CR>")
 -- vim-easy-align
 map('x', 'ga', '<Plug>(EasyAlign)', {noremap = false})
 map('n', 'ga', '<Plug>(EasyAlign)', {noremap = false})
@@ -478,10 +417,11 @@ g['vimtex_compiler_method'] = 'tectonic'
 g['vimtex_view_general_viewer'] = 'evince'
 -------------------- OPTIONS -------------------------------
 local width = 96
-cmd 'colorscheme onedarker'
+cmd 'colorscheme onedark'
 o.background = 'dark'
 -- global options
 o.guicursor = 'i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1'
+o.laststatus = 3                          -- global statusline
 o.timeoutlen = 300                        -- mapping timeout
 o.hidden = true                           -- Enable background buffers
 o.mouse = 'a'                             -- Allow the mouse
@@ -557,8 +497,8 @@ map('n', 'F', '%')
 map('v', 'L', 'g_')
 map('n', 'S', '<cmd>bn<CR>')
 map('n', 'X', '<cmd>bp<CR>')
-map('n', '<Right>', '<cmd>bn<CR>')
-map('n', '<Left>', '<cmd>bp<CR>')
+map('n', '<Right>', '<cmd>BufferLineCycleNext<CR>')
+map('n', '<Left>', '<cmd>BufferLineCyclePrev<CR>')
 map('t', '<C-h>', '<C-\\><C-N><C-w>h')
 map('t', '<C-j>', '<C-\\><C-N><C-w>j')
 map('t', '<C-k>', '<C-\\><C-N><C-w>k')
@@ -643,10 +583,18 @@ local enhance_server_opts = {
       }
     }
   end,
+  ["sumneko_lua"] = function(opts)
+    opts.settings = {
+      Lua = {
+        diagnostics = { globals = { "vim" }}
+      }
+    }
+  end,
   ["jsonls"] = function(opts)
     opts.settings = {
       json = {
-        schemas = require('schemastore').json.schemas()
+        schemas = require('schemastore').json.schemas(),
+        validate = { enable = true }
       }
     }
   end
@@ -770,6 +718,8 @@ function Toggle_Wrap()
   wo.linebreak = not wo.linebreak
   wo.wrap = not wo.wrap
 end
+
+autocmd("TermEnter", { pattern = "*", callback = function() cmd 'startinsert' end})
 
 vim.tbl_map(function(c) cmd(string.format('autocmd %s', c)) end, {
   'TermOpen * lua Init_Term()',
