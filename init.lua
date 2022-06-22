@@ -104,7 +104,6 @@ packer.startup { function()
       { 'rafamadriz/friendly-snippets' },
       { 'ray-x/lsp_signature.nvim' },
       { 'kdheepak/cmp-latex-symbols' },
-      { 'hrsh7th/cmp-nvim-lsp-document-symbol' },
       { 'onsails/lspkind-nvim' }
     }
   }
@@ -701,15 +700,13 @@ cmp.setup({
     },
   },
   sources = cmp.config.sources({
-    { name = "nvim_lsp" },
     { name = "nvim_lua" },
-    { name = "nvim_lsp_document_symbol" },
+    { name = "nvim_lsp" },
     { name = "path" },
     { name = "luasnip" },
     { name = "buffer", keyword_length = 5 },
     { name = "spell" },
     { name = "tags" },
-    -- { name = "vim_dadbod_completion" },
     { name = "latex_symbols" }
   })
 })
