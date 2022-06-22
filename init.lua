@@ -9,8 +9,8 @@ local o, wo, b, map, autocmd = vim.o, vim.wo, vim.b, vim.keymap.set, vim.api.nvi
 
 g['loaded_python_provider'] = 1
 g['python3_host_prog'] = '/usr/bin/python3'
-g['mapleader'] = ' '
-g['maplocalleader'] = ","
+g['mapleader'] = ','
+g['maplocalleader'] = ";"
 
 -------------------- PACKER  -------------------------------
 local execute = api.nvim_command
@@ -37,7 +37,7 @@ local packer = require('packer')
 local use = packer.use
 packer.startup { function()
   use 'wbthomason/packer.nvim' -- Let packer manage packer
-  use 'dstein64/vim-startuptime' -- :StartupTime
+  -- use 'dstein64/vim-startuptime' -- :StartupTime
   -- use 'Shatur/neovim-session-manager'
   -- use 'tanvirtin/monokai.nvim'
   -- use 'LunarVim/onedarker.nvim'
@@ -100,7 +100,7 @@ packer.startup { function()
       { 'hrsh7th/cmp-buffer' },
       { 'hrsh7th/cmp-path' },
       { 'hrsh7th/cmp-vsnip' },
-      { 'hrsh7th/vim-vsnip' },
+      { 'L3MON4D3/LuaSnip' },
       { 'rafamadriz/friendly-snippets' },
       { 'ray-x/lsp_signature.nvim' },
       { 'kdheepak/cmp-latex-symbols' },
@@ -176,12 +176,12 @@ local wk = require('which-key')
 wk.register({
   ["S"] = { ':s//gcI<Left><Left><Left><Left>', "Substitue" },
   ["y"] = { '"+y', "Yank System Clipboard" },
-  ["/"] = { "<ESC><CMD>lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>", "Comment" }
+  ["."] = { "<ESC><CMD>lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>", "Comment" }
 }, { prefix = "<leader>", mode = 'v' })
 wk.register({
   ["w"] = { "<cmd>w!<CR>", "Save" },
   ["q"] = { "<cmd>q!<CR>", "Quit" },
-  ["/"] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
+  ["."] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
   ["c"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
   ["gg"] = { '<cmd>TermExec cmd="gitui" direction=float<CR>', "Gitui" },
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
@@ -426,39 +426,48 @@ o.mouse = 'a' -- Allow the mouse
 o.completeopt = 'menu,menuone,noselect' -- Completion options
 o.ignorecase = true -- Ignore case
 o.joinspaces = false -- No double spaces with join
-o.scrolloff = 1 -- Lines of context
+o.scrolloff = 10 -- Lines of context
 o.scrolljump = 1 -- min. lines to scroll
 o.shiftround = true -- Round indent
-o.sidescrolloff = 10 -- Columns of context
+o.sidescrolloff = 8 -- Columns of context
 o.smartcase = true -- Don't ignore case with capitals
 o.splitbelow = true -- Put new windows below current
 o.splitright = true -- Put new windows right of current
 o.updatetime = 200 -- Delay before swap file is saved
 o.shortmess = 'IFc' -- Avoid showing extra message on completion
-o.showbreak = '↪ '
+o.showbreak = '↪  '
 o.showmode = false
-o.fillchars = "eob: "
+o.showmatch = true
+o.equalalways = false -- I don't like my windows changing all the time
+o.fillchars = 'eob: '
 o.inccommand = 'split'
 o.backup = false
 o.writebackup = false
 o.swapfile = false
 o.undofile = true
 o.undodir = '/home/hvaria/.nvim/undo'
+o.wildmode = "longest:full"
+o.wildoptions = 'pum'
+o.updatetime = 1000 -- make updates faster
+o.wrap = true
+o.breakindent = true
+o.showbreak = '↪  '
+o.linebreak = true
 -- window-local options
 wo.cursorline = false -- Highlight cursor line
 wo.list = true -- Show some invisible characters
 wo.relativenumber = false -- Relative line numbers
 wo.number = true -- Show line numbers
 wo.signcolumn = 'yes' -- Show sign column
-wo.wrap = true -- Disable line wrap
 wo.foldmethod = 'expr'
 wo.foldexpr = 'nvim_treesitter#foldexpr()'
-wo.foldlevel = 9
+wo.foldlevel = 5
 -- buffer-local options
 o.tabstop = 2 -- Number of spaces tabs count for
+o.shiftwidth = 2 -- Size of an indent
+o.softtabstop = 2
 o.expandtab = true -- Use spaces instead of tabs
 o.formatoptions = 'crqnj1' -- Automatic formatting options
-o.shiftwidth = 2 -- Size of an indent
 o.smartindent = true -- Insert indents automatically
 o.textwidth = width -- Maximum width of text
 
@@ -468,7 +477,6 @@ map('n', '<C-s>', '<cmd>update<CR>')
 map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('v', '<BS>', '<ESC>')
-map('n', '<F3>', '<cmd>lua Toggle_Wrap()<CR>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
 map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
 map('n', '<F6>', '<cmd>SymbolsOutline<CR>')
@@ -635,16 +643,6 @@ end
 
 -------------------- LSP w/ Cmp-----------------------------
 -- Setup our autocompletion. These configuration options are the default ones
--- copied out of the documentation.
-local has_words_before = function()
-  local line, col = unpack(api.nvim_win_get_cursor(0))
-  return col ~= 0 and api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-end
-
-local feedkey = function(key, mode)
-  api.nvim_feedkeys(api.nvim_replace_termcodes(key, true, true, true), mode, true)
-end
-
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local cmp = require 'cmp'
 cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
@@ -652,54 +650,66 @@ local lspkind = require('lspkind')
 cmp.setup({
   formatting = {
     format = lspkind.cmp_format({
-      mode = 'symbol'
+      with_text = true,
+      menu = {
+        buffer = "[buf]",
+        nvim_lsp = "[LSP]",
+        nvim_lua = "[api]",
+        path = "[path]",
+        luasnip = "[snip]",
+      },
     })
   },
   snippet = {
     expand = function(args)
-      fn["vsnip#anonymous"](args.body)
+      require('luasnip').lsp_expand(args.body)
     end,
   },
   mapping = {
-    ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-    ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-    ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-    ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
-    ['<C-e>'] = cmp.mapping({
-      i = cmp.mapping.abort(),
-      c = cmp.mapping.close(),
-    }),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
-    ["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif fn["vsnip#available"](1) == 1 then
-        feedkey("<Plug>(vsnip-expand-or-jump)", "")
-      elseif has_words_before() then
-        cmp.complete()
-      else
-        fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
-      end
-    end, { "i", "s" }),
-
-    ["<S-Tab>"] = cmp.mapping(function()
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif fn["vsnip#jumpable"](-1) == 1 then
-        feedkey("<Plug>(vsnip-jump-prev)", "")
-      end
-    end, { "i", "s" }),
+    ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+    ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+    ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+    ["<C-e>"] = cmp.mapping.abort(),
+    ["<c-y>"] = cmp.mapping(
+      cmp.mapping.confirm {
+        behavior = cmp.ConfirmBehavior.Insert,
+        select = true,
+      },
+      { "i", "c" }
+    ),
+    ["<c-space>"] = cmp.mapping {
+      i = cmp.mapping.complete(),
+      c = function(
+        _ --[[fallback]]
+      )
+        if cmp.visible() then
+          if not cmp.confirm { select = true } then
+            return
+          end
+        else
+          cmp.complete()
+        end
+      end,
+    },
+    -- ["<tab>"] = false,
+    ["<tab>"] = cmp.config.disable,
+    -- Testing
+    ["<c-q>"] = cmp.mapping.confirm {
+      behavior = cmp.ConfirmBehavior.Replace,
+      select = true,
+    },
   },
   sources = cmp.config.sources({
     { name = "nvim_lsp" },
     { name = "nvim_lua" },
     { name = "nvim_lsp_document_symbol" },
-    { name = "vsnip" },
     { name = "path" },
-    { name = "buffer", keyword_length = 3 },
+    { name = "luasnip" },
+    { name = "buffer", keyword_length = 4 },
     { name = "spell" },
     { name = "tags" },
-    { name = "vim_dadbod_completion" },
+    -- { name = "vim_dadbod_completion" },
     { name = "latex_symbols" }
   })
 })
@@ -713,12 +723,6 @@ function Init_Term()
   cmd 'startinsert'
 end
 
-function Toggle_Wrap()
-  wo.breakindent = not wo.breakindent
-  wo.linebreak = not wo.linebreak
-  wo.wrap = not wo.wrap
-end
-
 local group = vim.api.nvim_create_augroup("MyGroup", { clear = true })
 autocmd("TextYankPost",
   { pattern = "*",
@@ -726,7 +730,7 @@ autocmd("TextYankPost",
     group = group })
 autocmd("FileType",
   { pattern = "sql,mysql,plsql",
-    command = 'lua require("cmp").setup.buffer({ sources = {{ name = "vim-dadbod-completion}}})', group = group })
+    command = 'lua require("cmp").setup.buffer({ sources = {{ name = "vim-dadbod-completion"}}})', group = group })
 
 local term_group = vim.api.nvim_create_augroup("TermGroup", { clear = true })
 autocmd("BufEnter", { pattern = "term://*", command = 'startinsert', group = term_group })
