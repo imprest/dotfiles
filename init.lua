@@ -706,14 +706,35 @@ cmp.setup({
     { name = "nvim_lsp_document_symbol" },
     { name = "path" },
     { name = "luasnip" },
-    { name = "buffer", keyword_length = 4 },
+    { name = "buffer", keyword_length = 5 },
     { name = "spell" },
     { name = "tags" },
     -- { name = "vim_dadbod_completion" },
     { name = "latex_symbols" }
   })
 })
-
+--- Luasnip
+local ls = require('luasnip')
+require("luasnip.loaders.from_lua").load({ paths = "~/dotfiles/snippets/" })
+ls.config.set_config({
+  history = true, -- keep around last snippet local to jump back
+  updateevents = "TextChanged,TextChangedI", -- update changes as you type
+  enable_autosnippets = true,
+  ext_opts = {
+    [require("luasnip.util.types").choiceNode] = {
+      active = { virt_text = { { "·", "Question" } } }
+    }
+  }
+})
+vim.keymap.set({ "i", "s" }, "<a-k>", function() -- my expansion key
+  if ls.expand_or_jumpable() then ls.expand_or_jump() end
+end, { silent = true })
+vim.keymap.set({ "i", "s" }, "<a-j>", function() -- my jump backwords key
+  if ls.jumpable(-1) then ls.jump(-1) end
+end, { silent = true })
+vim.keymap.set({ "i" }, "<a-l>", function() -- select within list of options
+  if ls.choice_active() then ls.change_choice(1) end
+end)
 
 -------------------- COMMANDS ------------------------------
 function Init_Term()
