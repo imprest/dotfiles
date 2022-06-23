@@ -99,8 +99,8 @@ packer.startup { function()
       { 'hrsh7th/cmp-nvim-lua' },
       { 'hrsh7th/cmp-buffer' },
       { 'hrsh7th/cmp-path' },
-      { 'hrsh7th/cmp-vsnip' },
       { 'L3MON4D3/LuaSnip' },
+      { 'saadparwaiz1/cmp_luasnip' },
       { 'rafamadriz/friendly-snippets' },
       { 'ray-x/lsp_signature.nvim' },
       { 'kdheepak/cmp-latex-symbols' },
@@ -111,7 +111,6 @@ packer.startup { function()
   use 'NvChad/nvim-colorizer.lua'
   use 'nvim-lualine/lualine.nvim'
   use 'olambo/vi-viz'
-  use 'ojroques/nvim-lspfuzzy'
   use 'pbrisbin/vim-mkdir' -- :e this/does/not/exist/file.txt then :w
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
@@ -153,6 +152,11 @@ o.termguicolors = true -- True color support
 require('onedark').setup {
   style = 'darker'
 }
+-- symbols-outline
+g.symbols_outline = {
+  highlight_hovered_item = false,
+  auto_preview = false
+}
 -- neoscroll
 require('neoscroll').setup()
 -- bufferline
@@ -173,7 +177,7 @@ require('bufferline').setup {
 -- which-key
 local wk = require('which-key')
 wk.register({
-  ["S"] = { ':s//gcI<Left><Left><Left><Left>', "Substitue" },
+  ["ss"] = { ':s//gcI<Left><Left><Left><Left>', "Substitue" },
   ["y"] = { '"+y', "Yank System Clipboard" },
   ["."] = { "<ESC><CMD>lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>", "Comment" }
 }, { prefix = "<leader>", mode = 'v' })
@@ -181,16 +185,16 @@ wk.register({
   ["w"] = { "<cmd>w!<CR>", "Save" },
   ["q"] = { "<cmd>q!<CR>", "Quit" },
   ["."] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
-  ["c"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
+  ["x"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
   ["gg"] = { '<cmd>TermExec cmd="gitui" direction=float<CR>', "Gitui" },
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
   ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
   ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
-  ["S"] = { ':%s//gcI<Left><Left><Left><Left>', "Substitue" },
+  ["ss"] = { ':%s//gcI<Left><Left><Left><Left>', "Substitue" },
   ["<leader>"] = { '<C-^>', 'Last buffer' },
   ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
   ["v"] = { '<C-w>v<C-w>l', 'Split vertical' },
-  ["t"] = { '<cmd>split<bar>res 10 <bar>terminal<CR>', 'Terminal bottom' },
+  ["c"] = { '<cmd>split<bar>res 10 <bar>terminal<CR>', 'Terminal bottom' },
   p = {
     name = 'Packer',
     c = { "<cmd>PackerCompile<cr>", "Compile" },
@@ -455,6 +459,7 @@ o.linebreak = true
 -- window-local options
 wo.cursorline = false -- Highlight cursor line
 wo.list = true -- Show some invisible characters
+wo.listchars = "tab:▸ ,extends:>,precedes:<"
 wo.relativenumber = false -- Relative line numbers
 wo.number = true -- Show line numbers
 wo.signcolumn = 'yes' -- Show sign column
@@ -554,13 +559,6 @@ cmd [[autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focu
 -- lsp_signature
 local on_attach_lsp_signature = function(_, _)
   require('lsp_signature').on_attach({
-    bind = true, -- This is mandatory, otherwise border config won't get registered.
-    floating_window = true,
-    handler_opts = {
-      border = "single"
-    },
-    zindex = 99, -- <100 so that it does not hide completion popup.
-    fix_pos = false, -- Let signature window change its position when needed, see GH-53
     toggle_key = '<M-x>', -- Press <Alt-x> to toggle signature on and off.
   })
 end
@@ -649,7 +647,7 @@ local lspkind = require('lspkind')
 cmp.setup({
   formatting = {
     format = lspkind.cmp_format({
-      with_text = true,
+      mode = 'text',
       menu = {
         buffer = "[buf]",
         nvim_lsp = "[LSP]",
@@ -700,10 +698,10 @@ cmp.setup({
     },
   },
   sources = cmp.config.sources({
+    { name = "luasnip" },
     { name = "nvim_lua" },
     { name = "nvim_lsp" },
     { name = "path" },
-    { name = "luasnip" },
     { name = "buffer", keyword_length = 5 },
     { name = "spell" },
     { name = "tags" },
