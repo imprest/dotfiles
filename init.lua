@@ -177,7 +177,6 @@ require('bufferline').setup {
 -- which-key
 local wk = require('which-key')
 wk.register({
-  ["ss"] = { ':s//gcI<Left><Left><Left><Left>', "Substitue" },
   ["y"] = { '"+y', "Yank System Clipboard" },
   ["."] = { "<ESC><CMD>lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>", "Comment" }
 }, { prefix = "<leader>", mode = 'v' })
@@ -190,7 +189,6 @@ wk.register({
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
   ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
   ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
-  ["ss"] = { ':%s//gcI<Left><Left><Left><Left>', "Substitue" },
   ["<leader>"] = { '<C-^>', 'Last buffer' },
   ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
   ["v"] = { '<C-w>v<C-w>l', 'Split vertical' },
@@ -231,6 +229,7 @@ wk.register({
     s = { "<cmd>FzfLua git_status<cr>", "Status" },
   },
 }, { prefix = "<leader>" })
+
 -- bufdel
 require('bufdel').setup { next = 'alternate' }
 -- closetag
