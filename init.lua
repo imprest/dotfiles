@@ -338,19 +338,7 @@ require 'lualine'.setup {
       { "filetype", cond = conditions.hide_in_width } -- color = { fg = colors.fg, bg = colors.bg } },
     },
     lualine_y = {},
-    lualine_z = {
-      {
-        function()
-          local current_line = fn.line "."
-          local total_lines = fn.line "$"
-          local chars = { "██", "▇▇", "▆▆", "▆▆", "▄▄", "▃▃", "▂▂", "▁▁", "  " }
-          local line_ratio = current_line / total_lines
-          local index = math.ceil(line_ratio * #chars)
-          return chars[index]
-        end,
-        padding = { left = 0, right = 0 }
-      },
-    }
+    lualine_z = { '%3l:%3c' }
   },
   inactive_sections = {
     lualine_a = { 'filename' },
@@ -371,7 +359,7 @@ require 'nvim-tree'.setup {
   ignore_ft_on_setup = { "startify", "dashboard", "alpha" },
   update_focused_file = {
     enable = true,
-    update_cwd = true,
+    update_cwd = false,
     ignore_list = {},
   },
   git = {
