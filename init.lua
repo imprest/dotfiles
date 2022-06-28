@@ -41,7 +41,7 @@ packer.startup { function()
   -- use 'Shatur/neovim-session-manager'
   -- use 'tanvirtin/monokai.nvim'
   -- use 'LunarVim/onedarker.nvim'
-  -- use 'cohama/lexima.vim'
+  use 'cohama/lexima.vim'
   use 'navarasu/onedark.nvim'
   use 'karb94/neoscroll.nvim'
   use 'alvan/vim-closetag' -- Close html tags
@@ -384,17 +384,17 @@ map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 map('x', 'v', "<cmd>lua require('vi-viz').vizExpand()<CR>")
 map('x', 'V', "<cmd>lua require('vi-viz').vizContract()<CR>")
 -- vim-easy-align
-map('x', 'ga', '<Plug>(EasyAlign)', { noremap = false })
-map('n', 'ga', '<Plug>(EasyAlign)', { noremap = false })
+map('x', 'ga', '<Plug>(EasyAlign)')
+map('n', 'ga', '<Plug>(EasyAlign)')
 -- vim-dadbod
 g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
 map('x', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
 map('n', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
 map('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', { expr = true })
--- map('x', '<leader>p', '<Plug>(DBExe)', {noremap=false})
--- map('n', '<leader>p', '<Plug>(DBExe)', {noremap=false})
--- map('o', '<leader>p', '<Plug>(DBExe)', {noremap=false})
--- map('n', '<leader>p', '<Plug>(DBExeLine)', {noremap=false})
+map('x', '<leader>d', '<Plug>(DBExe)')
+map('n', '<leader>d', '<Plug>(DBExe)')
+map('o', '<leader>d', '<Plug>(DBExe)')
+map('n', '<leader>dd', '<Plug>(DBExeLine)')
 -- vim-svelte
 g['vim_svelte_plugin_use_typescript'] = 1
 g['vim_svelte_plugin_use_sass']       = 1
@@ -452,7 +452,7 @@ wo.number = true -- Show line numbers
 wo.signcolumn = 'yes' -- Show sign column
 wo.foldmethod = 'expr'
 wo.foldexpr = 'nvim_treesitter#foldexpr()'
-wo.foldlevel = 5
+wo.foldlevel = 9
 -- buffer-local options
 o.tabstop = 2 -- Number of spaces tabs count for
 o.shiftwidth = 2 -- Size of an indent
@@ -509,14 +509,14 @@ map('n', '<S-Right>', '<C-w>2<')
 map('n', '<S-Up>', '<C-w>2-')
 map('n', '<S-Down>', '<C-w>2+')
 map('n', '<S-Left>', '<C-w>2>')
-map('n', 'n', 'nzz')
-map('n', 'N', 'Nzz')
-map('n', '*', '*zz')
-map('n', '#', '#zz')
-map('n', 'g*', 'g*zz')
-map('n', 'g#', 'g#zz')
-map('n', '<C-o>', '<C-o>zz')
-map('n', '<C-i>', '<C-i>zz')
+map('n', 'n', 'nzz', { silent = true })
+map('n', 'N', 'Nzz', { silent = true })
+map('n', '*', '*zz', { silent = true })
+map('n', '#', '#zz', { silent = true })
+map('n', 'g*', 'g*zz', { silent = true })
+map('n', 'g#', 'g#zz', { silent = true })
+map('n', '<C-o>', '<C-o>zz', { silent = true })
+map('n', '<C-i>', '<C-i>zz', { silent = true })
 -- reselect visual block after indent
 map('v', '<', '<gv')
 map('v', '>', '>gv')
@@ -561,8 +561,8 @@ local on_attach = function(client, bufnr)
   -- keybindings
   -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
   -- NOTE: Order is important. You can't lazy load lexima.vim
-  -- g['lexima_no_defualt_rules'] = true
-  -- g['lexima_enable_endwise_rules'] = 1
+  g['lexima_no_defualt_rules'] = true
+  g['lexima_enable_endwise_rules'] = 1
 end
 
 local lsp_installer = require("nvim-lsp-installer")
@@ -676,13 +676,25 @@ cmp.setup({
         end
       end,
     },
-    -- ["<tab>"] = false,
-    ["<tab>"] = cmp.config.disable,
     -- Testing
     ["<c-q>"] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
       select = true,
     },
+    ["<Tab>"] = function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      else
+        fallback()
+      end
+    end,
+    ["<S-Tab>"] = function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      else
+        fallback()
+      end
+    end,
   },
   sources = cmp.config.sources({
     { name = "luasnip" },
