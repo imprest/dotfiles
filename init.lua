@@ -41,6 +41,12 @@ packer.startup { function()
   -- use 'Shatur/neovim-session-manager'
   -- use 'tanvirtin/monokai.nvim'
   -- use 'LunarVim/onedarker.nvim'
+  -- use { 'anuvyklack/pretty-fold.nvim', requires = 'anuvyklack/nvim-keymap-amend',
+  --   config = function()
+  --     require('pretty-fold').setup()
+  --     require('pretty-fold.preview').setup()
+  --   end
+  -- }
   use 'cohama/lexima.vim'
   use 'navarasu/onedark.nvim'
   use 'karb94/neoscroll.nvim'
@@ -110,6 +116,9 @@ packer.startup { function()
   -- lsp-diagnostics
   use 'NvChad/nvim-colorizer.lua'
   use 'nvim-lualine/lualine.nvim'
+  use { 'j-hui/fidget.nvim', config = function()
+    require('fidget').setup {}
+  end }
   use 'olambo/vi-viz'
   use 'pbrisbin/vim-mkdir' -- :e this/does/not/exist/file.txt then :w
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
@@ -166,13 +175,23 @@ require('bufferline').setup {
     show_close_icon = false,
     separator_style = 'thin',
     offsets = { { filetype = "NvimTree", padding = 1 } },
+    numbers = function(opts) return string.format('%s', opts.raise(opts.ordinal)) end,
     custom_filter = function(buf_number, _) -- hide shell and other unknown ft
       cmd [[highlight BufferLineFill guibg=#1f2329]]
       if vim.bo[buf_number].filetype ~= "" then
         return true
       end
     end
-  }
+  },
+  map('n', '<leader>1', '<cmd>BufferLineGoToBuffer 1<cr>', { silent = true }),
+  map('n', '<leader>2', '<cmd>BufferLineGoToBuffer 2<cr>', { silent = true }),
+  map('n', '<leader>3', '<cmd>BufferLineGoToBuffer 3<cr>', { silent = true }),
+  map('n', '<leader>4', '<cmd>BufferLineGoToBuffer 4<cr>', { silent = true }),
+  map('n', '<leader>5', '<cmd>BufferLineGoToBuffer 5<cr>', { silent = true }),
+  map('n', '<leader>6', '<cmd>BufferLineGoToBuffer 6<cr>', { silent = true }),
+  map('n', '<leader>7', '<cmd>BufferLineGoToBuffer 7<cr>', { silent = true }),
+  map('n', '<leader>8', '<cmd>BufferLineGoToBuffer 8<cr>', { silent = true }),
+  map('n', '<leader>9', '<cmd>BufferLineGoToBuffer 9<cr>', { silent = true }),
 }
 -- which-key
 local wk = require('which-key')
@@ -332,9 +351,10 @@ require 'lualine'.setup {
           end
           return msg
         end,
-        icon = ' ',
+        icon = '',
         cond = conditions.hide_in_width,
       },
+      { 'encoding' }, { 'fileformat' },
       { "filetype", cond = conditions.hide_in_width } -- color = { fg = colors.fg, bg = colors.bg } },
     },
     lualine_y = {},
@@ -450,15 +470,15 @@ wo.listchars = "tab:▸ ,extends:>,precedes:<"
 wo.relativenumber = false -- Relative line numbers
 wo.number = true -- Show line numbers
 wo.signcolumn = 'yes' -- Show sign column
-wo.foldmethod = 'expr'
-wo.foldexpr = 'nvim_treesitter#foldexpr()'
-wo.foldlevel = 9
+wo.foldmethod = 'indent' -- expr
+-- wo.foldexpr = 'nvim_treesitter#foldexpr()'
+wo.foldlevel = 6
 -- buffer-local options
 o.tabstop = 2 -- Number of spaces tabs count for
 o.shiftwidth = 2 -- Size of an indent
 o.softtabstop = 2
 o.expandtab = true -- Use spaces instead of tabs
-o.formatoptions = 'crqnj1' -- Automatic formatting options
+o.formatoptions = 'cqn1j' -- Automatic formatting options
 o.smartindent = true -- Insert indents automatically
 o.textwidth = width -- Maximum width of text
 
