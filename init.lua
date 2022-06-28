@@ -54,6 +54,7 @@ packer.startup { function()
   use { 'akinsho/nvim-bufferline.lua', tag = "v2.*", requires = { 'ojroques/nvim-bufdel' } }
   use 'airblade/vim-rooter'
   use 'elixir-editors/vim-elixir'
+  use 'slashmili/alchemist.vim'
   use 'farmergreg/vim-lastplace'
   use { 'ibhagwan/fzf-lua', requires = { 'vijaymarupudi/nvim-fzf' } }
   use 'junegunn/vim-easy-align' -- visual select then ga<char> to align
@@ -758,6 +759,10 @@ function Init_Term()
   cmd 'startinsert'
 end
 
+function OpenExDoc()
+  cmd 'call alchemist#exdoc() | wincmd L | vert res 77'
+end
+
 local group = vim.api.nvim_create_augroup("MyGroup", { clear = true })
 autocmd("TextYankPost",
   { pattern = "*",
@@ -782,6 +787,11 @@ autocmd("TermOpen", { pattern = "*", callback = Init_Term, group = term_group })
 
 local elixir_group = vim.api.nvim_create_augroup("ElixirGroup", { clear = true })
 autocmd("FileType", { pattern = "elixir,eelixir", command = 'iab pp \\|>', group = elixir_group })
+autocmd("FileType",
+  { pattern = "elixir,eelixir", command = 'nnoremap <buffer> <K> :lua OpenExDoc()<cr>', group = elixir_group })
+autocmd("FileType",
+  { pattern = "exdoc", command = 'setlocal nonumber bufhidden=wipe nobuflisted nowrap nofoldenable',
+    group = elixir_group })
 
 local lsp_group = vim.api.nvim_create_augroup("LSPGroup", { clear = true })
 autocmd("BufWritePre", { pattern = "*.{ex,exs,heex}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
