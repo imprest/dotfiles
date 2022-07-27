@@ -113,6 +113,10 @@ packer.startup { function()
       { 'onsails/lspkind-nvim' }
     }
   }
+  use {
+    'kosayoda/nvim-lightbulb',
+    require = 'antoinemadec/FixCursorHold.nvim'
+  }
   -- lsp-diagnostics
   use 'NvChad/nvim-colorizer.lua'
   use 'nvim-lualine/lualine.nvim'
@@ -159,7 +163,7 @@ end,
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true -- True color support
 require('onedark').setup {
-  style = 'darker'
+  style = 'warmer'
 }
 -- symbols-outline
 g.symbols_outline = {
@@ -459,7 +463,7 @@ o.undodir = '/home/hvaria/.nvim/undo'
 o.wildmode = "longest:full"
 o.wildoptions = 'pum'
 o.updatetime = 1000 -- make updates faster
-o.wrap = true
+o.wrap = false
 o.breakindent = true
 o.showbreak = '↪  '
 o.linebreak = true
@@ -485,7 +489,8 @@ o.textwidth = width -- Maximum width of text
 -------------------- MAPPINGS ------------------------------
 -- common tasks
 map('n', '<C-s>', '<cmd>update<CR>')
-map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
+-- map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
+map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('v', '<BS>', '<ESC>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
@@ -569,6 +574,8 @@ local on_attach_lsp_signature = function(_, _)
     toggle_key = '<M-x>', -- Press <Alt-x> to toggle signature on and off.
   })
 end
+-- nvim-lightbulb
+require('nvim-lightbulb').setup({ autocmd = { enabled = true } })
 
 -- Customize LSP behavior
 local on_attach = function(client, bufnr)
@@ -640,7 +647,7 @@ local lsp_handlers_hover = lsp.with(lsp.handlers.hover, {
 lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
   local bufnr, winnr = lsp_handlers_hover(err, result, ctx, config)
   if winnr ~= nil then
-    api.nvim_win_set_option(winnr, "winblend", 20) -- opacity for hover
+    api.nvim_win_set_option(winnr, "winblend", 0) -- opacity for hover
   end
   return bufnr, winnr
 end
