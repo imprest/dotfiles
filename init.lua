@@ -548,7 +548,8 @@ map('v', '>', '>gv')
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
 ts.setup {
-  ensure_installed = { "css", "erlang", "elixir", "html", "javascript", "json", "ledger", "lua", "svelte", "toml",
+  ensure_installed = { "css", "erlang", "elixir", "eex", "heex", "html", "javascript", "json", "ledger", "lua", "svelte",
+    "toml",
     "typescript", "zig" },
   context_commentstring = { enable = true, enable_autocmd = false },
   highlight = { enable = true }, indent = { enable = false } -- indent is experimental
@@ -592,48 +593,39 @@ local on_attach = function(client, bufnr)
   g['lexima_enable_endwise_rules'] = 1
 end
 
-local lsp_installer = require("nvim-lsp-installer")
-local enhance_server_opts = {
-  ["elixirls"] = function(opts)
-    opts.settings = {
-      elixirLS = {
-        dialyzerEnabled = false,
-        fetchDeps = false
-      }
+require("nvim-lsp-installer").setup {}
+local lspconfig = require("lspconfig")
+local capabilities = lsp.protocol.make_client_capabilities()
+
+lspconfig.elixirls.setup {
+  on_attach = on_attach,
+  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities),
+  settings = {
+    elixirLS = {
+      dialyzerEnabled = false,
+      fetchDeps = false
     }
-  end,
-  ["sumneko_lua"] = function(opts)
-    opts.settings = {
-      Lua = {
-        diagnostics = { globals = { "vim" } }
-      }
-    }
-  end,
-  ["jsonls"] = function(opts)
-    opts.settings = {
-      json = {
-        schemas = require('schemastore').json.schemas(),
-        validate = { enable = true }
-      }
-    }
-  end
-}
-lsp_installer.on_server_ready(function(server)
-  local opts = {
-    on_attach = on_attach,
-    -- Suggested configuration by nvim-cmp
-    capabilities = require('cmp_nvim_lsp').update_capabilities(lsp.protocol.make_client_capabilities())
   }
-
-  if enhance_server_opts[server.name] then
-    -- Enhance the default opts with the server-specific ones
-    enhance_server_opts[server.name](opts)
-  end
-
-  -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
-  server:setup(opts)
-  cmd [[ do User LspAttachBuffers ]]
-end)
+}
+lspconfig.sumneko_lua.setup {
+  on_attach = on_attach,
+  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities),
+  settings = { Lua = { diagnostics = { globals = { "vim" } } } }
+}
+lspconfig.jsonls.setup {
+  on_attach = on_attach,
+  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities),
+  settings = { json = {
+    schemas = require('schemastore').json.schemas(),
+    validate = { enable = true }
+  } }
+}
+for _, server in ipairs { "tailwindcss", "svelte", "tsserver" } do
+  lspconfig[server].setup {
+    on_attach = on_attach,
+    capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+  }
+end
 
 -------------------------
 -- LSP Handlers (general)
