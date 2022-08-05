@@ -162,14 +162,9 @@ end,
 }
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true -- True color support
-require('onedark').setup {
-  style = 'warmer'
-}
+require('onedark').setup { style = 'warmer' }
 -- symbols-outline
-g.symbols_outline = {
-  highlight_hovered_item = false,
-  auto_preview = false
-}
+g.symbols_outline = { highlight_hovered_item = false, auto_preview = false }
 -- neoscroll
 require('neoscroll').setup()
 -- bufferline
@@ -177,25 +172,14 @@ require('bufferline').setup {
   options = {
     show_buffer_close_icons = false,
     show_close_icon = false,
-    separator_style = 'thin',
     offsets = { { filetype = "NvimTree", padding = 1 } },
-    numbers = function(opts) return string.format('%s', opts.raise(opts.ordinal)) end,
     custom_filter = function(buf_number, _) -- hide shell and other unknown ft
       cmd [[highlight BufferLineFill guibg=#1f2329]]
       if vim.bo[buf_number].filetype ~= "" then
         return true
       end
     end
-  },
-  map('n', '<leader>1', '<cmd>BufferLineGoToBuffer 1<cr>', { silent = true }),
-  map('n', '<leader>2', '<cmd>BufferLineGoToBuffer 2<cr>', { silent = true }),
-  map('n', '<leader>3', '<cmd>BufferLineGoToBuffer 3<cr>', { silent = true }),
-  map('n', '<leader>4', '<cmd>BufferLineGoToBuffer 4<cr>', { silent = true }),
-  map('n', '<leader>5', '<cmd>BufferLineGoToBuffer 5<cr>', { silent = true }),
-  map('n', '<leader>6', '<cmd>BufferLineGoToBuffer 6<cr>', { silent = true }),
-  map('n', '<leader>7', '<cmd>BufferLineGoToBuffer 7<cr>', { silent = true }),
-  map('n', '<leader>8', '<cmd>BufferLineGoToBuffer 8<cr>', { silent = true }),
-  map('n', '<leader>9', '<cmd>BufferLineGoToBuffer 9<cr>', { silent = true }),
+  }
 }
 -- which-key
 local wk = require('which-key')
@@ -355,7 +339,7 @@ require 'lualine'.setup {
           end
           return msg
         end,
-        icon = '',
+        icon = ' ',
         cond = conditions.hide_in_width,
       },
       { 'encoding' }, { 'fileformat' },
