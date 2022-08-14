@@ -174,7 +174,6 @@ require('bufferline').setup {
     show_close_icon = false,
     offsets = { { filetype = "NvimTree", padding = 1 } },
     custom_filter = function(buf_number, _) -- hide shell and other unknown ft
-      cmd [[highlight BufferLineFill guibg=#1f2329]]
       if vim.bo[buf_number].filetype ~= "" then
         return true
       end
@@ -185,12 +184,12 @@ require('bufferline').setup {
 local wk = require('which-key')
 wk.register({
   ["y"] = { '"+y', "Yank System Clipboard" },
-  ["."] = { "<ESC><CMD>lua require('Comment.api').toggle_linewise_op(vim.fn.visualmode())<CR>", "Comment" }
+  ["."] = { "<ESC><CMD>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", "Comment" }
 }, { prefix = "<leader>", mode = 'v' })
 wk.register({
   ["w"] = { "<cmd>w!<CR>", "Save" },
   ["q"] = { "<cmd>q!<CR>", "Quit" },
-  ["."] = { "<cmd>lua require('Comment.api').toggle_current_linewise()<CR>", "Comment" },
+  ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
   ["x"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
   ["gg"] = { '<cmd>TermExec cmd="gitui" direction=float<CR>', "Gitui" },
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
@@ -375,7 +374,7 @@ require 'nvim-tree'.setup {
     ignore = false,
     timeout = 200,
   },
-  view = { width = 26 },
+  view = { width = 24, preserve_window_proportions = true },
   renderer = { group_empty = true, icons = { git_placement = "after" } },
   filters = { custom = { "node_modules", ".cache", ".git" } },
   actions = {
@@ -416,7 +415,7 @@ local width                           = 96
 cmd 'colorscheme onedark'
 o.background = 'dark'
 -- global options
-o.guicursor = 'i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1'
+o.guicursor = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
 o.laststatus = 3 -- global statusline
 o.timeoutlen = 300 -- mapping timeout
 o.hidden = true -- Enable background buffers

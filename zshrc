@@ -43,6 +43,7 @@ setopt inc_append_history # append history list to the history file
 setopt share_history      # share command history data (important for multiple parallel zsh sessions!)
 
 # Exports
+export TERMINAL=alacritty
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export LANG=en_GB.UTF-8
@@ -90,13 +91,14 @@ bindkey -e                             # emacs like keybind (e.x. Ctrl-a, Ctrl-e
 bindkey '^ ' autosuggest-accept        # Autosuggestion
 bindkey '^u' backward-kill-line        # Like bash
 bindkey '^[[Z' reverse-menu-complete   # Shift-Tab
+bindkey -s '^o' 'ranger^M'
 
 # Aliases
 alias vim="nvim"
 alias ls='ls --color=auto'
 alias e="exa --long --git --header --sort=type"
 alias et="exa -T"
-alias g="lazygit"
+alias g="gitui"
 alias gd="git diff"
 alias gs="git status"
 alias gl="git log --oneline --decorate -20"
