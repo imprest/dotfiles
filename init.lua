@@ -40,15 +40,9 @@ packer.startup { function()
   -- use 'dstein64/vim-startuptime' -- :StartupTime
   -- use 'Shatur/neovim-session-manager'
   -- use 'tanvirtin/monokai.nvim'
-  -- use 'LunarVim/onedarker.nvim'
-  -- use { 'anuvyklack/pretty-fold.nvim', requires = 'anuvyklack/nvim-keymap-amend',
-  --   config = function()
-  --     require('pretty-fold').setup()
-  --     require('pretty-fold.preview').setup()
-  --   end
-  -- }
+  -- use 'navarasu/onedark.nvim'
   use 'cohama/lexima.vim'
-  use 'navarasu/onedark.nvim'
+  use 'tiagovla/tokyodark.nvim'
   use 'karb94/neoscroll.nvim'
   use 'alvan/vim-closetag' -- Close html tags
   use { 'akinsho/nvim-bufferline.lua', tag = "v2.*", requires = { 'ojroques/nvim-bufdel' } }
@@ -70,6 +64,7 @@ packer.startup { function()
   }
   use 'lervag/vimtex'
   use 'machakann/vim-sandwich' -- sr({ sd' <select text>sa'
+  use 'mg979/vim-visual-multi'
   -- lsp
   use 'neovim/nvim-lspconfig'
   use 'b0o/SchemaStore.nvim'
@@ -162,7 +157,7 @@ end,
 }
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true -- True color support
-require('onedark').setup { style = 'warmer' }
+-- require('onedark').setup { style = 'warmer' }
 -- symbols-outline
 g.symbols_outline = { highlight_hovered_item = false, auto_preview = false }
 -- neoscroll
@@ -278,7 +273,7 @@ end
 require 'lualine'.setup {
   options = {
     icons_enabled = true,
-    theme = 'onedark',
+    theme = 'tokyodark',
     component_separators = { left = '', right = '' },
     section_separators = { left = '', right = '' },
     disabled_filetypes = { "NvimTree", "Telescope", "Outline", "dashboard" },
@@ -369,13 +364,18 @@ require 'nvim-tree'.setup {
     update_cwd = false,
     ignore_list = {},
   },
+  diagnostics = { enable = true },
   git = {
     enable = true,
-    ignore = false,
-    timeout = 200,
+    ignore = false
   },
   view = { width = 24, preserve_window_proportions = true },
-  renderer = { group_empty = true, icons = { git_placement = "after" } },
+  renderer = {
+    group_empty = true,
+    icons = { git_placement = "after" },
+    highlight_opened_files = "all",
+    indent_markers = { enable = true }
+  },
   filters = { custom = { "node_modules", ".cache", ".git" } },
   actions = {
     open_file = {
@@ -412,7 +412,8 @@ g['vimtex_compiler_method']           = 'tectonic'
 g['vimtex_view_general_viewer']       = 'evince'
 -------------------- OPTIONS -------------------------------
 local width                           = 96
-cmd 'colorscheme onedark'
+-- cmd 'colorscheme onedark'
+cmd 'colorscheme tokyodark'
 o.background = 'dark'
 -- global options
 o.guicursor = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
@@ -457,9 +458,9 @@ wo.listchars = "tab:▸ ,extends:>,precedes:<"
 wo.relativenumber = false -- Relative line numbers
 wo.number = true -- Show line numbers
 wo.signcolumn = 'yes' -- Show sign column
-wo.foldmethod = 'indent' -- expr
--- wo.foldexpr = 'nvim_treesitter#foldexpr()'
-wo.foldlevel = 6
+wo.foldmethod = 'indent'
+wo.foldlevel = 99
+wo.foldenable = true
 -- buffer-local options
 o.tabstop = 2 -- Number of spaces tabs count for
 o.shiftwidth = 2 -- Size of an indent
@@ -513,10 +514,10 @@ map('n', '<C-h>', '<C-w>h')
 map('n', '<C-j>', '<C-w>j')
 map('n', '<C-k>', '<C-w>k')
 map('n', '<C-l>', '<C-w>l')
-map('n', '<S-Right>', '<C-w>2<')
-map('n', '<S-Up>', '<C-w>2-')
-map('n', '<S-Down>', '<C-w>2+')
-map('n', '<S-Left>', '<C-w>2>')
+map('n', '<M-Left>', '<C-w>2<')
+map('n', '<M-Up>', '<C-w>2-')
+map('n', '<M-Down>', '<C-w>2+')
+map('n', '<M-Right>', '<C-w>2>')
 map('n', 'n', 'nzz', { silent = true })
 map('n', 'N', 'Nzz', { silent = true })
 map('n', '*', '*zz', { silent = true })
