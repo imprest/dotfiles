@@ -532,8 +532,8 @@ for type, icon in pairs(signs) do
 end
 o.updatetime = 250
 vim.diagnostic.config({
-  virtual_text = false
-  -- virtual_text = { prefix = '●'}
+  -- virtual_text = false
+  virtual_text = { prefix = '' }
 })
 cmd [[autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
 -- lsp_signature
@@ -617,13 +617,14 @@ local lspkind = require('lspkind')
 cmp.setup({
   formatting = {
     format = lspkind.cmp_format({
-      mode = 'text',
+      mode = 'symbol',
+      maxwidth = 50,
       menu = {
-        buffer = "[buf]",
-        nvim_lsp = "[LSP]",
+        buffer   = "[buf]",
+        nvim_lsp = "[lsp]",
         nvim_lua = "[api]",
-        path = "[path]",
-        luasnip = "[snip]",
+        path     = "[path]",
+        luasnip  = "[snip]",
       },
     })
   },
@@ -680,10 +681,10 @@ cmp.setup({
     end,
   },
   sources = cmp.config.sources({
-    { name = "luasnip" },
-    { name = "nvim_lua" },
-    { name = "nvim_lsp" },
-    { name = "path" },
+    { name = "luasnip", keyword_length = 2 },
+    { name = "nvim_lua", keyword_length = 2 },
+    { name = "nvim_lsp", keyword_length = 2 },
+    { name = "path", keyword_length = 2 },
     { name = "buffer", keyword_length = 5 },
     { name = "spell" },
     { name = "tags" },
