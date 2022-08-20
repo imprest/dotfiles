@@ -72,21 +72,7 @@ packer.startup { function()
   use { 'numToStr/Comment.nvim',
     config = function()
       require('Comment').setup {
-        pre_hook = function(ctx)
-          local U = require 'Comment.utils'
-
-          local location = nil
-          if ctx.ctype == U.ctype.block then
-            location = require('ts_context_commentstring.utils').get_cursor_location()
-          elseif ctx.cmotion == U.cmotion.v or ctx.cmotion == U.cmotion.V then
-            location = require('ts_context_commentstring.utils').get_visual_start_location()
-          end
-
-          return require('ts_context_commentstring.internal').calculate_commentstring {
-            key = ctx.ctype == U.ctype.line and '__default' or '__multiline',
-            location = location,
-          }
-        end,
+        pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
       }
     end
   }
@@ -108,10 +94,6 @@ packer.startup { function()
       { 'onsails/lspkind-nvim' }
     }
   }
-  use {
-    'kosayoda/nvim-lightbulb',
-    require = 'antoinemadec/FixCursorHold.nvim'
-  }
   -- lsp-diagnostics
   use 'NvChad/nvim-colorizer.lua'
   use 'nvim-lualine/lualine.nvim'
@@ -129,7 +111,6 @@ packer.startup { function()
       direction = 'float',
     }
   end }
-  use 'simrat39/symbols-outline.nvim'
   use { 'folke/which-key.nvim',
     config = function()
       require("which-key").setup {
@@ -532,9 +513,11 @@ map('v', '>', '>gv')
 -------------------- TREE-SITTER ---------------------------
 local ts = require 'nvim-treesitter.configs'
 ts.setup {
-  ensure_installed = { "css", "erlang", "elixir", "eex", "heex", "html", "javascript", "json", "ledger", "lua", "svelte",
-    "toml",
-    "typescript", "zig" },
+  ensure_installed = {
+    "css", "html", "javascript", "json", "svelte", "typescript",
+    "erlang", "elixir", "eex", "heex",
+    "ledger", "lua", "toml", "zig"
+  },
   context_commentstring = { enable = true, enable_autocmd = false },
   highlight = { enable = true }, indent = { enable = false } -- indent is experimental
 }
@@ -559,9 +542,6 @@ local on_attach_lsp_signature = function(_, _)
     toggle_key = '<M-x>', -- Press <Alt-x> to toggle signature on and off.
   })
 end
--- nvim-lightbulb
-require('nvim-lightbulb').setup({ autocmd = { enabled = true } })
-
 -- Customize LSP behavior
 local on_attach = function(client, bufnr)
   -- Always use signcolumn for the current buffer
@@ -769,6 +749,6 @@ autocmd("FileType", { pattern = "elixir,eelixir", command = 'iab pp \\|>', group
 local lsp_group = vim.api.nvim_create_augroup("LSPGroup", { clear = true })
 autocmd("BufWritePre", { pattern = "*.{ex,exs,heex}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
 autocmd("BufWritePre",
-  { pattern = "*.{svelte.css.scss}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
+  { pattern = "*.{svelte,css,scss,js,ts,json}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
 autocmd("BufWritePre",
-  { pattern = "*.{lua,js,ts,json}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
+  { pattern = "*.{lua}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
