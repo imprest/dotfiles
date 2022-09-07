@@ -405,7 +405,7 @@ o.mouse = 'a' -- Allow the mouse
 o.completeopt = 'menu,menuone,noselect' -- Completion options
 o.ignorecase = true -- Ignore case
 o.joinspaces = false -- No double spaces with join
-o.scrolloff = 10 -- Lines of context
+o.scrolloff = 3 -- Lines of context
 o.scrolljump = 1 -- min. lines to scroll
 o.shiftround = true -- Round indent
 o.sidescrolloff = 8 -- Columns of context
@@ -436,7 +436,7 @@ o.linebreak = true
 wo.cursorline = false -- Highlight cursor line
 wo.list = true -- Show some invisible characters
 wo.listchars = "tab:▸ ,extends:>,precedes:<"
-wo.relativenumber = false -- Relative line numbers
+wo.relativenumber = true -- Relative line numbers
 wo.number = true -- Show line numbers
 wo.signcolumn = 'yes' -- Show sign column
 wo.foldmethod = 'indent'
@@ -546,6 +546,19 @@ end
 local on_attach = function(client, bufnr)
   -- Always use signcolumn for the current buffer
   wo.signcolumn = 'yes:1'
+
+  -- Enable completion triggered by <c-x><c-o>
+  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+  -- Mappings.
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  local bufopts = { noremap = true, silent = true, buffer = bufnr }
+  vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, bufopts)
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+  vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, bufopts)
+  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
 
   -- Activate LSP signature on attach.
   on_attach_lsp_signature(client, bufnr)
