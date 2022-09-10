@@ -56,5 +56,6 @@ curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/instal
 ln -sf ~/dotfiles/zshrc ~/.zshrc
 chsh -s /usr/bin/zsh
 
+# create a file in home dir ~/.npmrc with 'ignore-scripts=true'
 # node global packages
 npm i -g neovim

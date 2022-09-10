@@ -341,7 +341,6 @@ require 'nvim-tree'.setup {
   disable_netrw = true,
   ignore_ft_on_setup = { "startify", "dashboard", "alpha" },
   update_focused_file = {
-    enable = true,
     update_cwd = false,
     ignore_list = {},
   },
@@ -350,7 +349,10 @@ require 'nvim-tree'.setup {
     enable = true,
     ignore = false
   },
-  view = { width = 24, preserve_window_proportions = true },
+  view = {
+    width = 24,
+    preserve_window_proportions = true
+  },
   renderer = {
     group_empty = true,
     icons = { git_placement = "after" },
@@ -360,6 +362,7 @@ require 'nvim-tree'.setup {
   filters = { custom = { "node_modules", ".cache", ".git" } },
   actions = {
     open_file = {
+      resize_window = false,
       window_picker = {
         enable = false
       },
