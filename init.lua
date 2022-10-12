@@ -95,7 +95,7 @@ packer.startup { function()
     }
   }
   -- lsp-diagnostics
-  use 'NvChad/nvim-colorizer.lua'
+  -- use 'NvChad/nvim-colorizer.lua'
   use 'nvim-lualine/lualine.nvim'
   use { 'j-hui/fidget.nvim', config = function()
     require('fidget').setup {}
@@ -104,13 +104,13 @@ packer.startup { function()
   use 'pbrisbin/vim-mkdir' -- :e this/does/not/exist/file.txt then :w
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
-  use { 'akinsho/toggleterm.nvim', tag = 'v1.*', config = function()
-    require('toggleterm').setup {
-      open_mapping = [[<A-t>]],
-      shading_factor = 2,
-      direction = 'float',
-    }
-  end }
+  -- use { 'akinsho/toggleterm.nvim', tag = 'v1.*', config = function()
+  --   require('toggleterm').setup {
+  --     open_mapping = [[<A-t>]],
+  --     shading_factor = 2,
+  --     direction = 'float',
+  --   }
+  -- end }
   use { 'folke/which-key.nvim',
     config = function()
       require("which-key").setup {
@@ -190,7 +190,7 @@ wk.register({
     c = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
     d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
     D = { "<cmd>FzfLua lsp_document_diagnostics<cr>", "Buffer Diagnostics" },
-    f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
+    f = { "<cmd>lua vim.lsp.buf.format()<cr>", "Format" },
     i = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Implementation" },
     j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
     k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
@@ -217,7 +217,7 @@ require('bufdel').setup { next = 'alternate' }
 -- closetag
 g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
 -- colorizer
-require('colorizer').setup { 'css'; 'javascript'; html = { mode = 'foreground'; } }
+-- require('colorizer').setup { 'css'; 'javascript'; html = { mode = 'foreground'; } }
 -- fzf-lua
 g['fzf_action'] = { ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit' }
 require('fzf-lua').setup({
@@ -764,8 +764,8 @@ local elixir_group = vim.api.nvim_create_augroup("ElixirGroup", { clear = true }
 autocmd("FileType", { pattern = "elixir,eelixir", command = 'iab pp \\|>', group = elixir_group })
 
 local lsp_group = vim.api.nvim_create_augroup("LSPGroup", { clear = true })
-autocmd("BufWritePre", { pattern = "*.{ex,exs,heex}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
+autocmd("BufWritePre", { pattern = "*.{ex,exs,heex}", command = 'lua vim.lsp.buf.format()', group = lsp_group })
 autocmd("BufWritePre",
-  { pattern = "*.{svelte,css,scss,js,ts,json}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
+  { pattern = "*.{svelte,css,scss,js,ts,json}", command = 'lua vim.lsp.buf.format()', group = lsp_group })
 autocmd("BufWritePre",
-  { pattern = "*.{lua}", command = 'lua vim.lsp.buf.formatting_sync()', group = lsp_group })
+  { pattern = "*.{lua}", command = 'lua vim.lsp.buf.format()', group = lsp_group })
