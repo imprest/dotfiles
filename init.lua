@@ -45,7 +45,7 @@ packer.startup { function()
   use 'tiagovla/tokyodark.nvim'
   use 'karb94/neoscroll.nvim'
   use 'alvan/vim-closetag' -- Close html tags
-  use { 'akinsho/nvim-bufferline.lua', tag = "v2.*", requires = { 'ojroques/nvim-bufdel' } }
+  -- use { 'akinsho/nvim-bufferline.lua', tag = "v2.*", requires = { 'ojroques/nvim-bufdel' } }
   use 'airblade/vim-rooter'
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
@@ -143,19 +143,19 @@ o.termguicolors = true -- True color support
 g.symbols_outline = { highlight_hovered_item = false, auto_preview = false }
 -- neoscroll
 require('neoscroll').setup()
--- bufferline
-require('bufferline').setup {
-  options = {
-    show_buffer_close_icons = false,
-    show_close_icon = false,
-    offsets = { { filetype = "NvimTree", padding = 1 } },
-    custom_filter = function(buf_number, _) -- hide shell and other unknown ft
-      if vim.bo[buf_number].filetype ~= "" then
-        return true
-      end
-    end
-  }
-}
+-- -- bufferline
+-- require('bufferline').setup {
+--   options = {
+--     show_buffer_close_icons = false,
+--     show_close_icon = false,
+--     offsets = { { filetype = "NvimTree", padding = 1 } },
+--     custom_filter = function(buf_number, _) -- hide shell and other unknown ft
+--       if vim.bo[buf_number].filetype ~= "" then
+--         return true
+--       end
+--     end
+--   }
+-- }
 -- which-key
 local wk = require('which-key')
 wk.register({
@@ -213,7 +213,7 @@ wk.register({
 }, { prefix = "<leader>" })
 
 -- bufdel
-require('bufdel').setup { next = 'alternate' }
+-- require('bufdel').setup { next = 'alternate' }
 -- closetag
 g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
 -- colorizer
@@ -439,7 +439,7 @@ o.linebreak = true
 wo.cursorline = false -- Highlight cursor line
 wo.list = true -- Show some invisible characters
 wo.listchars = "tab:▸ ,extends:>,precedes:<"
-wo.relativenumber = true -- Relative line numbers
+wo.relativenumber = false -- Relative line numbers
 wo.number = true -- Show line numbers
 wo.signcolumn = 'yes' -- Show sign column
 wo.foldmethod = 'indent'
@@ -579,7 +579,7 @@ local capabilities = lsp.protocol.make_client_capabilities()
 
 lspconfig.elixirls.setup {
   on_attach = on_attach,
-  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities),
+  capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
   settings = {
     elixirLS = {
       dialyzerEnabled = false,
@@ -589,12 +589,12 @@ lspconfig.elixirls.setup {
 }
 lspconfig.sumneko_lua.setup {
   on_attach = on_attach,
-  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities),
+  capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
   settings = { Lua = { diagnostics = { globals = { "vim" } } } }
 }
 lspconfig.jsonls.setup {
   on_attach = on_attach,
-  capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities),
+  capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
   settings = { json = {
     schemas = require('schemastore').json.schemas(),
     validate = { enable = true }
@@ -603,7 +603,7 @@ lspconfig.jsonls.setup {
 for _, server in ipairs { "tailwindcss", "svelte", "tsserver" } do
   lspconfig[server].setup {
     on_attach = on_attach,
-    capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+    capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
   }
 end
 
