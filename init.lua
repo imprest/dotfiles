@@ -40,12 +40,12 @@ packer.startup { function()
   -- use 'dstein64/vim-startuptime' -- :StartupTime
   -- use 'Shatur/neovim-session-manager'
   -- use 'tanvirtin/monokai.nvim'
-  -- use 'navarasu/onedark.nvim'
+  use 'navarasu/onedark.nvim'
   use 'cohama/lexima.vim'
-  use 'tiagovla/tokyodark.nvim'
+  -- use 'tiagovla/tokyodark.nvim'
   use 'karb94/neoscroll.nvim'
   use 'alvan/vim-closetag' -- Close html tags
-  -- use { 'akinsho/nvim-bufferline.lua', tag = "v2.*", requires = { 'ojroques/nvim-bufdel' } }
+  use { 'akinsho/nvim-bufferline.lua', tag = "v2.*", requires = { 'ojroques/nvim-bufdel' } }
   use 'airblade/vim-rooter'
   use 'elixir-editors/vim-elixir'
   use 'farmergreg/vim-lastplace'
@@ -138,24 +138,26 @@ end,
 }
 -------------------- PLUGIN SETUP --------------------------
 o.termguicolors = true -- True color support
--- require('onedark').setup { style = 'warmer' }
+require('onedark').setup { style = 'dark' }
+require('onedark').load()
 -- symbols-outline
 g.symbols_outline = { highlight_hovered_item = false, auto_preview = false }
 -- neoscroll
 require('neoscroll').setup()
--- -- bufferline
--- require('bufferline').setup {
---   options = {
---     show_buffer_close_icons = false,
---     show_close_icon = false,
---     offsets = { { filetype = "NvimTree", padding = 1 } },
---     custom_filter = function(buf_number, _) -- hide shell and other unknown ft
---       if vim.bo[buf_number].filetype ~= "" then
---         return true
---       end
---     end
---   }
--- }
+-- bufferline
+require('bufferline').setup {
+  highlights = { fill = { bg = "" } },
+  options = {
+    show_buffer_close_icons = false,
+    show_close_icon = false,
+    offsets = { { filetype = "NvimTree", padding = 1 } },
+    custom_filter = function(buf_number, _) -- hide shell and other unknown ft
+      if vim.bo[buf_number].filetype ~= "" then
+        return true
+      end
+    end
+  }
+}
 -- which-key
 local wk = require('which-key')
 wk.register({
@@ -254,7 +256,7 @@ end
 require 'lualine'.setup {
   options = {
     icons_enabled = true,
-    theme = 'tokyodark',
+    theme = 'onedark',
     component_separators = { left = '', right = '' },
     section_separators = { left = '', right = '' },
     disabled_filetypes = { "NvimTree", "Telescope", "Outline", "dashboard" },
@@ -397,62 +399,62 @@ g['vimtex_view_general_viewer']       = 'evince'
 -------------------- OPTIONS -------------------------------
 local width                           = 96
 -- cmd 'colorscheme onedark'
-cmd 'colorscheme tokyodark'
-o.background = 'dark'
+-- cmd 'colorscheme tokyodark'
+o.background                          = 'dark'
 -- global options
-o.guicursor = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
-o.laststatus = 3 -- global statusline
-o.timeoutlen = 300 -- mapping timeout
-o.hidden = true -- Enable background buffers
-o.mouse = 'a' -- Allow the mouse
-o.completeopt = 'menu,menuone,noselect' -- Completion options
-o.ignorecase = true -- Ignore case
-o.joinspaces = false -- No double spaces with join
-o.scrolloff = 3 -- Lines of context
-o.scrolljump = 1 -- min. lines to scroll
-o.shiftround = true -- Round indent
-o.sidescrolloff = 8 -- Columns of context
-o.smartcase = true -- Don't ignore case with capitals
-o.splitbelow = true -- Put new windows below current
-o.splitright = true -- Put new windows right of current
-o.updatetime = 200 -- Delay before swap file is saved
-o.shortmess = 'IFc' -- Avoid showing extra message on completion
-o.showbreak = '↪  '
-o.showmode = false
-o.showmatch = true
-o.equalalways = false -- I don't like my windows changing all the time
-o.fillchars = 'eob: '
-o.inccommand = 'split'
-o.backup = false
-o.writebackup = false
-o.swapfile = false
-o.undofile = true
-o.undodir = '/home/hvaria/.nvim/undo'
-o.wildmode = "longest:full"
-o.wildoptions = 'pum'
-o.updatetime = 1000 -- make updates faster
-o.wrap = true
-o.breakindent = true
-o.showbreak = '↪  '
-o.linebreak = true
+o.guicursor                           = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
+o.laststatus                          = 3 -- global statusline
+o.timeoutlen                          = 300 -- mapping timeout
+o.hidden                              = true -- Enable background buffers
+o.mouse                               = 'a' -- Allow the mouse
+o.completeopt                         = 'menu,menuone,noselect' -- Completion options
+o.ignorecase                          = true -- Ignore case
+o.joinspaces                          = false -- No double spaces with join
+o.scrolloff                           = 3 -- Lines of context
+o.scrolljump                          = 1 -- min. lines to scroll
+o.shiftround                          = true -- Round indent
+o.sidescrolloff                       = 8 -- Columns of context
+o.smartcase                           = true -- Don't ignore case with capitals
+o.splitbelow                          = true -- Put new windows below current
+o.splitright                          = true -- Put new windows right of current
+o.updatetime                          = 200 -- Delay before swap file is saved
+o.shortmess                           = 'IFc' -- Avoid showing extra message on completion
+o.showbreak                           = '↪  '
+o.showmode                            = false
+o.showmatch                           = true
+o.equalalways                         = false -- I don't like my windows changing all the time
+o.fillchars                           = 'eob: '
+o.inccommand                          = 'split'
+o.backup                              = false
+o.writebackup                         = false
+o.swapfile                            = false
+o.undofile                            = true
+o.undodir                             = '/home/hvaria/.nvim/undo'
+o.wildmode                            = "longest:full"
+o.wildoptions                         = 'pum'
+o.updatetime                          = 1000 -- make updates faster
+o.wrap                                = true
+o.breakindent                         = true
+o.showbreak                           = '↪  '
+o.linebreak                           = true
 -- window-local options
-wo.cursorline = false -- Highlight cursor line
-wo.list = true -- Show some invisible characters
-wo.listchars = "tab:▸ ,extends:>,precedes:<"
-wo.relativenumber = false -- Relative line numbers
-wo.number = true -- Show line numbers
-wo.signcolumn = 'yes' -- Show sign column
-wo.foldmethod = 'indent'
-wo.foldlevel = 99
-wo.foldenable = true
+wo.cursorline                         = false -- Highlight cursor line
+wo.list                               = true -- Show some invisible characters
+wo.listchars                          = "tab:▸ ,extends:>,precedes:<"
+wo.relativenumber                     = false -- Relative line numbers
+wo.number                             = true -- Show line numbers
+wo.signcolumn                         = 'yes' -- Show sign column
+wo.foldmethod                         = 'indent'
+wo.foldlevel                          = 99
+wo.foldenable                         = true
 -- buffer-local options
-o.tabstop = 2 -- Number of spaces tabs count for
-o.shiftwidth = 2 -- Size of an indent
-o.softtabstop = 2
-o.expandtab = true -- Use spaces instead of tabs
-o.formatoptions = 'cqn1j' -- Automatic formatting options
-o.smartindent = true -- Insert indents automatically
-o.textwidth = width -- Maximum width of text
+o.tabstop                             = 2 -- Number of spaces tabs count for
+o.shiftwidth                          = 2 -- Size of an indent
+o.softtabstop                         = 2
+o.expandtab                           = true -- Use spaces instead of tabs
+o.formatoptions                       = 'cqn1j' -- Automatic formatting options
+o.smartindent                         = true -- Insert indents automatically
+o.textwidth                           = width -- Maximum width of text
 
 -------------------- MAPPINGS ------------------------------
 -- common tasks
