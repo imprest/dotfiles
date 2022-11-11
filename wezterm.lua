@@ -14,7 +14,7 @@ end
 return {
   keys = mykeys,
   font = wezterm.font('JetBrainsMono', { weight = 'Bold', italic = false }),
-  font_size = 9.0,
+  font_size = 10,
   force_reverse_video_cursor = true,
   harfbuzz_features = { "zero" },
   color_scheme = 'OneDark (base16)',
