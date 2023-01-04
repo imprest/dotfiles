@@ -26,6 +26,7 @@ sudo pacman-mirrors -f 5
 sudo pacman -Syu zsh ranger neovim python-pynvim tree-sitter fzf ripgrep bat ttf-fira-code ttf-jetbrains-mono ttf-fonts-noto-sans-mono exa starship trash-cli gitui fd\
   erlang elixir fop wxgtk inotify-tools postgresql
 # size 9 in qterminal for fira mono retina 
+# konsole font size JetBrains Mono SemiBold 11 
 # gnome-terminal text/background Gnome | palette Tango
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Inconsolata SemiBold 12'"
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'FiraCode SemiBold 10'"

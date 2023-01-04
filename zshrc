@@ -12,8 +12,6 @@ fi
 
 source "${ZINIT_HOME}/zinit.zsh"
 
-zinit light spaceship-prompt/spaceship-prompt
-
 zinit ice wait lucid
 zinit for \
   light-mode agkozak/zsh-z \
@@ -45,7 +43,7 @@ setopt inc_append_history # append history list to the history file
 setopt share_history      # share command history data (important for multiple parallel zsh sessions!)
 
 # Exports
-export TERMINAL=wezterm
+export TERMINAL=konsole
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export LANG=en_GB.UTF-8
@@ -138,4 +136,4 @@ fpath=(${ASDF_DIR}/completions $fpath) # append completions to fpath
 # initialise completions with ZSH's compinit
 autoload -Uz compinit
 compinit
-# eval "$(starship init zsh)"
+eval "$(starship init zsh)"
