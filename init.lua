@@ -37,7 +37,6 @@ local packer = require('packer')
 local use = packer.use
 packer.startup { function()
   use 'wbthomason/packer.nvim' -- Let packer manage packer
-  -- use 'dstein64/vim-startuptime' -- :StartupTime
   -- use 'Shatur/neovim-session-manager'
   -- use 'tanvirtin/monokai.nvim'
   use 'navarasu/onedark.nvim'
@@ -52,7 +51,7 @@ packer.startup { function()
   use { 'ibhagwan/fzf-lua', requires = { 'vijaymarupudi/nvim-fzf' } }
   use 'junegunn/vim-easy-align' -- visual select then ga<char> to align
   use 'justinmk/vim-gtfo' -- gof open file in filemanager
-  use { 'kyazdani42/nvim-tree.lua', requires = 'kyazdani42/nvim-web-devicons' }
+  use { 'nvim-tree/nvim-tree.lua', requires = 'nvim-tree/nvim-web-devicons' }
   use { 'kristijanhusak/vim-dadbod-completion', requires = 'tpope/vim-dadbod' }
   use 'leafOfTree/vim-svelte-plugin'
   use {
@@ -341,7 +340,6 @@ require('nvim-autopairs').setup()
 -- nvim-tree
 require 'nvim-tree'.setup {
   disable_netrw = true,
-  ignore_ft_on_setup = { "startify", "dashboard", "alpha" },
   update_focused_file = {
     update_cwd = false,
     ignore_list = {},
