@@ -65,6 +65,8 @@ packer.startup { function()
   use 'machakann/vim-sandwich' -- sr({ sd' <select text>sa'
   use 'mg979/vim-visual-multi'
   -- lsp
+  use 'williamboman/mason.nvim'
+  use 'williamboman/mason-lspconfig.nvim'
   use 'neovim/nvim-lspconfig'
   use 'b0o/SchemaStore.nvim'
   use 'JoosepAlviste/nvim-ts-context-commentstring'
@@ -75,7 +77,6 @@ packer.startup { function()
       }
     end
   }
-  use 'williamboman/nvim-lsp-installer'
   -- autocomplete and snippets
   use {
     'hrsh7th/nvim-cmp',
@@ -186,7 +187,7 @@ wk.register({
   },
   l = {
     name = "LSP",
-    I = { "<cmd>LspInstallInfo<cr>", "Installer Info" },
+    I = { "<cmd>Mason<cr>", "Installer Info" },
     a = { "<cmd>FzfLua lsp_code_actions<cr>", "Code Action" },
     c = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
     d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
@@ -220,7 +221,7 @@ g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
 -- colorizer
 -- require('colorizer').setup { 'css'; 'javascript'; html = { mode = 'foreground'; } }
 -- fzf-lua
-g['fzf_action'] = { ['ctrl-s'] = 'split', ['ctrl-v'] = 'vsplit' }
+g['fzf_action'] = { ['ctrl-s'] = 'split',['ctrl-v'] = 'vsplit' }
 require('fzf-lua').setup({
   winopts = {
     preview = { default = 'bat_native' }
@@ -290,15 +291,15 @@ require 'lualine'.setup {
         sources = { "nvim_diagnostic" },
         symbols = { error = "  ", warn = "  ", info = "  ", hint = "  " }
       },
-      { -- 'treesitter'
-        function()
-          if next(vim.treesitter.highlighter.active[api.nvim_get_current_buf()]) then
-            return ""
-          end
-          return ""
-        end,
-        cond = conditions.hide_in_width,
-      },
+      -- { -- 'treesitter'
+      --   function()
+      --     if next(vim.treesitter.highlighter.active[api.nvim_get_current_buf()]) then
+      --       return ""
+      --     end
+      --     return ""
+      --   end,
+      --   cond = conditions.hide_in_width,
+      -- },
       { -- 'lsp'
         function()
           local msg = ''
@@ -315,10 +316,11 @@ require 'lualine'.setup {
           end
           return msg
         end,
-        icon = ' ',
+        -- icon = ' ',
         cond = conditions.hide_in_width,
       },
-      { 'encoding' }, { 'fileformat' },
+      -- { 'encoding' },
+      -- { 'fileformat' },
       { "filetype", cond = conditions.hide_in_width } -- color = { fg = colors.fg, bg = colors.bg } },
     },
     lualine_y = {},
@@ -573,7 +575,10 @@ local on_attach = function(client, bufnr)
   g['lexima_enable_endwise_rules'] = 1
 end
 
-require("nvim-lsp-installer").setup {}
+require("mason").setup()
+require("mason-lspconfig").setup {
+  ensure_installed = { "lua_ls" }
+}
 local lspconfig = require("lspconfig")
 local capabilities = lsp.protocol.make_client_capabilities()
 
@@ -587,7 +592,7 @@ lspconfig.elixirls.setup {
     }
   }
 }
-lspconfig.sumneko_lua.setup {
+lspconfig.lua_ls.setup {
   on_attach = on_attach,
   capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
   settings = { Lua = { diagnostics = { globals = { "vim" } } } }
@@ -652,7 +657,7 @@ cmp.setup({
   mapping = {
     ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
     ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
-    ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-d>"] = cmp.mapping.scroll_docs( -4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
     ["<C-e>"] = cmp.mapping.abort(),
     ["<c-y>"] = cmp.mapping(
@@ -697,11 +702,11 @@ cmp.setup({
     end,
   },
   sources = cmp.config.sources({
-    { name = "luasnip", keyword_length = 2 },
-    { name = "nvim_lua", keyword_length = 2 },
-    { name = "nvim_lsp", keyword_length = 2 },
-    { name = "path", keyword_length = 2 },
-    { name = "buffer", keyword_length = 5 },
+    { name = "luasnip",      keyword_length = 2 },
+    { name = "nvim_lua",     keyword_length = 2 },
+    { name = "nvim_lsp",     keyword_length = 2 },
+    { name = "path",         keyword_length = 2 },
+    { name = "buffer",       keyword_length = 5 },
     { name = "spell" },
     { name = "tags" },
     { name = "latex_symbols" }
@@ -724,7 +729,7 @@ vim.keymap.set({ "i", "s" }, "<a-k>", function() -- my expansion key
   if ls.expand_or_jumpable() then ls.expand_or_jump() end
 end, { silent = true })
 vim.keymap.set({ "i", "s" }, "<a-j>", function() -- my jump backwords key
-  if ls.jumpable(-1) then ls.jump(-1) end
+  if ls.jumpable( -1) then ls.jump( -1) end
 end, { silent = true })
 vim.keymap.set({ "i" }, "<a-l>", function() -- select within list of options
   if ls.choice_active() then ls.change_choice(1) end
@@ -740,12 +745,17 @@ end
 
 local group = vim.api.nvim_create_augroup("MyGroup", { clear = true })
 autocmd("TextYankPost",
-  { pattern = "*",
+  {
+    pattern = "*",
     command = 'silent! lua vim.highlight.on_yank({ hi_group="IncSearch", timeout=200, on_visual=true})',
-    group = group })
+    group = group
+  })
 autocmd("FileType",
-  { pattern = "sql,mysql,plsql",
-    command = 'lua require("cmp").setup.buffer({ sources = {{ name = "vim-dadbod-completion"}}})', group = group })
+  {
+    pattern = "sql,mysql,plsql",
+    command = 'lua require("cmp").setup.buffer({ sources = {{ name = "vim-dadbod-completion"}}})',
+    group = group
+  })
 autocmd("BufEnter", {
   nested = true,
   callback = function()

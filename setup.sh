@@ -23,19 +23,17 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu zsh ranger neovim python-pynvim tree-sitter fzf ripgrep bat ttf-fira-code ttf-jetbrains-mono ttf-fonts-noto-sans-mono exa starship trash-cli gitui fd\
+sudo pacman -Syu zsh ranger neovim python-pynvim fzf ripgrep bat \
+  ttf-firacode-nerd ttf-jetbrains-mono-nerd exa starship trash-cli gitui fd ncdu\
   erlang elixir fop wxgtk inotify-tools postgresql
 # size 9 in qterminal for fira mono retina 
-# konsole font size JetBrains Mono SemiBold 11 
+# konsole font size JetBrains Mono SemiBold 10
 # gnome-terminal text/background Gnome | palette Tango
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Inconsolata SemiBold 12'"
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'FiraCode SemiBold 10'"
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'JetBrains Mono SemiBold 10'"
 # optional
 # weechat pdfarranger
-
-# yay packages
-# yay -S tectonic
 
 # starship.toml
 ln -sf `pwd`/starship.toml ~/.config/starship.toml
@@ -59,4 +57,4 @@ chsh -s /usr/bin/zsh
 
 # create a file in home dir ~/.npmrc with 'ignore-scripts=true'
 # node global packages
-npm i -g neovim
+npm i -g neovim pnpm
