@@ -404,7 +404,7 @@ o.background                          = 'dark'
 -- global options
 o.guicursor                           = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
 o.laststatus                          = 3 -- global statusline
-o.timeoutlen                          = 300 -- mapping timeout
+o.timeoutlen                          = 100 -- mapping timeout
 o.hidden                              = true -- Enable background buffers
 o.mouse                               = 'a' -- Allow the mouse
 o.completeopt                         = 'menu,menuone,noselect' -- Completion options
@@ -438,7 +438,7 @@ o.breakindent                         = true
 o.showbreak                           = '↪  '
 o.linebreak                           = true
 -- window-local options
-wo.cursorline                         = false -- Highlight cursor line
+wo.cursorline                         = true -- Highlight cursor line
 wo.list                               = true -- Show some invisible characters
 wo.listchars                          = "tab:▸ ,extends:>,precedes:<"
 wo.relativenumber                     = false -- Relative line numbers
