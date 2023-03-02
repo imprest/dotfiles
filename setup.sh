@@ -24,7 +24,7 @@ sudo pacman-mirrors -f 5
 
 # packages
 sudo pacman -Syu zsh ranger neovim python-pynvim fzf ripgrep bat \
-  ttf-firacode-nerd ttf-jetbrains-mono-nerd exa starship trash-cli gitui fd ncdu\
+  ttf-firacode-nerd ttf-jetbrains-mono-nerd exa starship trash-cli lazygit fd ncdu\
   erlang elixir fop wxgtk inotify-tools postgresql
 # size 9 in qterminal for fira mono retina 
 # konsole font size JetBrains Mono SemiBold 10
