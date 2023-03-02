@@ -28,8 +28,30 @@ vim.opt.rtp:prepend(lazypath)
 
 -------------------- PLUGINS -------------------------------
 require('lazy').setup({
-  { "folke/which-key.nvim",      lazy = true },
-  { 'NvChad/nvim-colorizer.lua', cmd = 'ColorizerToggle' }, -- lazy-load on a command
+  {
+    "folke/which-key.nvim",
+    lazy = true,
+    opts = {
+      plugins = {
+        spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints i.e. z=
+        -- the presets plugin, adds help for a bunch of default keybindings in Neovim
+        -- No actual key bindings are created
+        presets = {
+          operators = false, -- adds help for operators like d, y, ...
+          motions = false, -- adds help for motions
+          text_objects = false, -- help for text objects triggered after entering an operator
+          windows = true, -- default bindings on <c-w>
+          nav = true, -- misc bindings to work with windows
+          z = true, -- bindings for folds, spelling and others prefixed with z
+          g = true, -- bindings for prefixed with g
+        },
+      }
+    }
+  },
+  { 'NvChad/nvim-colorizer.lua',
+    cmd = 'ColorizerToggle',
+    opts = { 'css', 'javascript', html = { mode = 'foreground', } }
+  }, -- lazy-load on a command
   -- session management
   {
     "folke/persistence.nvim",
@@ -43,7 +65,6 @@ require('lazy').setup({
     },
   },
   {
-    -- 'navarasu/onedark.nvim'
     "NTBBloodbath/doom-one.nvim",
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
@@ -80,7 +101,7 @@ require('lazy').setup({
   'airblade/vim-rooter',
   'elixir-editors/vim-elixir',
   'farmergreg/vim-lastplace',
-  { 'ibhagwan/fzf-lua',                dependencies = { 'vijaymarupudi/nvim-fzf' } },
+  { 'ibhagwan/fzf-lua',  dependencies = { 'vijaymarupudi/nvim-fzf' } },
   'williamboman/mason.nvim',
   'williamboman/mason-lspconfig.nvim',
   {
@@ -101,6 +122,90 @@ require('lazy').setup({
       'kdheepak/cmp-latex-symbols',
       'onsails/lspkind-nvim'
     },
+    config = function()
+      -- nvim-autopairs
+      require('nvim-autopairs').setup()
+      local cmp = require 'cmp'
+      -- cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
+      local lspkind = require('lspkind')
+      cmp.setup({
+        formatting = {
+          format = lspkind.cmp_format({
+            mode = 'symbol',
+            maxwidth = 50,
+            menu = {
+              buffer   = "[buf]",
+              nvim_lsp = "[lsp]",
+              nvim_lua = "[api]",
+              path     = "[path]",
+              luasnip  = "[snip]",
+            },
+          })
+        },
+        snippet = {
+          expand = function(args)
+            require('luasnip').lsp_expand(args.body)
+          end,
+        },
+        mapping = {
+          ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+          ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+          ["<C-d>"] = cmp.mapping.scroll_docs( -4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ["<C-e>"] = cmp.mapping.abort(),
+          ["<c-y>"] = cmp.mapping(
+            cmp.mapping.confirm {
+              behavior = cmp.ConfirmBehavior.Insert,
+              select = true,
+            },
+            { "i", "c" }
+          ),
+          ["<c-space>"] = cmp.mapping {
+            i = cmp.mapping.complete(),
+            c = function(
+              _ --[[fallback]]
+            )
+              if cmp.visible() then
+                if not cmp.confirm { select = true } then
+                  return
+                end
+              else
+                cmp.complete()
+              end
+            end,
+          },
+          -- Testing
+          ["<c-q>"] = cmp.mapping.confirm {
+            behavior = cmp.ConfirmBehavior.Replace,
+            select = true,
+          },
+          ["<Tab>"] = function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            else
+              fallback()
+            end
+          end,
+          ["<S-Tab>"] = function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            else
+              fallback()
+            end
+          end,
+        },
+        sources = cmp.config.sources({
+          { name = "luasnip",      keyword_length = 2 },
+          { name = "nvim_lua",     keyword_length = 2 },
+          { name = "nvim_lsp",     keyword_length = 2 },
+          { name = "path",         keyword_length = 2 },
+          { name = "buffer",       keyword_length = 5 },
+          { name = "spell" },
+          { name = "tags" },
+          { name = "latex_symbols" }
+        })
+      })
+    end
   },
   {
     'nvim-lualine/lualine.nvim',
@@ -168,6 +273,11 @@ require('lazy').setup({
               "diagnostics",
               sources = { "nvim_diagnostic" },
               symbols = { error = "  ", warn = "  ", info = "  ", hint = "H " }
+            },
+            {
+              require("lazy.status").updates,
+              cond = require("lazy.status").has_updates,
+              color = { fg = "#ff9e64" }
             },
             -- { -- 'treesitter'
             --   function()
@@ -254,7 +364,19 @@ require('lazy').setup({
       }
     end,
   },
-  { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
+  {
+    'nvim-treesitter/nvim-treesitter',
+    build = ':TSUpdate',
+    opts = {
+      ensure_installed = {
+        "css", "html", "javascript", "json", "svelte", "typescript",
+        "erlang", "elixir", "eex", "heex",
+        "ledger", "lua", "toml", "zig"
+      },
+      context_commentstring = { enable = true, enable_autocmd = false },
+      highlight = { enable = true }, indent = { enable = false } -- indent is experimental
+    }
+  },
   'neovim/nvim-lspconfig',
   'b0o/schemastore.nvim',
   {
@@ -293,64 +415,35 @@ require('lazy').setup({
       }
     end,
   },
+  {
+    'numToStr/Comment.nvim',
+    dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' },
+    opts = {
+      --pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
+    }
+  },
+  { 'j-hui/fidget.nvim', config = true },
+  'olambo/vi-viz',
+  'pbrisbin/vim-mkdir', -- :e this/does/not/exist/file.txt then :w
+  'cohama/lexima.vim',
+  'alvan/vim-closetag', -- Close html tags
+  'justinmk/vim-gtfo', -- gof open file in filemanager
+  'junegunn/vim-easy-align', -- visual select then ga<char> to align
+  { 'kristijanhusak/vim-dadbod-completion', dependencies = { 'tpope/vim-dadbod' } },
+  'lervag/vimtex',
+  {
+    'akinsho/toggleterm.nvim',
+    version = 'v2.*',
+    opts = {
+      open_mapping = [[A-1]],
+      -- shading-factor = 2
+    }
+  },
+  'machakann/vim-sandwich', -- sr({ sd' <select text>sa'
+  'mg979/vim-visual-multi',
+  -- 'leafOfTree/vim-svelte-plugin'
 })
--- -- use 'Shatur/neovim-session-manager'
--- use 'cohama/lexima.vim'
--- use 'alvan/vim-closetag' -- Close html tags
--- use 'junegunn/vim-easy-align' -- visual select then ga<char> to align
--- use 'justinmk/vim-gtfo' -- gof open file in filemanager
--- use { 'kristijanhusak/vim-dadbod-completion', requires = 'tpope/vim-dadbod' }
--- use 'leafOfTree/vim-svelte-plugin'
--- use 'lervag/vimtex'
--- use 'machakann/vim-sandwich' -- sr({ sd' <select text>sa'
--- use 'mg979/vim-visual-multi'
--- -- lsp
--- use 'JoosepAlviste/nvim-ts-context-commentstring'
--- use { 'numToStr/Comment.nvim',
---   config = function()
---     require('Comment').setup {
---       pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
---     }
---   end
--- }
--- -- autocomplete and snippets
--- -- lsp-diagnostics
--- use { 'j-hui/fidget.nvim', config = function()
---   require('fidget').setup {}
--- end }
--- use 'olambo/vi-viz'
--- use 'pbrisbin/vim-mkdir' -- :e this/does/not/exist/file.txt then :w
--- use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
--- -- use {'mfussenegger/nvim-dap'}        -- Debug Adapter Protocol
--- -- use { 'akinsho/toggleterm.nvim', tag = 'v1.*', config = function()
--- --   require('toggleterm').setup {
--- --     open_mapping = [[<A-t>]],
--- --     shading_factor = 2,
--- --     direction = 'float',
--- --   }
--- -- end }
--- use { 'folke/which-key.nvim',
---   config = function()
---     require("which-key").setup {
---       plugins = {
---         spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints i.e. z=
---         -- the presets plugin, adds help for a bunch of default keybindings in Neovim
---         -- No actual key bindings are created
---         presets = {
---           operators = false, -- adds help for operators like d, y, ...
---           motions = false, -- adds help for motions
---           text_objects = false, -- help for text objects triggered after entering an operator
---           windows = true, -- default bindings on <c-w>
---           nav = true, -- misc bindings to work with windows
---           z = true, -- bindings for folds, spelling and others prefixed with z
---           g = true, -- bindings for prefixed with g
---         },
---       },
---     }
---   end
--- }
--- end,
--- }
+
 -------------------- PLUGIN SETUP --------------------------
 -- symbols-outline
 g.symbols_outline = { highlight_hovered_item = false, auto_preview = false }
@@ -414,8 +507,6 @@ wk.register({
 -- require('bufdel').setup { next = 'alternate' }
 -- closetag
 g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
--- colorizer
--- require('colorizer').setup { 'css'; 'javascript'; html = { mode = 'foreground'; } }
 -- fzf-lua
 g['fzf_action'] = { ['ctrl-s'] = 'split',['ctrl-v'] = 'vsplit' }
 require('fzf-lua').setup({
@@ -423,8 +514,7 @@ require('fzf-lua').setup({
     preview = { default = 'bat_native' }
   }
 })
--- nvim-autopairs
-require('nvim-autopairs').setup()
+-- nvim-tree
 map('n', '<F2>', '<cmd>NvimTreeToggle<CR>')
 map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 -- vi-viz
@@ -566,17 +656,6 @@ map('n', '<C-i>', '<C-i>zz', { silent = true })
 -- reselect visual block after indent
 map('v', '<', '<gv')
 map('v', '>', '>gv')
--------------------- TREE-SITTER ---------------------------
-local ts = require 'nvim-treesitter.configs'
-ts.setup {
-  ensure_installed = {
-    "css", "html", "javascript", "json", "svelte", "typescript",
-    "erlang", "elixir", "eex", "heex",
-    "ledger", "lua", "toml", "zig"
-  },
-  context_commentstring = { enable = true, enable_autocmd = false },
-  highlight = { enable = true }, indent = { enable = false } -- indent is experimental
-}
 
 ------------------ LSP-INSTALL & CONFIG --------------------
 -- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
@@ -685,7 +764,6 @@ end
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local cmp = require 'cmp'
 cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
-local lspkind = require('lspkind')
 --- Luasnip
 local ls = require('luasnip')
 require("luasnip.loaders.from_lua").load({ paths = "~/dotfiles/snippets/" })
@@ -710,13 +788,6 @@ vim.keymap.set({ "i" }, "<a-l>", function() -- select within list of options
 end)
 
 -------------------- COMMANDS ------------------------------
-function Init_Term()
-  cmd 'setlocal nonumber norelativenumber'
-  cmd 'setlocal nospell'
-  cmd 'setlocal signcolumn=auto'
-  cmd 'startinsert'
-end
-
 local group = vim.api.nvim_create_augroup("MyGroup", { clear = true })
 autocmd("TextYankPost",
   {
@@ -742,7 +813,6 @@ autocmd("BufEnter", {
 
 local term_group = vim.api.nvim_create_augroup("TermGroup", { clear = true })
 autocmd("BufEnter", { pattern = "term://*", command = 'startinsert', group = term_group })
-autocmd("TermOpen", { pattern = "*", callback = Init_Term, group = term_group })
 
 local elixir_group = vim.api.nvim_create_augroup("ElixirGroup", { clear = true })
 autocmd("FileType", { pattern = "elixir,eelixir", command = 'iab pp \\|>', group = elixir_group })
