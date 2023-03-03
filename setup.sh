@@ -26,14 +26,14 @@ sudo pacman-mirrors -f 5
 sudo pacman -Syu zsh ranger neovim python-pynvim fzf ripgrep bat \
   ttf-firacode-nerd ttf-jetbrains-mono-nerd exa starship trash-cli lazygit fd ncdu\
   erlang elixir fop wxgtk inotify-tools postgresql
-# size 9 in qterminal for fira mono retina 
-# konsole font size JetBrains Mono SemiBold 10
-# gnome-terminal text/background Gnome | palette Tango
-# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Inconsolata SemiBold 12'"
-# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'FiraCode SemiBold 10'"
-# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'JetBrains Mono SemiBold 10'"
 # optional
 # weechat pdfarranger
+# gnome-terminal text/background Gnome | palette Tango
+# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Fira Code Retina 10'"
+# size 9 in qterminal for fira mono retina 
+# konsole font size JetBrains Mono SemiBold 10
+# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Inconsolata SemiBold 12'"
+# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'JetBrains Mono SemiBold 10'"
 
 # starship.toml
 ln -sf `pwd`/starship.toml ~/.config/starship.toml
