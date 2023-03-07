@@ -89,7 +89,7 @@ require('lazy').setup({
       'akinsho/bufferline.nvim',
       event = "VeryLazy",
       version = "v3.*",
-      dependencies = { "ojroques/nvim-bufdel" },
+      dependencies = { "ojroques/nvim-bufdel", "nvim-tree/nvim-web-devicons" },
       opts = {
         -- run require("bufferline.nvim").setup({ highlights = { fill = "#ee44f5" } })
         highlights = { fill = { bg = "" } },
@@ -97,7 +97,7 @@ require('lazy').setup({
           always_show_bufferline = true,
           show_buffer_close_icons = false,
           show_close_icon = false,
-          offsets = { { filetype = "NvimTree", padding = 1 } },
+          offsets = { { filetype = "neo-tree", highlight = "Directory" } },
           custom_filter = function(buf_number, _) -- hide shell and other unknown ft
             if vim.bo[buf_number].filetype ~= "" then
               return true
@@ -282,9 +282,10 @@ require('lazy').setup({
           options = {
             icons_enabled = true,
             theme = 'onedark',
+            globalstatus = true,
             component_separators = { left = '', right = '' },
             section_separators = { left = '', right = '' },
-            disabled_filetypes = { "NvimTree", "Telescope", "Outline", "dashboard" },
+            disabled_filetypes = { "Telescope", "Outline", "dashboard" },
             always_divide_middle = true,
           },
           sections = {
@@ -300,12 +301,17 @@ require('lazy').setup({
                 icon = "",
                 cond = conditions.hide_in_width
               },
-              { -- 'filename'
-                "filename"
-              }
+              {
+                "filetype",
+                icon_only = true,
+                separator = "",
+                padding = {
+                  left = 1, right = 0 }
+              },
+              { "filename", path = 3, symbols = { modified = "  ", readonly = "", unnamed = "" } },
             },
-            -- {'diagnostics', sources={'nvim_diagnostic'}}},
             lualine_c = {
+              { 'filesize', cond = conditions.buffer_not_empty },
               {
                 -- 'diff'
                 "diff",
@@ -316,7 +322,6 @@ require('lazy').setup({
                   removed = " "
                 }
               },
-              { 'filesize', cond = conditions.buffer_not_empty },
             },
             lualine_x = {
               {
@@ -336,15 +341,6 @@ require('lazy').setup({
                 cond = require("lazy.status").has_updates,
                 color = { fg = "#ff9e64" }
               },
-              -- { -- 'treesitter'
-              --   function()
-              --     if next(vim.treesitter.highlighter.active[api.nvim_get_current_buf()]) then
-              --       return ""
-              --     end
-              --     return ""
-              --   end,
-              --   cond = conditions.hide_in_width,
-              -- },
               {
                 -- 'lsp'
                 function()
@@ -367,9 +363,6 @@ require('lazy').setup({
                 -- icon = ' ',
                 cond = conditions.hide_in_width,
               },
-              -- { 'encoding' },
-              -- { 'fileformat' },
-              { "filetype", cond = conditions.hide_in_width } -- color = { fg = colors.fg, bg = colors.bg } },
             },
             lualine_y = {},
             lualine_z = { '%3l:%3c' }
@@ -383,54 +376,53 @@ require('lazy').setup({
             lualine_z = {}
           },
           tabline = {},
-          extensions = { 'quickfix', 'nvim-tree', 'fzf' }
+          extensions = { 'quickfix', 'neo-tree', 'fzf' }
         }
       end
     },
+    -- file explorer
     {
-      'nvim-tree/nvim-tree.lua',
-      event = "VeryLazy",
-      dependencies = { 'nvim-tree/nvim-web-devicons' },
-      config = function()
-        require 'nvim-tree'.setup {
-          disable_netrw = true,
-          update_focused_file = {
-            update_cwd = false,
-            ignore_list = {},
-          },
-          diagnostics = { enable = true },
-          git = {
-            enable = true,
-            ignore = false
-          },
-          view = {
-            width = 24,
-            preserve_window_proportions = true
-          },
-          renderer = {
-            group_empty = true,
-            icons = { git_placement = "after" },
-            highlight_opened_files = "all",
-            indent_markers = { enable = true }
-          },
-          filters = { custom = { "node_modules", ".cache", ".git" } },
-          actions = {
-            open_file = {
-              resize_window = false,
-              window_picker = {
-                enable = false
-              },
-            },
-          }
-        }
+      "nvim-neo-tree/neo-tree.nvim",
+      cmd = "Neotree",
+      dependencies = { "MunifTanjim/nui.nvim" },
+      keys = {
+        { "<F2>",   '<cmd>Neotree toggle<CR>', desc = "Toggle NeoTree" },
+        { "<C-\\>", '<cmd>Neotree toggle<CR>', desc = "Toggle NeoTree" }
+      },
+      deactivate = function()
+        vim.cmd([[Neotree close]])
       end,
+      init = function()
+        vim.g.neo_tree_remove_legacy_commands = 1
+        if vim.fn.argc() == 1 then
+          local stat = vim.loop.fs_stat(vim.fn.argv(0))
+          if stat and stat.type == "directory" then
+            require("neo-tree")
+          end
+        end
+      end,
+      opts = {
+        close_if_last_window = true,
+        source_selector = { statusline = true },
+        filesystem = {
+          bind_to_cwd = false,
+          follow_current_file = true,
+        },
+        window = {
+          width = "28",
+          mappings = {
+                ["<space>"] = "none",
+          },
+        },
+      },
     },
     {
       'nvim-treesitter/nvim-treesitter',
       build = ':TSUpdate',
       opts = {
         ensure_installed = {
-          "css", "html", "javascript", "json", "svelte", "typescript",
+          "vim", "regex", "lua", "bash", "markdown", "markdown_inline",
+          "css", "html", "javascript", "json", "typescript",
           "erlang", "elixir", "eex", "heex",
           "ledger", "lua", "toml", "zig"
         },
@@ -461,12 +453,25 @@ require('lazy').setup({
       "SmiteshP/nvim-navic",
       lazy = true,
       init = function()
-        vim.g.navic_silence = true
-        -- require("lazyvim.util").on_attach(function(client, buffer)
-        --   if client.server_capabilities.documentSymbolProvider then
-        --     require("nvim-navic").attach(client, buffer)
-        --   end
-        -- end)
+        vim.g.navic_silence = false
+
+        local M = {}
+
+        function M.on_attach(on_attach)
+          vim.api.nvim_create_autocmd('LspAttach', {
+            callback = function(args)
+              local buffer = args.buf
+              local client = vim.lsp.get_client_by_id(args.data.client_id)
+              on_attach(client, buffer)
+            end,
+          })
+        end
+
+        M.on_attach(function(client, buffer)
+          if client.server_capabilities.documentSymbolProvider then
+            require("nvim-navic").attach(client, buffer)
+          end
+        end)
       end,
       opts = function()
         return {
@@ -504,7 +509,6 @@ require('lazy').setup({
     },
     'machakann/vim-sandwich', -- sr({ sd' <select text>sa'
     'mg979/vim-visual-multi',
-    -- 'leafOfTree/vim-svelte-plugin'
   },
   {
     checker = { enabled = true },
@@ -579,7 +583,7 @@ wk.register({
 -- bufdel
 -- require('bufdel').setup { next = 'alternate' }
 -- closetag
-g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
+g['closetag_filenames'] = '*.html, *.heex'
 -- fzf-lua
 g['fzf_action'] = { ['ctrl-s'] = 'split',['ctrl-v'] = 'vsplit' }
 require('fzf-lua').setup({
@@ -587,9 +591,6 @@ require('fzf-lua').setup({
     preview = { default = 'bat_native' }
   }
 })
--- nvim-tree
-map('n', '<F2>', '<cmd>NvimTreeToggle<CR>')
-map('n', '<C-\\>', '<cmd>NvimTreeToggle<CR>')
 -- vi-viz
 map('x', 'v', "<cmd>lua require('vi-viz').vizExpand()<CR>")
 map('x', 'V', "<cmd>lua require('vi-viz').vizContract()<CR>")
@@ -605,43 +606,39 @@ map('x', '<leader>d', '<Plug>(DBExe)')
 map('n', '<leader>d', '<Plug>(DBExe)')
 map('o', '<leader>d', '<Plug>(DBExe)')
 map('n', '<leader>dd', '<Plug>(DBExeLine)')
--- vim-svelte
-g['vim_svelte_plugin_use_typescript'] = 1
-g['vim_svelte_plugin_use_sass']       = 1
-g['vim_svelte_plugin_use_foldexpr']   = 1
 -- vimtex
-g['vimtex_quickfix_mode']             = 0
-g['vimtex_compiler_method']           = 'tectonic'
-g['vimtex_view_general_viewer']       = 'okular'
+g['vimtex_quickfix_mode']       = 0
+g['vimtex_compiler_method']     = 'tectonic'
+g['vimtex_view_general_viewer'] = 'okular'
 -------------------- OPTIONS -------------------------------
-local width                           = 80
+local width                     = 80
 -- global options
-opt.backup                            = false
-opt.breakindent                       = true
-opt.completeopt                       = 'menu,menuone,noselect' -- Completion options
-opt.conceallevel                      = 3                       -- Hide * markip for bold and italic
-opt.cursorline                        = true                    -- Highlight cursor line
+opt.backup                      = false
+opt.breakindent                 = true
+opt.completeopt                 = 'menu,menuone,noselect' -- Completion options
+opt.conceallevel                = 3                       -- Hide * markip for bold and italic
+opt.cursorline                  = true                    -- Highlight cursor line
 -- opt.equalalways                       = false                   -- I don't like my windows changing all the time
-opt.expandtab                         = true                    -- Use spaces instead of tabs
-opt.foldlevel                         = 99
-opt.foldmethod                        = 'indent'
-opt.formatoptions                     = 'cqn1j' -- Automatic formatting options
+opt.expandtab                   = true                    -- Use spaces instead of tabs
+opt.foldlevel                   = 99
+opt.foldmethod                  = 'indent'
+opt.formatoptions               = 'cqn1j' -- Automatic formatting options
 -- opt.guicursor                         = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
-opt.grepformat                        = "%f:%l:%c:%m"
-opt.grepprg                           = "rg --vimgrep"
-opt.ignorecase                        = true  -- Ignore case
-opt.joinspaces                        = false -- No double spaces with join
-opt.laststatus                        = 3     -- global statusline
-opt.linebreak                         = true
-opt.list                              = true  -- Show some invisible characters
-opt.listchars                         = "tab:▸ ,extends:>,precedes:<"
-opt.mouse                             = 'a'   -- Allow the mouse
-opt.number                            = true  -- Show line numbers
-opt.pumheight                         = 10    -- Maximum number of entries in a popup
-opt.scrolljump                        = 4     -- min. lines to scroll
-opt.scrolloff                         = 4     -- Lines of context
-opt.shiftround                        = true  -- Round indent
-opt.shiftwidth                        = 2     -- Size of an indent
+opt.grepformat                  = "%f:%l:%c:%m"
+opt.grepprg                     = "rg --vimgrep"
+opt.ignorecase                  = true  -- Ignore case
+opt.joinspaces                  = false -- No double spaces with join
+opt.laststatus                  = 3     -- global statusline
+opt.linebreak                   = true
+opt.list                        = true  -- Show some invisible characters
+opt.listchars                   = "tab:▸ ,extends:>,precedes:<"
+opt.mouse                       = 'a'   -- Allow the mouse
+opt.number                      = true  -- Show line numbers
+opt.pumheight                   = 10    -- Maximum number of entries in a popup
+opt.scrolljump                  = 4     -- min. lines to scroll
+opt.scrolloff                   = 4     -- Lines of context
+opt.shiftround                  = true  -- Round indent
+opt.shiftwidth                  = 2     -- Size of an indent
 -- opt.shortmess                         = 'IFc' -- Avoid showing extra message on completion
 opt.shortmess:append { W = true, I = true, c = true }
 opt.showbreak     = '↪  '
@@ -810,7 +807,7 @@ lspconfig.jsonls.setup {
     }
   }
 }
-for _, server in ipairs { "tailwindcss", "svelte", "tsserver" } do
+for _, server in ipairs { "tailwindcss", "tsserver" } do
   lspconfig[server].setup {
     on_attach = on_attach,
     capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
@@ -862,39 +859,65 @@ vim.keymap.set({ "i" }, "<a-l>", function() -- select within list of options
   if ls.choice_active() then ls.change_choice(1) end
 end)
 
--------------------- COMMANDS ------------------------------
-local group = vim.api.nvim_create_augroup("MyGroup", { clear = true })
-autocmd("TextYankPost",
-  {
-    pattern = "*",
-    command = 'silent! lua vim.highlight.on_yank({ hi_group="IncSearch", timeout=200, on_visual=true})',
-    group = group
-  })
-autocmd("FileType",
-  {
-    pattern = "sql,mysql,plsql",
-    command = 'lua require("cmp").setup.buffer({ sources = {{ name = "vim-dadbod-completion"}}})',
-    group = group
-  })
-autocmd("BufEnter", {
-  nested = true,
+-------------------- AUTO COMMANDS -------------------------
+local function augroup(name)
+  return vim.api.nvim_create_augroup("My_" .. name, { clear = true })
+end
+
+-- Highlight on yank
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = augroup("highlight_yank"),
   callback = function()
-    if #vim.api.nvim_list_wins() == 1 and vim.api.nvim_buf_get_name(0):match("NvimTree_") ~= nil then
-      vim.cmd "quit"
-    end
+    vim.highlight.on_yank({ hi_group = "IncSearch", timeout = 200, on_visual = true })
   end,
-  group = group
 })
 
-local term_group = vim.api.nvim_create_augroup("TermGroup", { clear = true })
-autocmd("BufEnter", { pattern = "term://*", command = 'startinsert', group = term_group })
+-- resize splits if window got resized
+vim.api.nvim_create_autocmd({ "VimResized" }, {
+  group = augroup("resize_splits"),
+  callback = function()
+    vim.cmd("tabdo wincmd =")
+  end,
+})
 
-local elixir_group = vim.api.nvim_create_augroup("ElixirGroup", { clear = true })
-autocmd("FileType", { pattern = "elixir,eelixir", command = 'iab pp \\|>', group = elixir_group })
+-- wrap and check for spell in text filetypes
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("wrap_spell"),
+  pattern = { "gitcommit", "markdown" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.spell = true
+  end,
+})
 
-local lsp_group = vim.api.nvim_create_augroup("LSPGroup", { clear = true })
-autocmd("BufWritePre", { pattern = "*.{ex,exs,heex}", command = 'lua vim.lsp.buf.format()', group = lsp_group })
-autocmd("BufWritePre",
-  { pattern = "*.{svelte,css,scss,js,ts,json}", command = 'lua vim.lsp.buf.format()', group = lsp_group })
-autocmd("BufWritePre",
-  { pattern = "*.{lua}", command = 'lua vim.lsp.buf.format()', group = lsp_group })
+-- On entering a terminal switch to insert mode by default
+vim.api.nvim_create_autocmd("BufEnter", {
+  group = augroup("term_group"),
+  pattern = "term://*",
+  command = 'startinsert'
+})
+
+-- Elixir autocommands like abbreviation of pipe as pp
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("elixir_group"),
+  pattern = "elixir,eelixir",
+  command = 'iab pp \\|>'
+})
+
+-- SQL cmp
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("sql_cmp"),
+  pattern = "sql,mysql,plsql",
+  callback = function()
+    require("cmp").setup.buffer({ sources = { { name = "vim-dadbod-completion" } } })
+  end
+})
+
+-- LSP autocommands like format on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = augroup("lsp_format"),
+  pattern = "*.{ex,exs,heex,css,scss,js,ts,json,lua}",
+  callback = function()
+    vim.lsp.buf.format()
+  end
+})
