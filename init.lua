@@ -1,7 +1,7 @@
 -- Based of https://github.com/LazyVim/LazyVim
 -------------------- HELPERS -------------------------------
 local api, cmd, fn, g, lsp = vim.api, vim.cmd, vim.fn, vim.g, vim.lsp
-local opt, wo, b, map, autocmd = vim.opt, vim.wo, vim.b, vim.keymap.set, vim.api.nvim_create_autocmd
+local opt, wo, b, map = vim.opt, vim.wo, vim.b, vim.keymap.set
 -- local bo = vim.bo
 
 g['loaded_python_provider'] = 1
@@ -116,9 +116,6 @@ require('lazy').setup({
     -- snippets
     {
       "L3MON4D3/LuaSnip",
-      --[[ build = (not jit.os:find("Windows"))
-          and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
-          or nil, ]]
       dependencies = {
         "rafamadriz/friendly-snippets",
         config = function()
@@ -129,21 +126,7 @@ require('lazy').setup({
         history = true,
         delete_check_events = "TextChanged",
       },
-      -- stylua: ignore
-      keys = {
-        {
-          "<tab>",
-          function()
-            return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or
-                "<tab>"
-          end,
-          expr = true,
-          silent = true,
-          mode = "i",
-        },
-        { "<tab>",   function() require("luasnip").jump(1) end,  mode = "s" },
-        { "<s-tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
-      },
+      keys = function() return {} end,
     },
     -- auto completion
     {
@@ -162,12 +145,26 @@ require('lazy').setup({
         'kdheepak/cmp-latex-symbols',
         'onsails/lspkind-nvim'
       },
-      config = function()
-        -- nvim-autopairs
+      opts = function(_, opts)
         require('nvim-autopairs').setup()
+
+        local has_words_before = function()
+          unpack = unpack or table.unpack
+          local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+          return col ~= 0 and
+              vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match(
+                "%s") ==
+              nil
+        end
+
+        local luasnip = require("luasnip")
         local cmp = require("cmp")
-        -- cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
+        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+
+        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
+
         local lspkind = require('lspkind')
+
         cmp.setup({
           formatting = {
             format = lspkind.cmp_format({
@@ -308,7 +305,15 @@ require('lazy').setup({
                 padding = {
                   left = 1, right = 0 }
               },
-              { "filename", path = 3, symbols = { modified = "  ", readonly = "", unnamed = "" } },
+              {
+                "filename",
+                path = 3,
+                symbols = {
+                  modified = "  ",
+                  readonly = "",
+                  unnamed = ""
+                }
+              },
             },
             lualine_c = {
               { 'filesize', cond = conditions.buffer_not_empty },
@@ -409,7 +414,7 @@ require('lazy').setup({
           follow_current_file = true,
         },
         window = {
-          width = "28",
+          width = "22",
           mappings = {
                 ["<space>"] = "none",
           },
@@ -419,10 +424,11 @@ require('lazy').setup({
     {
       'nvim-treesitter/nvim-treesitter',
       build = ':TSUpdate',
+      event = "VeryLazy",
       opts = {
         ensure_installed = {
           "vim", "regex", "lua", "bash", "markdown", "markdown_inline",
-          "css", "html", "javascript", "json", "typescript",
+          "css", "html", "javascript", "json", "typescript", "tsx",
           "erlang", "elixir", "eex", "heex",
           "ledger", "lua", "toml", "zig"
         },
@@ -507,7 +513,14 @@ require('lazy').setup({
         -- shading-factor = 2
       }
     },
-    'machakann/vim-sandwich', -- sr({ sd' <select text>sa'
+    {
+      'echasnovski/mini.surround',
+      keys = { "sr", "sh", "sf", "sF", "sd", "sn", { "sa", mode = "v" } }, -- Only load on these keystrokes
+      version = false,
+      config = function()
+        require('mini.surround').setup()
+      end,
+    }, -- sr({ sd' <select text>sa'
     'mg979/vim-visual-multi',
   },
   {
@@ -542,7 +555,7 @@ wk.register({
       ["q"] = { "<cmd>q!<CR>", "Quit" },
       ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
       ["x"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
-      ["gg"] = { '<cmd>TermExec cmd="gitui" direction=float<CR>', "Gitui" },
+      ["gg"] = { '<cmd>TermExec cmd="lazygit" direction=float<CR>', "lazygit" },
       ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
       ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
       ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
@@ -667,41 +680,36 @@ opt.wrap          = false               -- Disable line wrap
 opt.writebackup   = false
 
 -------------------- MAPPINGS ------------------------------
--- common tasks
-map('n', '<C-s>', '<cmd>update<CR>')
+-- Personal common tasks
 -- map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
 map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
 map('n', '<BS>', '<cmd>nohlsearch<CR>')
 map('v', '<BS>', '<ESC>')
 map('n', '<F4>', '<cmd>set spell!<CR>')
 map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
-map('n', '<F6>', '<cmd>SymbolsOutline<CR>')
 map('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
 map('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
 map('n', '<C-f>', '<cmd>FzfLua grep<CR>')
 map('n', '<C-b>', '<cmd>FzfLua blines<CR>')
 map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
--- move lines up/down
-map('n', '<A-j>', ':m .+1<CR>==')
-map('n', '<A-k>', ':m .-2<CR>==')
-map('i', '<A-j>', '<Esc>:m .+1<CR>==gi')
-map('i', '<A-k>', '<Esc>:m .-2<CR>==gi')
-map('v', '<A-j>', ':m \'>+1<CR>gv=gv')
-map('v', '<A-k>', ':m \'<-2<CR>gv=gv')
+
 -- Escape
 map('i', 'jk', '<ESC>', { noremap = false })
 map('t', 'jk', '<ESC>', { noremap = false })
 map('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"', { expr = true })
--- Navigation & Window management
+
+-- Easier movement
 map('n', 'q', '<C-w>c')
 map('n', 'H', '^')
 map('n', 'L', 'g_')
 map('n', 'F', '%')
 map('v', 'L', 'g_')
-map('n', 'S', '<cmd>bn<CR>')
-map('n', 'X', '<cmd>bp<CR>')
-map('n', '<Right>', '<cmd>BufferLineCycleNext<CR>')
-map('n', '<Left>', '<cmd>BufferLineCyclePrev<CR>')
+
+-- better up/down
+map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+
+-- Move to window using the <ctrl> hjkl keys
 map('t', '<C-h>', '<C-\\><C-N><C-w>h')
 map('t', '<C-j>', '<C-\\><C-N><C-w>j')
 map('t', '<C-k>', '<C-\\><C-N><C-w>k')
@@ -710,10 +718,29 @@ map('n', '<C-h>', '<C-w>h')
 map('n', '<C-j>', '<C-w>j')
 map('n', '<C-k>', '<C-w>k')
 map('n', '<C-l>', '<C-w>l')
-map('n', '<M-Left>', '<C-w>2<')
-map('n', '<M-Up>', '<C-w>2-')
-map('n', '<M-Down>', '<C-w>2+')
-map('n', '<M-Right>', '<C-w>2>')
+
+-- Move Lines
+map("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
+map("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
+map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
+map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
+map("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
+map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
+
+-- Resize window using <ctrl> arrow keys
+map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
+map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
+map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
+map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
+
+-- buffers
+map("n", "<A-h>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
+map("n", "<A-l>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+map("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
+map("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+
+-- Try and center this motions to the middle of the screen
+map({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
 map('n', 'n', 'nzz', { silent = true })
 map('n', 'N', 'Nzz', { silent = true })
 map('n', '*', '*zz', { silent = true })
@@ -721,12 +748,24 @@ map('n', '#', '#zz', { silent = true })
 map('n', 'g*', 'g*zz', { silent = true })
 map('n', 'g#', 'g#zz', { silent = true })
 map('n', '<C-o>', '<C-o>zz', { silent = true })
-map('n', '<C-o>', '<C-o>zz', { silent = true })
+map('n', '<C-i>', '<C-i>zz', { silent = true })
 map('n', '<C-d>', '<C-d>zz', { silent = true })
 map('n', '<C-u>', '<C-u>zz', { silent = true })
--- reselect visual block after indent
-map('v', '<', '<gv')
-map('v', '>', '>gv')
+
+-- Add undo break-points
+map("i", ",", ",<c-g>u")
+map("i", ".", ".<c-g>u")
+map("i", ";", ";<c-g>u")
+
+-- save file
+map({ "i", "v", "n", "s" }, "<C-s>", "<cmd>update<cr><esc>", { desc = "Save file" })
+
+-- better indenting
+map("v", "<", "<gv")
+map("v", ">", ">gv")
+
+-- lazy
+map("n", "<leader>z", "<cmd>:Lazy<cr>", { desc = "Lazy" })
 
 ------------------ LSP-INSTALL & CONFIG --------------------
 -- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
@@ -832,10 +871,6 @@ lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
 end
 
 -------------------- LSP w/ Cmp-----------------------------
--- Setup our autocompletion. These configuration options are the default ones
-local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-local cmp = require 'cmp'
-cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
 --- Luasnip
 local ls = require('luasnip')
 require("luasnip.loaders.from_lua").load({ paths = "~/dotfiles/snippets/" })
