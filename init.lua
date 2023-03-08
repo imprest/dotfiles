@@ -421,26 +421,66 @@ require('lazy').setup({
         },
       },
     },
+    -- search/replace in multiple files
+    {
+      "windwp/nvim-spectre",
+      -- stylua: ignore
+      keys = {
+        { "<leader>S", function() require("spectre").open() end, desc = "Replace in files (Spectre)" },
+      },
+    },
     {
       'nvim-treesitter/nvim-treesitter',
+      version = false,
       build = ':TSUpdate',
-      event = "VeryLazy",
+      event = { "BufReadPost", "BufNewFile" },
       opts = {
+        highlight = { enable = true },
+        indent = { enable = true, disable = { "python" } },
+        context_commentstring = { enable = true, enable_autocmd = false },
         ensure_installed = {
           "vim", "regex", "lua", "bash", "markdown", "markdown_inline",
           "css", "html", "javascript", "json", "typescript", "tsx",
           "erlang", "elixir", "eex", "heex",
           "ledger", "lua", "toml", "zig"
-        },
-        context_commentstring = { enable = true, enable_autocmd = false },
-        highlight = { enable = true },
-        indent = { enable = false } -- indent is experimental
+        }
       }
+    },
+
+    -- easily jump to any location and enhanced f/t motions for Leap
+    {
+      "ggandor/flit.nvim",
+      keys = function()
+        local ret = {}
+        for _, key in ipairs({ "f", "F", "t", "T" }) do
+          ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
+        end
+        return ret
+      end,
+      opts = { labeled_modes = "nx" },
+    },
+    {
+      "ggandor/leap.nvim",
+      keys = {
+        { "s",  mode = { "n", "x", "o" }, desc = "Leap forward to" },
+        { "S",  mode = { "n", "x", "o" }, desc = "Leap backward to" },
+        { "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
+      },
+      config = function(_, opts)
+        local leap = require("leap")
+        for k, v in pairs(opts) do
+          leap.opts[k] = v
+        end
+        leap.add_default_mappings(true)
+        vim.keymap.del({ "x", "o" }, "x")
+        vim.keymap.del({ "x", "o" }, "X")
+      end,
     },
     'neovim/nvim-lspconfig',
     'b0o/schemastore.nvim',
     {
       'lewis6991/gitsigns.nvim',
+      event = { "BufReadPre", "BufNewFile" },
       dependencies = { 'nvim-lua/plenary.nvim' },
       opts = { current_line_blame = false }
     },
@@ -562,8 +602,7 @@ wk.register({
       ["<leader>"] = { '<C-^>', 'Last buffer' },
       ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
       ["v"] = { '<C-w>v<C-w>l', 'Split vertical' },
-      ["c"] = { '<cmd>split<bar>res 10 <bar>terminal<CR>', 'Terminal bottom' },
-      ["L"] = { '<cmd>Lazy<CR>', 'Lazy' },
+      ["c"] = { '<cmd>ToggleTerm<CR>', 'Terminal bottom' },
   l = {
     name = "LSP",
     I = { "<cmd>Mason<cr>", "Installer Info" },
@@ -631,12 +670,12 @@ opt.breakindent                 = true
 opt.completeopt                 = 'menu,menuone,noselect' -- Completion options
 opt.conceallevel                = 3                       -- Hide * markip for bold and italic
 opt.cursorline                  = true                    -- Highlight cursor line
--- opt.equalalways                       = false                   -- I don't like my windows changing all the time
+-- opt.equalalways              = false                   -- I don't like my windows changing all the time
 opt.expandtab                   = true                    -- Use spaces instead of tabs
 opt.foldlevel                   = 99
 opt.foldmethod                  = 'indent'
 opt.formatoptions               = 'cqn1j' -- Automatic formatting options
--- opt.guicursor                         = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
+-- opt.guicursor                = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
 opt.grepformat                  = "%f:%l:%c:%m"
 opt.grepprg                     = "rg --vimgrep"
 opt.ignorecase                  = true  -- Ignore case
@@ -652,7 +691,7 @@ opt.scrolljump                  = 4     -- min. lines to scroll
 opt.scrolloff                   = 4     -- Lines of context
 opt.shiftround                  = true  -- Round indent
 opt.shiftwidth                  = 2     -- Size of an indent
--- opt.shortmess                         = 'IFc' -- Avoid showing extra message on completion
+-- opt.shortmess                = 'IFc' -- Avoid showing extra message on completion
 opt.shortmess:append { W = true, I = true, c = true }
 opt.showbreak     = '↪  '
 opt.showbreak     = '↪  '
@@ -750,7 +789,9 @@ map('n', 'g#', 'g#zz', { silent = true })
 map('n', '<C-o>', '<C-o>zz', { silent = true })
 map('n', '<C-i>', '<C-i>zz', { silent = true })
 map('n', '<C-d>', '<C-d>zz', { silent = true })
-map('n', '<C-u>', '<C-u>zz', { silent = true })
+map('n', '<C-d>', '<C-d>zz', { silent = true })
+map('n', 'u', 'uzz', { silent = true })
+map('n', '<C-r>', '<C-r>zz', { silent = true })
 
 -- Add undo break-points
 map("i", ",", ",<c-g>u")
