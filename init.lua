@@ -1,7 +1,7 @@
 -- Based of https://github.com/LazyVim/LazyVim
 -------------------- HELPERS -------------------------------
 local api, cmd, fn, g, lsp = vim.api, vim.cmd, vim.fn, vim.g, vim.lsp
-local opt, wo, b, map = vim.opt, vim.wo, vim.b, vim.keymap.set
+local opt, wo, b = vim.opt, vim.wo, vim.b
 -- local bo = vim.bo
 
 g['loaded_python_provider'] = 1
@@ -106,6 +106,37 @@ require('lazy').setup({
         }
       }
     },
+    -- references
+    {
+      "RRethy/vim-illuminate",
+      event = { "BufReadPost", "BufNewFile" },
+      opts = { delay = 200 },
+      config = function(_, opts)
+        require("illuminate").configure(opts)
+
+        local function map(key, dir, buffer)
+          vim.keymap.set("n", key, function()
+            require("illuminate")["goto_" .. dir .. "_reference"](false)
+          end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
+        end
+
+        map("]]", "next")
+        map("[[", "prev")
+
+        -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
+        vim.api.nvim_create_autocmd("FileType", {
+          callback = function()
+            local buffer = vim.api.nvim_get_current_buf()
+            map("]]", "next", buffer)
+            map("[[", "prev", buffer)
+          end,
+        })
+      end,
+      keys = {
+        { "]]", desc = "Next Reference" },
+        { "[[", desc = "Prev Reference" },
+      },
+    },
     'airblade/vim-rooter',
     'elixir-editors/vim-elixir',
     { 'ethanholz/nvim-lastplace', config = true },
@@ -126,16 +157,31 @@ require('lazy').setup({
         history = true,
         delete_check_events = "TextChanged",
       },
-      keys = function() return {} end,
+      keys = {
+        {
+          "<tab>",
+          function()
+            return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>"
+          end,
+          expr = true,
+          silent = true,
+          mode = "i",
+        },
+        { "<tab>",   function() require("luasnip").jump(1) end,  mode = "s" },
+        { "<s-tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
+      },
     },
     -- auto completion
+    {
+      "windwp/nvim-autopairs",
+      config = true
+    },
     {
       "hrsh7th/nvim-cmp",
       version = false,       -- last release is way too old
       event = "InsertEnter", -- load cmp on InsertEnter
       -- these dependencies will only be loaded when cmp loads
       dependencies = {
-        'windwp/nvim-autopairs',
         "hrsh7th/cmp-nvim-lsp",
         "hrsh7th/cmp-nvim-lua",
         "hrsh7th/cmp-buffer",
@@ -145,27 +191,43 @@ require('lazy').setup({
         'kdheepak/cmp-latex-symbols',
         'onsails/lspkind-nvim'
       },
-      opts = function(_, opts)
-        require('nvim-autopairs').setup()
-
-        local has_words_before = function()
-          unpack = unpack or table.unpack
-          local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-          return col ~= 0 and
-              vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match(
-                "%s") ==
-              nil
-        end
-
-        local luasnip = require("luasnip")
-        local cmp = require("cmp")
-        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-
-        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
-
+      opts = function()
         local lspkind = require('lspkind')
-
-        cmp.setup({
+        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+        local cmp = require("cmp")
+        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done()) -- If you want insert `(` after select function or method item
+        return {
+          completion = {
+            completeopt = "menu,menuone,noinsert",
+          },
+          snippet = {
+            expand = function(args)
+              require("luasnip").lsp_expand(args.body)
+            end
+          },
+          mapping = cmp.mapping.preset.insert({
+                ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+                ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+                ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+                ["<C-f>"] = cmp.mapping.scroll_docs(4),
+                ["<C-Space>"] = cmp.mapping.complete(),
+                ["<C-e>"] = cmp.mapping.abort(),
+                ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+                ["<S-CR>"] = cmp.mapping.confirm({
+              behavior = cmp.ConfirmBehavior.Replace,
+              select = true,
+            }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+          }),
+          sources = cmp.config.sources({
+            { name = "nvim_lsp",     keyword_length = 2 },
+            { name = "luasnip",      keyword_length = 2 },
+            { name = "nvim_lua",     keyword_length = 2 },
+            { name = "path",         keyword_length = 2 },
+            { name = "buffer",       keyword_length = 5 },
+            { name = "spell" },
+            { name = "tags" },
+            { name = "latex_symbols" }
+          }),
           formatting = {
             format = lspkind.cmp_format({
               mode = 'symbol',
@@ -179,71 +241,12 @@ require('lazy').setup({
               },
             })
           },
-          snippet = {
-            expand = function(args)
-              require('luasnip').lsp_expand(args.body)
-            end,
-          },
-          mapping = {
-                ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp
-                .SelectBehavior.Insert },
-                ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp
-                .SelectBehavior.Insert },
-                ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-                ["<C-f>"] = cmp.mapping.scroll_docs(4),
-                ["<C-e>"] = cmp.mapping.abort(),
-                ["<c-y>"] = cmp.mapping(
-              cmp.mapping.confirm {
-                behavior = cmp.ConfirmBehavior.Insert,
-                select = true,
-              },
-              { "i", "c" }
-            ),
-                ["<c-space>"] = cmp.mapping {
-              i = cmp.mapping.complete(),
-              c = function(
-                _ --[[fallback]]
-              )
-                if cmp.visible() then
-                  if not cmp.confirm { select = true } then
-                    return
-                  end
-                else
-                  cmp.complete()
-                end
-              end,
+          experimental = {
+            ghost_text = {
+              hl_group = "LspCodeLens",
             },
-            -- Testing
-                ["<c-q>"] = cmp.mapping.confirm {
-              behavior = cmp.ConfirmBehavior.Replace,
-              select = true,
-            },
-                ["<Tab>"] = function(fallback)
-              if cmp.visible() then
-                cmp.select_next_item()
-              else
-                fallback()
-              end
-            end,
-                ["<S-Tab>"] = function(fallback)
-              if cmp.visible() then
-                cmp.select_prev_item()
-              else
-                fallback()
-              end
-            end,
           },
-          sources = cmp.config.sources({
-            { name = "luasnip",      keyword_length = 2 },
-            { name = "nvim_lua",     keyword_length = 2 },
-            { name = "nvim_lsp",     keyword_length = 2 },
-            { name = "path",         keyword_length = 2 },
-            { name = "buffer",       keyword_length = 5 },
-            { name = "spell" },
-            { name = "tags" },
-            { name = "latex_symbols" }
-          })
-        })
+        }
       end
     },
     {
@@ -536,13 +539,14 @@ require('lazy').setup({
         --pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
       }
     },
-    { 'j-hui/fidget.nvim',                    config = true },
-    'olambo/vi-viz',
-    'pbrisbin/vim-mkdir',      -- :e this/does/not/exist/file.txt then :w
+    {
+      'j-hui/fidget.nvim',
+      config = true
+    },
+    'pbrisbin/vim-mkdir', -- :e this/does/not/exist/file.txt then :w
     'cohama/lexima.vim',
-    'alvan/vim-closetag',      -- Close html tags
-    'justinmk/vim-gtfo',       -- gof open file in filemanager
-    'junegunn/vim-easy-align', -- visual select then ga<char> to align
+    'alvan/vim-closetag', -- Close html tags
+    'justinmk/vim-gtfo',  -- gof open file in filemanager
     { 'kristijanhusak/vim-dadbod-completion', dependencies = { 'tpope/vim-dadbod' } },
     'lervag/vimtex',
     {
@@ -643,21 +647,15 @@ require('fzf-lua').setup({
     preview = { default = 'bat_native' }
   }
 })
--- vi-viz
-map('x', 'v', "<cmd>lua require('vi-viz').vizExpand()<CR>")
-map('x', 'V', "<cmd>lua require('vi-viz').vizContract()<CR>")
--- vim-easy-align
-map('x', 'ga', '<Plug>(EasyAlign)')
-map('n', 'ga', '<Plug>(EasyAlign)')
 -- vim-dadbod
 g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
-map('x', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
-map('n', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
-map('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', { expr = true })
-map('x', '<leader>d', '<Plug>(DBExe)')
-map('n', '<leader>d', '<Plug>(DBExe)')
-map('o', '<leader>d', '<Plug>(DBExe)')
-map('n', '<leader>dd', '<Plug>(DBExeLine)')
+vim.keymap.set('x', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
+vim.keymap.set('n', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
+vim.keymap.set('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', { expr = true })
+vim.keymap.set('x', '<leader>d', '<Plug>(DBExe)')
+vim.keymap.set('n', '<leader>d', '<Plug>(DBExe)')
+vim.keymap.set('o', '<leader>d', '<Plug>(DBExe)')
+vim.keymap.set('n', '<leader>dd', '<Plug>(DBExeLine)')
 -- vimtex
 g['vimtex_quickfix_mode']       = 0
 g['vimtex_compiler_method']     = 'tectonic'
@@ -721,92 +719,92 @@ opt.writebackup   = false
 -------------------- MAPPINGS ------------------------------
 -- Personal common tasks
 -- map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
-map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
-map('n', '<BS>', '<cmd>nohlsearch<CR>')
-map('v', '<BS>', '<ESC>')
-map('n', '<F4>', '<cmd>set spell!<CR>')
-map('n', '<F5>', '<cmd>ColorizerToggle<CR>')
-map('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
-map('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
-map('n', '<C-f>', '<cmd>FzfLua grep<CR>')
-map('n', '<C-b>', '<cmd>FzfLua blines<CR>')
-map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
+vim.keymap.set('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
+vim.keymap.set('n', '<BS>', '<cmd>nohlsearch<CR>')
+vim.keymap.set('v', '<BS>', '<ESC>')
+vim.keymap.set('n', '<F4>', '<cmd>set spell!<CR>')
+vim.keymap.set('n', '<F5>', '<cmd>ColorizerToggle<CR>')
+vim.keymap.set('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
+vim.keymap.set('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
+vim.keymap.set('n', '<C-f>', '<cmd>FzfLua grep<CR>')
+vim.keymap.set('n', '<C-b>', '<cmd>FzfLua blines<CR>')
+vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
 
 -- Escape
-map('i', 'jk', '<ESC>', { noremap = false })
-map('t', 'jk', '<ESC>', { noremap = false })
-map('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"', { expr = true })
+vim.keymap.set('i', 'jk', '<ESC>', { noremap = false })
+vim.keymap.set('t', 'jk', '<ESC>', { noremap = false })
+vim.keymap.set('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"', { expr = true })
 
 -- Easier movement
-map('n', 'q', '<C-w>c')
-map('n', 'H', '^')
-map('n', 'L', 'g_')
-map('n', 'F', '%')
-map('v', 'L', 'g_')
+vim.keymap.set('n', 'q', '<C-w>c')
+vim.keymap.set('n', 'H', '^')
+vim.keymap.set('n', 'L', 'g_')
+vim.keymap.set('n', 'F', '%')
+vim.keymap.set('v', 'L', 'g_')
 
 -- better up/down
-map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 
 -- Move to window using the <ctrl> hjkl keys
-map('t', '<C-h>', '<C-\\><C-N><C-w>h')
-map('t', '<C-j>', '<C-\\><C-N><C-w>j')
-map('t', '<C-k>', '<C-\\><C-N><C-w>k')
-map('t', '<C-l>', '<C-\\><C-N><C-w>l')
-map('n', '<C-h>', '<C-w>h')
-map('n', '<C-j>', '<C-w>j')
-map('n', '<C-k>', '<C-w>k')
-map('n', '<C-l>', '<C-w>l')
+vim.keymap.set('t', '<C-h>', '<C-\\><C-N><C-w>h')
+vim.keymap.set('t', '<C-j>', '<C-\\><C-N><C-w>j')
+vim.keymap.set('t', '<C-k>', '<C-\\><C-N><C-w>k')
+vim.keymap.set('t', '<C-l>', '<C-\\><C-N><C-w>l')
+vim.keymap.set('n', '<C-h>', '<C-w>h')
+vim.keymap.set('n', '<C-j>', '<C-w>j')
+vim.keymap.set('n', '<C-k>', '<C-w>k')
+vim.keymap.set('n', '<C-l>', '<C-w>l')
 
 -- Move Lines
-map("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
-map("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
-map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
-map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
-map("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
-map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
+vim.keymap.set("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
+vim.keymap.set("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
+vim.keymap.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
+vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
+vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
+vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 
 -- Resize window using <ctrl> arrow keys
-map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
-map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
-map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
-map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
+vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
+vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
+vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
+vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
 -- buffers
-map("n", "<A-h>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
-map("n", "<A-l>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
-map("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
-map("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "<A-h>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
+vim.keymap.set("n", "<A-l>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
+vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
 
--- Try and center this motions to the middle of the screen
-map({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
-map('n', 'n', 'nzz', { silent = true })
-map('n', 'N', 'Nzz', { silent = true })
-map('n', '*', '*zz', { silent = true })
-map('n', '#', '#zz', { silent = true })
-map('n', 'g*', 'g*zz', { silent = true })
-map('n', 'g#', 'g#zz', { silent = true })
-map('n', '<C-o>', '<C-o>zz', { silent = true })
-map('n', '<C-i>', '<C-i>zz', { silent = true })
-map('n', '<C-d>', '<C-d>zz', { silent = true })
-map('n', '<C-d>', '<C-d>zz', { silent = true })
-map('n', 'u', 'uzz', { silent = true })
-map('n', '<C-r>', '<C-r>zz', { silent = true })
+-- Try and center these motions to the middle of the screen
+vim.keymap.set({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
+vim.keymap.set('n', 'n', 'nzz', { silent = true })
+vim.keymap.set('n', 'N', 'Nzz', { silent = true })
+vim.keymap.set('n', '*', '*zz', { silent = true })
+vim.keymap.set('n', '#', '#zz', { silent = true })
+vim.keymap.set('n', 'g*', 'g*zz', { silent = true })
+vim.keymap.set('n', 'g#', 'g#zz', { silent = true })
+vim.keymap.set('n', '<C-o>', '<C-o>zz', { silent = true })
+vim.keymap.set('n', '<C-i>', '<C-i>zz', { silent = true })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
+vim.keymap.set('n', 'u', 'uzz', { silent = true })
+vim.keymap.set('n', '<C-r>', '<C-r>zz', { silent = true })
 
 -- Add undo break-points
-map("i", ",", ",<c-g>u")
-map("i", ".", ".<c-g>u")
-map("i", ";", ";<c-g>u")
+vim.keymap.set("i", ",", ",<c-g>u")
+vim.keymap.set("i", ".", ".<c-g>u")
+vim.keymap.set("i", ";", ";<c-g>u")
 
 -- save file
-map({ "i", "v", "n", "s" }, "<C-s>", "<cmd>update<cr><esc>", { desc = "Save file" })
+vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>update<cr><esc>", { desc = "Save file" })
 
 -- better indenting
-map("v", "<", "<gv")
-map("v", ">", ">gv")
+vim.keymap.set("v", "<", "<gv")
+vim.keymap.set("v", ">", ">gv")
 
 -- lazy
-map("n", "<leader>z", "<cmd>:Lazy<cr>", { desc = "Lazy" })
+vim.keymap.set("n", "<leader>z", "<cmd>:Lazy<cr>", { desc = "Lazy" })
 
 ------------------ LSP-INSTALL & CONFIG --------------------
 -- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
