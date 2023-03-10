@@ -1,6 +1,6 @@
 -- Based of https://github.com/LazyVim/LazyVim
 -------------------- HELPERS -------------------------------
-local api, cmd, fn, g, lsp = vim.api, vim.cmd, vim.fn, vim.g, vim.lsp
+local api, cmd, fn, g = vim.api, vim.cmd, vim.fn, vim.g
 local opt, wo, b = vim.opt, vim.wo, vim.b
 -- local bo = vim.bo
 
@@ -49,7 +49,7 @@ require('lazy').setup({
       'NvChad/nvim-colorizer.lua',
       cmd = 'ColorizerToggle',
       opts = { 'css', 'javascript', html = { mode = 'foreground', } }
-    }, -- lazy-load on a command
+    },
     -- session management
     {
       "folke/persistence.nvim",
@@ -87,7 +87,6 @@ require('lazy').setup({
     },
     {
       'akinsho/bufferline.nvim',
-      event = "VeryLazy",
       version = "v3.*",
       dependencies = { "ojroques/nvim-bufdel", "nvim-tree/nvim-web-devicons" },
       opts = {
@@ -116,8 +115,9 @@ require('lazy').setup({
 
         local function map(key, dir, buffer)
           vim.keymap.set("n", key, function()
-            require("illuminate")["goto_" .. dir .. "_reference"](false)
-          end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
+              require("illuminate")["goto_" .. dir .. "_reference"](false)
+            end,
+            { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
         end
 
         map("]]", "next")
@@ -140,10 +140,26 @@ require('lazy').setup({
     'airblade/vim-rooter',
     'elixir-editors/vim-elixir',
     { 'ethanholz/nvim-lastplace', config = true },
-    'farmergreg/vim-lastplace',
-    { 'ibhagwan/fzf-lua',         dependencies = { 'vijaymarupudi/nvim-fzf' } },
-    'williamboman/mason.nvim',
-    'williamboman/mason-lspconfig.nvim',
+    {
+      'ibhagwan/fzf-lua',
+      dependencies = { 'vijaymarupudi/nvim-fzf' },
+      opts = {
+        winopts = { preview = { default = 'bat_native' } }
+      }
+    },
+    'neovim/nvim-lspconfig',
+    'b0o/schemastore.nvim',
+    {
+      'williamboman/mason.nvim',
+      config = true
+    },
+    {
+      'williamboman/mason-lspconfig.nvim',
+      opts = {
+        ensure_installed = { "lua_ls", "elixirls", "cssls", "html", "jsonls", "tsserver",
+          "tailwindcss", "texlab" }
+      }
+    },
     -- snippets
     {
       "L3MON4D3/LuaSnip",
@@ -161,7 +177,8 @@ require('lazy').setup({
         {
           "<tab>",
           function()
-            return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>"
+            return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or
+                "<tab>"
           end,
           expr = true,
           silent = true,
@@ -206,14 +223,16 @@ require('lazy').setup({
             end
           },
           mapping = cmp.mapping.preset.insert({
-                ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-                ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-                ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-                ["<C-f>"] = cmp.mapping.scroll_docs(4),
-                ["<C-Space>"] = cmp.mapping.complete(),
-                ["<C-e>"] = cmp.mapping.abort(),
-                ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-                ["<S-CR>"] = cmp.mapping.confirm({
+            ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior
+                .Insert }),
+            ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior
+                .Insert }),
+            ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+            ["<C-f>"] = cmp.mapping.scroll_docs(4),
+            ["<C-Space>"] = cmp.mapping.complete(),
+            ["<C-e>"] = cmp.mapping.abort(),
+            ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+            ["<S-CR>"] = cmp.mapping.confirm({
               behavior = cmp.ConfirmBehavior.Replace,
               select = true,
             }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
@@ -305,8 +324,7 @@ require('lazy').setup({
                 "filetype",
                 icon_only = true,
                 separator = "",
-                padding = {
-                  left = 1, right = 0 }
+                padding = { left = 1, right = 0 }
               },
               {
                 "filename",
@@ -419,7 +437,7 @@ require('lazy').setup({
         window = {
           width = "22",
           mappings = {
-                ["<space>"] = "none",
+            ["<space>"] = "none",
           },
         },
       },
@@ -429,8 +447,18 @@ require('lazy').setup({
       "windwp/nvim-spectre",
       -- stylua: ignore
       keys = {
-        { "<leader>S", function() require("spectre").open() end, desc = "Replace in files (Spectre)" },
+        {
+          "<leader>S",
+          function() require("spectre").open() end,
+          desc = "Replace in files (Spectre)"
+        },
       },
+    },
+    {
+      'alvan/vim-closetag',
+      config = function()
+        g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
+      end
     },
     {
       'nvim-treesitter/nvim-treesitter',
@@ -446,7 +474,7 @@ require('lazy').setup({
           "css", "html", "javascript", "json", "typescript", "tsx",
           "erlang", "elixir", "eex", "heex",
           "ledger", "lua", "toml", "zig"
-        }
+        },
       }
     },
 
@@ -479,8 +507,6 @@ require('lazy').setup({
         vim.keymap.del({ "x", "o" }, "X")
       end,
     },
-    'neovim/nvim-lspconfig',
-    'b0o/schemastore.nvim',
     {
       'lewis6991/gitsigns.nvim',
       event = { "BufReadPre", "BufNewFile" },
@@ -544,27 +570,46 @@ require('lazy').setup({
       config = true
     },
     'pbrisbin/vim-mkdir', -- :e this/does/not/exist/file.txt then :w
-    'cohama/lexima.vim',
-    'alvan/vim-closetag', -- Close html tags
     'justinmk/vim-gtfo',  -- gof open file in filemanager
-    { 'kristijanhusak/vim-dadbod-completion', dependencies = { 'tpope/vim-dadbod' } },
-    'lervag/vimtex',
+    {
+      'kristijanhusak/vim-dadbod-completion',
+      ft = "sql",
+      dependencies = { 'tpope/vim-dadbod' },
+      config = function()
+        g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
+        vim.keymap.set('x', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
+        vim.keymap.set('n', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
+        vim.keymap.set('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', { expr = true })
+        vim.keymap.set('x', '<leader>d', '<Plug>(DBExe)')
+        vim.keymap.set('n', '<leader>d', '<Plug>(DBExe)')
+        vim.keymap.set('o', '<leader>d', '<Plug>(DBExe)')
+        vim.keymap.set('n', '<leader>dd', '<Plug>(DBExeLine)')
+      end
+    },
+    {
+      'lervag/vimtex', -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
+      config = function()
+        g['vimtex_quickfix_mode']       = 0
+        g['vimtex_compiler_method']     = 'tectonic'
+        g['vimtex_view_general_viewer'] = 'okular'
+      end
+    },
     {
       'akinsho/toggleterm.nvim',
       version = 'v2.*',
       opts = {
         open_mapping = [[A-1]],
-        -- shading-factor = 2
+        shading_factor = 1
       }
     },
     {
-      'echasnovski/mini.surround',
+      'echasnovski/mini.surround',                                         -- sr({ sd' <select text>sa'
       keys = { "sr", "sh", "sf", "sF", "sd", "sn", { "sa", mode = "v" } }, -- Only load on these keystrokes
       version = false,
       config = function()
         require('mini.surround').setup()
       end,
-    }, -- sr({ sd' <select text>sa'
+    },
     'mg979/vim-visual-multi',
   },
   {
@@ -585,110 +630,35 @@ require('lazy').setup({
     }
   })
 
--------------------- PLUGIN SETUP --------------------------
--- symbols-outline
-g.symbols_outline = { highlight_hovered_item = false, auto_preview = false }
--- which-key
-local wk = require('which-key')
-wk.register({
-      ["y"] = { '"+y', "Yank System Clipboard" },
-      ["."] = { "<ESC><CMD>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", "Comment" }
-}, { prefix = "<leader>", mode = 'v' })
-wk.register({
-      ["w"] = { "<cmd>w!<CR>", "Save" },
-      ["q"] = { "<cmd>q!<CR>", "Quit" },
-      ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
-      ["x"] = { "<cmd>BufDel<CR>", "Close Buffer" }, -- vim-bbye
-      ["gg"] = { '<cmd>TermExec cmd="lazygit" direction=float<CR>', "lazygit" },
-      ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
-      ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
-      ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
-      ["<leader>"] = { '<C-^>', 'Last buffer' },
-      ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
-      ["v"] = { '<C-w>v<C-w>l', 'Split vertical' },
-      ["c"] = { '<cmd>ToggleTerm<CR>', 'Terminal bottom' },
-  l = {
-    name = "LSP",
-    I = { "<cmd>Mason<cr>", "Installer Info" },
-    a = { "<cmd>FzfLua lsp_code_actions<cr>", "Code Action" },
-    c = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-    d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
-    D = { "<cmd>FzfLua lsp_document_diagnostics<cr>", "Buffer Diagnostics" },
-    f = { "<cmd>lua vim.lsp.buf.format()<cr>", "Format" },
-    i = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Implementation" },
-    j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
-    k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
-    l = { "<cmd>LspInfo<cr>", "Info" },
-    t = { "<cmd>lua vim.lsp.buf.type_definition()<cr>", "Type Definition" },
-    w = { "<cmd>FzfLua lsp_workspace_diagnostics<cr>", "Diagnostics" },
-    q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
-    r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
-    s = { "<cmd>FzfLua lsp_document_symbols<cr>", "Document Symbols" },
-    S = { "<cmd>FzfLua lsp_workspace_symbols<cr>", "Workspace Symbols" },
-  },
-  g = {
-    name = "Git",
-    f = { "<cmd>FzfLua git_files<cr>", "Git Files" },
-    c = { "<cmd>FzfLua git_commits<cr>", "Commits" },
-    b = { "<cmd>FzfLua git_bcommits<cr>", "Buffer Commits" },
-    B = { "<cmd>FzfLua git_branches<cr>", "Branches" },
-    s = { "<cmd>FzfLua git_status<cr>", "Status" },
-  },
-}, { prefix = "<leader>" })
-
--- bufdel
--- require('bufdel').setup { next = 'alternate' }
--- closetag
-g['closetag_filenames'] = '*.html, *.heex'
--- fzf-lua
-g['fzf_action'] = { ['ctrl-s'] = 'split',['ctrl-v'] = 'vsplit' }
-require('fzf-lua').setup({
-  winopts = {
-    preview = { default = 'bat_native' }
-  }
-})
--- vim-dadbod
-g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
-vim.keymap.set('x', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
-vim.keymap.set('n', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
-vim.keymap.set('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', { expr = true })
-vim.keymap.set('x', '<leader>d', '<Plug>(DBExe)')
-vim.keymap.set('n', '<leader>d', '<Plug>(DBExe)')
-vim.keymap.set('o', '<leader>d', '<Plug>(DBExe)')
-vim.keymap.set('n', '<leader>dd', '<Plug>(DBExeLine)')
--- vimtex
-g['vimtex_quickfix_mode']       = 0
-g['vimtex_compiler_method']     = 'tectonic'
-g['vimtex_view_general_viewer'] = 'okular'
 -------------------- OPTIONS -------------------------------
-local width                     = 80
+local width       = 80
 -- global options
-opt.backup                      = false
-opt.breakindent                 = true
-opt.completeopt                 = 'menu,menuone,noselect' -- Completion options
-opt.conceallevel                = 3                       -- Hide * markip for bold and italic
-opt.cursorline                  = true                    -- Highlight cursor line
+opt.backup        = false
+opt.breakindent   = true
+opt.completeopt   = 'menu,menuone,noselect' -- Completion options
+opt.conceallevel  = 3                       -- Hide * markip for bold and italic
+opt.cursorline    = true                    -- Highlight cursor line
 -- opt.equalalways              = false                   -- I don't like my windows changing all the time
-opt.expandtab                   = true                    -- Use spaces instead of tabs
-opt.foldlevel                   = 99
-opt.foldmethod                  = 'indent'
-opt.formatoptions               = 'cqn1j' -- Automatic formatting options
+opt.expandtab     = true                    -- Use spaces instead of tabs
+opt.foldlevel     = 99
+opt.foldmethod    = 'indent'
+opt.formatoptions = 'cqn1j' -- Automatic formatting options
 -- opt.guicursor                = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
-opt.grepformat                  = "%f:%l:%c:%m"
-opt.grepprg                     = "rg --vimgrep"
-opt.ignorecase                  = true  -- Ignore case
-opt.joinspaces                  = false -- No double spaces with join
-opt.laststatus                  = 3     -- global statusline
-opt.linebreak                   = true
-opt.list                        = true  -- Show some invisible characters
-opt.listchars                   = "tab:▸ ,extends:>,precedes:<"
-opt.mouse                       = 'a'   -- Allow the mouse
-opt.number                      = true  -- Show line numbers
-opt.pumheight                   = 10    -- Maximum number of entries in a popup
-opt.scrolljump                  = 4     -- min. lines to scroll
-opt.scrolloff                   = 4     -- Lines of context
-opt.shiftround                  = true  -- Round indent
-opt.shiftwidth                  = 2     -- Size of an indent
+opt.grepformat    = "%f:%l:%c:%m"
+opt.grepprg       = "rg --vimgrep"
+opt.ignorecase    = true  -- Ignore case
+opt.joinspaces    = false -- No double spaces with join
+opt.laststatus    = 3     -- global statusline
+opt.linebreak     = true
+opt.list          = true  -- Show some invisible characters
+opt.listchars     = "tab:▸ ,extends:>,precedes:<"
+opt.mouse         = 'a'   -- Allow the mouse
+opt.number        = true  -- Show line numbers
+opt.pumheight     = 10    -- Maximum number of entries in a popup
+opt.scrolljump    = 4     -- min. lines to scroll
+opt.scrolloff     = 4     -- Lines of context
+opt.shiftround    = true  -- Round indent
+opt.shiftwidth    = 2     -- Size of an indent
 -- opt.shortmess                = 'IFc' -- Avoid showing extra message on completion
 opt.shortmess:append { W = true, I = true, c = true }
 opt.showbreak     = '↪  '
@@ -803,8 +773,53 @@ vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>update<cr><esc>", { desc =
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
--- lazy
-vim.keymap.set("n", "<leader>z", "<cmd>:Lazy<cr>", { desc = "Lazy" })
+-- which-key
+local wk = require('which-key')
+wk.register({
+  ["y"] = { '"+y', "Yank System Clipboard" },
+  ["."] = { "<ESC><CMD>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", "Comment" }
+}, { prefix = "<leader>", mode = 'v' })
+wk.register({
+  ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
+  ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
+  ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
+  ["gg"] = { '<cmd>TermExec cmd="lazygit" direction=float<CR>', "lazygit" },
+  ["<leader>"] = { '<C-^>', 'Last buffer' },
+  ["m"] = { "<cmd>Mason<cr>", "Mason [LSP Manager]" }, -- mason plugin
+  ["q"] = { "<cmd>q!<CR>", "Quit" },
+  ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
+  ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
+  ["v"] = { '<C-w>v<C-w>l', 'Split vertical' },
+  ["w"] = { "<cmd>w!<CR>", "Save" },
+  ["x"] = { "<cmd>BufDel<CR>", "Close Buffer" },        -- bufdel plugin
+  ["z"] = { "<cmd>Lazy<CR>", "Lazy [Plugin Manager]" }, -- lazy plugin
+  l = {
+    name = "LSP",
+    a = { "<cmd>FzfLua lsp_code_actions<cr>", "Code Action" },
+    c = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
+    d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
+    D = { "<cmd>FzfLua lsp_document_diagnostics<cr>", "Buffer Diagnostics" },
+    f = { "<cmd>lua vim.lsp.buf.format()<cr>", "Format" },
+    i = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Implementation" },
+    j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
+    k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
+    l = { "<cmd>LspInfo<cr>", "Info" },
+    t = { "<cmd>lua vim.lsp.buf.type_definition()<cr>", "Type Definition" },
+    w = { "<cmd>FzfLua lsp_workspace_diagnostics<cr>", "Diagnostics" },
+    q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
+    r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+    s = { "<cmd>FzfLua lsp_document_symbols<cr>", "Document Symbols" },
+    S = { "<cmd>FzfLua lsp_workspace_symbols<cr>", "Workspace Symbols" },
+  },
+  g = {
+    name = "Git",
+    f = { "<cmd>FzfLua git_files<cr>", "Git Files" },
+    c = { "<cmd>FzfLua git_commits<cr>", "Commits" },
+    b = { "<cmd>FzfLua git_bcommits<cr>", "Buffer Commits" },
+    B = { "<cmd>FzfLua git_branches<cr>", "Branches" },
+    s = { "<cmd>FzfLua git_status<cr>", "Status" },
+  },
+}, { prefix = "<leader>" })
 
 ------------------ LSP-INSTALL & CONFIG --------------------
 -- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
@@ -845,20 +860,10 @@ local on_attach = function(client, bufnr)
 
   -- Activate LSP signature on attach.
   on_attach_lsp_signature(client, bufnr)
-
-  -- keybindings
-  -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
-  -- NOTE: Order is important. You can't lazy load lexima.vim
-  g['lexima_no_defualt_rules'] = true
-  g['lexima_enable_endwise_rules'] = 1
 end
 
-require("mason").setup()
-require("mason-lspconfig").setup {
-  ensure_installed = { "lua_ls", "elixirls", "cssls", "html", "jsonls", "tsserver", "tailwindcss", "texlab" }
-}
 local lspconfig = require("lspconfig")
-local capabilities = lsp.protocol.make_client_capabilities()
+local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 lspconfig.elixirls.setup {
   on_attach = on_attach,
@@ -898,10 +903,10 @@ end
 -- :help lsp-method
 -- :help lsp-handler
 
-local lsp_handlers_hover = lsp.with(lsp.handlers.hover, {
+local lsp_handlers_hover = vim.lsp.with(vim.lsp.handlers.hover, {
   border = 'single'
 })
-lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
+vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
   local bufnr, winnr = lsp_handlers_hover(err, result, ctx, config)
   if winnr ~= nil then
     api.nvim_win_set_option(winnr, "winblend", 0) -- opacity for hover
@@ -918,7 +923,7 @@ ls.config.set_config({
   updateevents = "TextChanged,TextChangedI", -- update changes as you type
   enable_autosnippets = true,
   ext_opts = {
-        [require("luasnip.util.types").choiceNode] = {
+    [require("luasnip.util.types").choiceNode] = {
       active = { virt_text = { { "·", "Question" } } }
     }
   }
