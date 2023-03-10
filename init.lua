@@ -147,8 +147,13 @@ require('lazy').setup({
         winopts = { preview = { default = 'bat_native' } }
       }
     },
-    'neovim/nvim-lspconfig',
-    'b0o/schemastore.nvim',
+    {
+      'neovim/nvim-lspconfig',
+      dependencies = {
+        'b0o/schemastore.nvim',
+        version = false,
+      },
+    },
     {
       'williamboman/mason.nvim',
       config = true
@@ -163,30 +168,38 @@ require('lazy').setup({
     -- snippets
     {
       "L3MON4D3/LuaSnip",
+      version = "1.*",
+      build = "make install_jsregexp",
       dependencies = {
         "rafamadriz/friendly-snippets",
         config = function()
           require("luasnip.loaders.from_vscode").lazy_load()
         end,
       },
-      opts = {
-        history = true,
-        delete_check_events = "TextChanged",
-      },
-      keys = {
-        {
-          "<tab>",
-          function()
-            return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or
-                "<tab>"
-          end,
-          expr = true,
-          silent = true,
-          mode = "i",
-        },
-        { "<tab>",   function() require("luasnip").jump(1) end,  mode = "s" },
-        { "<s-tab>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
-      },
+      config = function()
+        local lsnip = require('luasnip')
+        require("luasnip.loaders.from_lua").load({ paths = "~/dotfiles/snippets/" })
+        lsnip.config.set_config({
+          history = true,                            -- keep around last snippet local to jump back
+          updateevents = "TextChanged,TextChangedI", -- update changes as you type
+          delete_check_events = "TextChanged",
+          enable_autosnippets = true,
+          ext_opts = {
+            [require("luasnip.util.types").choiceNode] = {
+              active = { virt_text = { { "·", "Question" } } }
+            }
+          }
+        })
+        vim.keymap.set({ "i", "s" }, "<a-k>", function() -- my expansion key
+          if lsnip.expand_or_jumpable() then lsnip.expand_or_jump() end
+        end, { silent = true })
+        vim.keymap.set({ "i", "s" }, "<a-j>", function() -- my jump backwords key
+          if lsnip.jumpable(-1) then lsnip.jump(-1) end
+        end, { silent = true })
+        vim.keymap.set({ "i" }, "<a-l>", function() -- select within list of options
+          if lsnip.choice_active() then lsnip.change_choice(1) end
+        end)
+      end
     },
     -- auto completion
     {
@@ -208,12 +221,21 @@ require('lazy').setup({
         'kdheepak/cmp-latex-symbols',
         'onsails/lspkind-nvim'
       },
-      opts = function()
+      config = function()
+        local has_words_before = function()
+          unpack = unpack or table.unpack
+          local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+          return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+        end
+
         local lspkind = require('lspkind')
         local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+        local luasnip = require("luasnip")
         local cmp = require("cmp")
-        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done()) -- If you want insert `(` after select function or method item
-        return {
+        -- If you want insert `(` after select function or method item
+        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
+
+        cmp.setup({
           completion = {
             completeopt = "menu,menuone,noinsert",
           },
@@ -229,20 +251,40 @@ require('lazy').setup({
                 .Insert }),
             ["<C-b>"] = cmp.mapping.scroll_docs(-4),
             ["<C-f>"] = cmp.mapping.scroll_docs(4),
-            ["<C-Space>"] = cmp.mapping.complete(),
+            ["<C-space>"] = cmp.mapping.complete(),
             ["<C-e>"] = cmp.mapping.abort(),
             ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
             ["<S-CR>"] = cmp.mapping.confirm({
               behavior = cmp.ConfirmBehavior.Replace,
               select = true,
             }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+            ["<Tab>"] = cmp.mapping(function(fallback)
+              if cmp.visible() then
+                cmp.select_next_item()
+              elseif luasnip.expand_or_jumpable() then
+                luasnip.expand_or_jump()
+              elseif has_words_before() then
+                cmp.complete()
+              else
+                fallback()
+              end
+            end, { "i", "s" }),
+            ["<S-Tab>"] = cmp.mapping(function(fallback)
+              if cmp.visible() then
+                cmp.select_prev_item()
+              elseif luasnip.jumpable(-1) then
+                luasnip.jump(-1)
+              else
+                fallback()
+              end
+            end, { "i", "s" }),
           }),
           sources = cmp.config.sources({
             { name = "nvim_lsp",     keyword_length = 2 },
             { name = "luasnip",      keyword_length = 2 },
             { name = "nvim_lua",     keyword_length = 2 },
             { name = "path",         keyword_length = 2 },
-            { name = "buffer",       keyword_length = 5 },
+            { name = "buffer",       keyword_length = 3 },
             { name = "spell" },
             { name = "tags" },
             { name = "latex_symbols" }
@@ -265,7 +307,7 @@ require('lazy').setup({
               hl_group = "LspCodeLens",
             },
           },
-        }
+        })
       end
     },
     {
@@ -461,6 +503,16 @@ require('lazy').setup({
       end
     },
     {
+      'numToStr/Comment.nvim',
+      event = "VeryLazy",
+      dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' }, -- Allow commenting embedded lang in files
+      config = function()
+        require('Comment').setup({
+          pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
+        })
+      end
+    },
+    {
       'nvim-treesitter/nvim-treesitter',
       version = false,
       build = ':TSUpdate',
@@ -468,7 +520,7 @@ require('lazy').setup({
       opts = {
         highlight = { enable = true },
         indent = { enable = true, disable = { "python" } },
-        context_commentstring = { enable = true, enable_autocmd = false },
+        context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
         ensure_installed = {
           "vim", "regex", "lua", "bash", "markdown", "markdown_inline",
           "css", "html", "javascript", "json", "typescript", "tsx",
@@ -556,14 +608,6 @@ require('lazy').setup({
           -- icons = require("lazyvim.config").icons.kinds,
         }
       end,
-    },
-    {
-      'numToStr/Comment.nvim',
-      event = "VeryLazy",
-      dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' },
-      opts = {
-        --pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
-      }
     },
     {
       'j-hui/fidget.nvim',
@@ -913,30 +957,6 @@ vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
   end
   return bufnr, winnr
 end
-
--------------------- LSP w/ Cmp-----------------------------
---- Luasnip
-local ls = require('luasnip')
-require("luasnip.loaders.from_lua").load({ paths = "~/dotfiles/snippets/" })
-ls.config.set_config({
-  history = true,                            -- keep around last snippet local to jump back
-  updateevents = "TextChanged,TextChangedI", -- update changes as you type
-  enable_autosnippets = true,
-  ext_opts = {
-    [require("luasnip.util.types").choiceNode] = {
-      active = { virt_text = { { "·", "Question" } } }
-    }
-  }
-})
-vim.keymap.set({ "i", "s" }, "<a-k>", function() -- my expansion key
-  if ls.expand_or_jumpable() then ls.expand_or_jump() end
-end, { silent = true })
-vim.keymap.set({ "i", "s" }, "<a-j>", function() -- my jump backwords key
-  if ls.jumpable(-1) then ls.jump(-1) end
-end, { silent = true })
-vim.keymap.set({ "i" }, "<a-l>", function() -- select within list of options
-  if ls.choice_active() then ls.change_choice(1) end
-end)
 
 -------------------- AUTO COMMANDS -------------------------
 local function augroup(name)
