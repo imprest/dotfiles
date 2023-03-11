@@ -117,7 +117,10 @@ require('lazy').setup({
           vim.keymap.set("n", key, function()
               require("illuminate")["goto_" .. dir .. "_reference"](false)
             end,
-            { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
+            {
+              desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference",
+              buffer = buffer
+            })
         end
 
         map("]]", "next")
@@ -142,28 +145,125 @@ require('lazy').setup({
     { 'ethanholz/nvim-lastplace', config = true },
     {
       'ibhagwan/fzf-lua',
+      event = "VeryLazy",
       dependencies = { 'vijaymarupudi/nvim-fzf' },
       opts = {
         winopts = { preview = { default = 'bat_native' } }
       }
     },
+    -- LSP
     {
       'neovim/nvim-lspconfig',
+      event = { "BufReadPre", "BufNewFile" },
       dependencies = {
-        'b0o/schemastore.nvim',
-        version = false,
+        { "jose-elias-alvarez/typescript.nvim" },
+        { 'b0o/schemastore.nvim',              version = false },
+        { 'williamboman/mason.nvim',           config = true },
+        {
+          'williamboman/mason-lspconfig.nvim',
+          opts = {
+            ensure_installed = {
+              "lua_ls", "elixirls", "cssls", "html", "jsonls", "tsserver",
+              "tailwindcss", "texlab" }
+          }
+        }
       },
-    },
-    {
-      'williamboman/mason.nvim',
-      config = true
-    },
-    {
-      'williamboman/mason-lspconfig.nvim',
-      opts = {
-        ensure_installed = { "lua_ls", "elixirls", "cssls", "html", "jsonls", "tsserver",
-          "tailwindcss", "texlab" }
-      }
+      config = function()
+        -- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
+        -- lsp_diagnostics
+        local signs = { Error = " ", Warn = " ", Hint = "Ⓗ ", Info = " " }
+        for type, icon in pairs(signs) do
+          local hl = "DiagnosticSign" .. type
+          fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+        end
+        vim.diagnostic.config({
+          underline = true,
+          update_in_insert = false,
+          virtual_text = { spacing = 4, prefix = "●" },
+          severity_sort = true,
+        })
+        cmd [[autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
+
+        -- lsp_signature
+        local on_attach_lsp_signature = function(_, _)
+          require('lsp_signature').on_attach({
+            toggle_key = '<M-x>', -- Press <Alt-x> to toggle signature on and off.
+          })
+        end
+        -- Customize LSP behavior
+        local on_attach = function(client, bufnr)
+          -- Always use signcolumn for the current buffer
+          wo.signcolumn = 'yes:1'
+
+          -- Enable completion triggered by <c-x><c-o>
+          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+          -- Mappings.
+          -- See `:help vim.lsp.*` for documentation on any of the below functions
+          local bufopts = { noremap = true, silent = true, buffer = bufnr }
+          vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, bufopts)
+          vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+          vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+          vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, bufopts)
+          vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+
+          -- Activate LSP signature on attach.
+          on_attach_lsp_signature(client, bufnr)
+        end
+
+        local lspconfig = require("lspconfig")
+        local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+        lspconfig.elixirls.setup {
+          on_attach = on_attach,
+          capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
+          settings = {
+            elixirLS = {
+              dialyzerEnabled = false,
+              fetchDeps = false
+            }
+          }
+        }
+        lspconfig.lua_ls.setup {
+          on_attach = on_attach,
+          capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
+          settings = { Lua = { diagnostics = { globals = { "vim" } } } }
+        }
+        lspconfig.jsonls.setup {
+          on_attach = on_attach,
+          capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
+          settings = {
+            json = {
+              schemas = require('schemastore').json.schemas(),
+              validate = { enable = true }
+            }
+          }
+        }
+        for _, server in ipairs { "tailwindcss", "tsserver" } do
+          lspconfig[server].setup {
+            on_attach = on_attach,
+            capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+          }
+        end
+
+        -------------------------
+        -- LSP Handlers (general)
+        -------------------------
+        -- :help lsp-method
+        -- :help lsp-handler
+
+        local lsp_handlers_hover = vim.lsp.with(vim.lsp.handlers.hover, {
+          border = 'single'
+        })
+        vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
+          local bufnr, winnr = lsp_handlers_hover(err, result, ctx, config)
+          if winnr ~= nil then
+            api.nvim_win_set_option(winnr, "winblend", 0) -- opacity for hover
+          end
+          return bufnr, winnr
+        end
+      end
     },
     -- snippets
     {
@@ -190,16 +290,7 @@ require('lazy').setup({
             }
           }
         })
-        vim.keymap.set({ "i", "s" }, "<a-k>", function() -- my expansion key
-          if lsnip.expand_or_jumpable() then lsnip.expand_or_jump() end
-        end, { silent = true })
-        vim.keymap.set({ "i", "s" }, "<a-j>", function() -- my jump backwords key
-          if lsnip.jumpable(-1) then lsnip.jump(-1) end
-        end, { silent = true })
-        vim.keymap.set({ "i" }, "<a-l>", function() -- select within list of options
-          if lsnip.choice_active() then lsnip.change_choice(1) end
-        end)
-      end
+      end,
     },
     -- auto completion
     {
@@ -225,7 +316,10 @@ require('lazy').setup({
         local has_words_before = function()
           unpack = unpack or table.unpack
           local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-          return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+          return col ~= 0 and
+              vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match(
+                "%s") ==
+              nil
         end
 
         local lspkind = require('lspkind')
@@ -245,13 +339,11 @@ require('lazy').setup({
             end
           },
           mapping = cmp.mapping.preset.insert({
-            ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior
-                .Insert }),
-            ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior
-                .Insert }),
+            ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+            ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
             ["<C-b>"] = cmp.mapping.scroll_docs(-4),
             ["<C-f>"] = cmp.mapping.scroll_docs(4),
-            ["<C-space>"] = cmp.mapping.complete(),
+            ["<C-Space>"] = cmp.mapping.complete(),
             ["<C-e>"] = cmp.mapping.abort(),
             ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
             ["<S-CR>"] = cmp.mapping.confirm({
@@ -280,14 +372,14 @@ require('lazy').setup({
             end, { "i", "s" }),
           }),
           sources = cmp.config.sources({
-            { name = "nvim_lsp",     keyword_length = 2 },
-            { name = "luasnip",      keyword_length = 2 },
-            { name = "nvim_lua",     keyword_length = 2 },
-            { name = "path",         keyword_length = 2 },
-            { name = "buffer",       keyword_length = 3 },
-            { name = "spell" },
-            { name = "tags" },
-            { name = "latex_symbols" }
+            { name = "nvim_lsp",      keyword_length = 2 },
+            { name = "luasnip",       keyword_length = 2 },
+            { name = "nvim_lua",      keyword_length = 2 },
+            { name = "buffer",        keyword_length = 3 },
+            { name = "path",          keyword_length = 3 },
+            { name = "spell",         keyword_length = 3 },
+            { name = "tags",          keyword_length = 3 },
+            { name = "latex_symbols", keyword_length = 3 }
           }),
           formatting = {
             format = lspkind.cmp_format({
@@ -397,10 +489,10 @@ require('lazy').setup({
                 "diagnostics",
                 sources = { "nvim_diagnostic" },
                 symbols = {
-                  error = "  ",
-                  warn = "  ",
-                  info = "  ",
-                  hint = "H "
+                  error = " ",
+                  warn = " ",
+                  info = " ",
+                  hint = "Ⓗ "
                 }
               },
               {
@@ -498,6 +590,7 @@ require('lazy').setup({
     },
     {
       'alvan/vim-closetag',
+      ft = 'html, heex, elixir, typescript, tsx, eelixir',
       config = function()
         g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
       end
@@ -508,7 +601,8 @@ require('lazy').setup({
       dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' }, -- Allow commenting embedded lang in files
       config = function()
         require('Comment').setup({
-          pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
+          pre_hook = require('ts_context_commentstring.integrations.comment_nvim')
+              .create_pre_hook()
         })
       end
     },
@@ -613,8 +707,8 @@ require('lazy').setup({
       'j-hui/fidget.nvim',
       config = true
     },
-    'pbrisbin/vim-mkdir', -- :e this/does/not/exist/file.txt then :w
-    'justinmk/vim-gtfo',  -- gof open file in filemanager
+    { 'pbrisbin/vim-mkdir',       event = 'VeryLazy' }, -- :e this/does/not/exist/file.txt then :w
+    { 'justinmk/vim-gtfo',        event = 'VeryLazy' }, -- gof open file in filemanager
     {
       'kristijanhusak/vim-dadbod-completion',
       ft = "sql",
@@ -654,7 +748,7 @@ require('lazy').setup({
         require('mini.surround').setup()
       end,
     },
-    'mg979/vim-visual-multi',
+    { 'mg979/vim-visual-multi', event = "VeryLazy" },
   },
   {
     checker = { enabled = true },
@@ -865,99 +959,6 @@ wk.register({
   },
 }, { prefix = "<leader>" })
 
------------------- LSP-INSTALL & CONFIG --------------------
--- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
--- lsp_diagnostics
-local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
-vim.diagnostic.config({
-  -- virtual_text = false
-  virtual_text = { prefix = '' }
-})
-cmd [[autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
--- lsp_signature
-local on_attach_lsp_signature = function(_, _)
-  require('lsp_signature').on_attach({
-    toggle_key = '<M-x>', -- Press <Alt-x> to toggle signature on and off.
-  })
-end
--- Customize LSP behavior
-local on_attach = function(client, bufnr)
-  -- Always use signcolumn for the current buffer
-  wo.signcolumn = 'yes:1'
-
-  -- Enable completion triggered by <c-x><c-o>
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-  -- Mappings.
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
-  local bufopts = { noremap = true, silent = true, buffer = bufnr }
-  vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, bufopts)
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-
-  -- Activate LSP signature on attach.
-  on_attach_lsp_signature(client, bufnr)
-end
-
-local lspconfig = require("lspconfig")
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-
-lspconfig.elixirls.setup {
-  on_attach = on_attach,
-  capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
-  settings = {
-    elixirLS = {
-      dialyzerEnabled = false,
-      fetchDeps = false
-    }
-  }
-}
-lspconfig.lua_ls.setup {
-  on_attach = on_attach,
-  capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
-  settings = { Lua = { diagnostics = { globals = { "vim" } } } }
-}
-lspconfig.jsonls.setup {
-  on_attach = on_attach,
-  capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
-  settings = {
-    json = {
-      schemas = require('schemastore').json.schemas(),
-      validate = { enable = true }
-    }
-  }
-}
-for _, server in ipairs { "tailwindcss", "tsserver" } do
-  lspconfig[server].setup {
-    on_attach = on_attach,
-    capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-  }
-end
-
--------------------------
--- LSP Handlers (general)
--------------------------
--- :help lsp-method
--- :help lsp-handler
-
-local lsp_handlers_hover = vim.lsp.with(vim.lsp.handlers.hover, {
-  border = 'single'
-})
-vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
-  local bufnr, winnr = lsp_handlers_hover(err, result, ctx, config)
-  if winnr ~= nil then
-    api.nvim_win_set_option(winnr, "winblend", 0) -- opacity for hover
-  end
-  return bufnr, winnr
-end
-
 -------------------- AUTO COMMANDS -------------------------
 local function augroup(name)
   return vim.api.nvim_create_augroup("My_" .. name, { clear = true })
@@ -1015,7 +1016,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- LSP autocommands like format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup("lsp_format"),
-  pattern = "*.{ex,exs,heex,css,scss,js,ts,json,lua}",
+  pattern = "*.{ex,exs,heex,css,scss,js,ts,tsx,json,lua}",
   callback = function()
     vim.lsp.buf.format()
   end
