@@ -1,13 +1,9 @@
 -- Based of https://github.com/LazyVim/LazyVim
 -------------------- HELPERS -------------------------------
-local api, cmd, fn, g = vim.api, vim.cmd, vim.fn, vim.g
-local opt, wo, b = vim.opt, vim.wo, vim.b
--- local bo = vim.bo
-
-g['loaded_python_provider'] = 1
-g['python3_host_prog'] = '/usr/bin/python3'
-g.mapleader = ','
-g.maplocalleader = ';'
+vim.g['loaded_python_provider'] = 1
+vim.g['python3_host_prog'] = '/usr/bin/python3'
+vim.g.mapleader = ','
+vim.g.maplocalleader = ';'
 
 -------------------- LAZY.NVIM -----------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -169,12 +165,12 @@ require('lazy').setup({
         }
       },
       config = function()
-        -- ref: https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
+        -- ref: LazyVim & https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
         -- lsp_diagnostics
         local signs = { Error = " ", Warn = " ", Hint = "Ⓗ ", Info = " " }
         for type, icon in pairs(signs) do
           local hl = "DiagnosticSign" .. type
-          fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+          vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
         end
         vim.diagnostic.config({
           underline = true,
@@ -182,42 +178,26 @@ require('lazy').setup({
           virtual_text = { spacing = 4, prefix = "●" },
           severity_sort = true,
         })
-        cmd [[autocmd! CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false, scope="cursor"})]]
 
-        -- lsp_signature
-        local on_attach_lsp_signature = function(_, _)
-          require('lsp_signature').on_attach({
-            toggle_key = '<M-x>', -- Press <Alt-x> to toggle signature on and off.
-          })
-        end
         -- Customize LSP behavior
-        local on_attach = function(client, bufnr)
-          -- Always use signcolumn for the current buffer
-          wo.signcolumn = 'yes:1'
-
-          -- Enable completion triggered by <c-x><c-o>
-          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-          -- Mappings.
-          -- See `:help vim.lsp.*` for documentation on any of the below functions
+        local on_attach = function(_, bufnr)
+          -- Mappings | See `:help vim.lsp.*` for documentation on any of the below functions
           local bufopts = { noremap = true, silent = true, buffer = bufnr }
           vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, bufopts)
           vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
           vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+          vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
           vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
           vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, bufopts)
           vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-
-          -- Activate LSP signature on attach.
-          on_attach_lsp_signature(client, bufnr)
         end
 
         local lspconfig = require("lspconfig")
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
+        local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
         lspconfig.elixirls.setup {
           on_attach = on_attach,
-          capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
+          capabilities = capabilities,
           settings = {
             elixirLS = {
               dialyzerEnabled = false,
@@ -225,43 +205,48 @@ require('lazy').setup({
             }
           }
         }
+
         lspconfig.lua_ls.setup {
           on_attach = on_attach,
-          capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
+          capabilities = capabilities,
           settings = { Lua = { diagnostics = { globals = { "vim" } } } }
         }
+
         lspconfig.jsonls.setup {
           on_attach = on_attach,
-          capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities),
+          capabilities = capabilities,
+          -- lazy-load schemastore when needed
+          on_new_config = function(new_config)
+            new_config.settings.json.schemas = new_config.settings.json.schemas or {}
+            vim.list_extend(new_config.settings.json.schemas, require("schemastore").json.schemas())
+          end,
           settings = {
             json = {
-              schemas = require('schemastore').json.schemas(),
               validate = { enable = true }
             }
           }
         }
-        for _, server in ipairs { "tailwindcss", "tsserver" } do
-          lspconfig[server].setup {
+
+        -- jose-elias-alvarez/typescript.nvim
+        require("typescript").setup({
+          disable_commands = false, -- prevent the plugin from creating Vim commands
+          debug = false,            -- enable debug logging for commands
+          go_to_source_definition = {
+            fallback = true,        -- fall back to standard LSP definition on failure
+          },
+          server = {
             on_attach = on_attach,
-            capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-          }
-        end
-
-        -------------------------
-        -- LSP Handlers (general)
-        -------------------------
-        -- :help lsp-method
-        -- :help lsp-handler
-
-        local lsp_handlers_hover = vim.lsp.with(vim.lsp.handlers.hover, {
-          border = 'single'
+            capabilities = capabilities,
+            settings = { completions = { completeFunctionCalls = true } }
+          },
         })
-        vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
-          local bufnr, winnr = lsp_handlers_hover(err, result, ctx, config)
-          if winnr ~= nil then
-            api.nvim_win_set_option(winnr, "winblend", 0) -- opacity for hover
-          end
-          return bufnr, winnr
+
+        local servers = { 'tailwindcss' }
+        for _, lsp in ipairs(servers) do
+          lspconfig[lsp].setup {
+            on_attach = on_attach,
+            capabilities = capabilities
+          }
         end
       end
     },
@@ -304,15 +289,26 @@ require('lazy').setup({
       -- these dependencies will only be loaded when cmp loads
       dependencies = {
         "hrsh7th/cmp-nvim-lsp",
-        "hrsh7th/cmp-nvim-lua",
         "hrsh7th/cmp-buffer",
         "hrsh7th/cmp-path",
         'saadparwaiz1/cmp_luasnip',
-        'ray-x/lsp_signature.nvim',
         'kdheepak/cmp-latex-symbols',
         'onsails/lspkind-nvim'
       },
-      config = function()
+      opts = function()
+        local cmp = require("cmp")
+        local snip_status_ok, luasnip = pcall(require, "luasnip")
+        local lspkind_status_ok, lspkind = pcall(require, "lspkind")
+        if not snip_status_ok then return end
+        local border_opts = {
+          border = "single",
+          winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
+        }
+
+        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+        -- If you want insert `(` after select function or method item
+        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
+
         local has_words_before = function()
           unpack = unpack or table.unpack
           local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -322,34 +318,50 @@ require('lazy').setup({
               nil
         end
 
-        local lspkind = require('lspkind')
-        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
-        local luasnip = require("luasnip")
-        local cmp = require("cmp")
-        -- If you want insert `(` after select function or method item
-        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
-
-        cmp.setup({
+        return {
+          formatting = {
+            format = lspkind.cmp_format({
+                  -- mode = 'symbol',
+                  maxwidth = 50,
+                  ellipsis_char = '...',
+                }) or nil
+          },
           completion = {
-            completeopt = "menu,menuone,noinsert",
+            completeopt = "menu,menuone,noselect,noinsert",
           },
           snippet = {
             expand = function(args)
-              require("luasnip").lsp_expand(args.body)
+              luasnip.lsp_expand(args.body)
             end
           },
-          mapping = cmp.mapping.preset.insert({
-            ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-            ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-            ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-            ["<C-f>"] = cmp.mapping.scroll_docs(4),
-            ["<C-Space>"] = cmp.mapping.complete(),
-            ["<C-e>"] = cmp.mapping.abort(),
-            ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-            ["<S-CR>"] = cmp.mapping.confirm({
-              behavior = cmp.ConfirmBehavior.Replace,
-              select = true,
-            }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+          duplicates = {
+            nvim_lsp = 1,
+            luasnip = 1,
+            cmp_tabnine = 1,
+            buffer = 1,
+            path = 1,
+          },
+          confirm_opts = {
+            behavior = cmp.ConfirmBehavior.Replace,
+            select = false,
+          },
+          window = {
+            completion = cmp.config.window.bordered(border_opts),
+            documentation = cmp.config.window.bordered(border_opts),
+          },
+          mapping = {
+            ["<Up>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Select },
+            ["<Down>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Select },
+            ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+            ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+            ["<C-k>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+            ["<C-j>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+            ["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
+            ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
+            ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
+            ["<C-y>"] = cmp.config.disable,
+            ["<C-e>"] = cmp.mapping { i = cmp.mapping.abort(), c = cmp.mapping.close() },
+            ["<CR>"] = cmp.mapping.confirm { select = false },
             ["<Tab>"] = cmp.mapping(function(fallback)
               if cmp.visible() then
                 cmp.select_next_item()
@@ -370,36 +382,20 @@ require('lazy').setup({
                 fallback()
               end
             end, { "i", "s" }),
-          }),
-          sources = cmp.config.sources({
-            { name = "nvim_lsp",      keyword_length = 2 },
-            { name = "luasnip",       keyword_length = 2 },
-            { name = "nvim_lua",      keyword_length = 2 },
-            { name = "buffer",        keyword_length = 3 },
-            { name = "path",          keyword_length = 3 },
-            { name = "spell",         keyword_length = 3 },
-            { name = "tags",          keyword_length = 3 },
-            { name = "latex_symbols", keyword_length = 3 }
-          }),
-          formatting = {
-            format = lspkind.cmp_format({
-              mode = 'symbol',
-              maxwidth = 50,
-              menu = {
-                buffer   = "[buf]",
-                nvim_lsp = "[lsp]",
-                nvim_lua = "[api]",
-                path     = "[path]",
-                luasnip  = "[snip]",
-              },
-            })
           },
+          sources = cmp.config.sources({
+            { name = "nvim_lsp",      priority = 1000 },
+            { name = "luasnip",       priority = 750 },
+            { name = "buffer",        priority = 500 },
+            { name = "path",          priority = 250 },
+            { name = "latex_symbols", priority = 200 }
+          }),
           experimental = {
             ghost_text = {
               hl_group = "LspCodeLens",
             },
           },
-        })
+        }
       end
     },
     {
@@ -409,10 +405,10 @@ require('lazy').setup({
         local window_width_limit = 70
         local conditions = {
           buffer_not_empty = function()
-            return fn.empty(fn.expand "%:t") ~= 1
+            return vim.fn.empty(vim.fn.expand "%:t") ~= 1
           end,
           hide_in_width = function()
-            return fn.winwidth(0) > window_width_limit
+            return vim.fn.winwidth(0) > window_width_limit
           end,
           check_git_workspace = function()
             local filepath = vim.fn.expand "%:p:h"
@@ -421,7 +417,7 @@ require('lazy').setup({
           end,
         }
         local function diff_source()
-          local gitsigns = b.gitsigns_status_dict
+          local gitsigns = vim.b.gitsigns_status_dict
           if gitsigns then
             return {
               added = gitsigns.added,
@@ -592,7 +588,7 @@ require('lazy').setup({
       'alvan/vim-closetag',
       ft = 'html, heex, elixir, typescript, tsx, eelixir',
       config = function()
-        g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
+        vim.g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
       end
     },
     {
@@ -673,38 +669,17 @@ require('lazy').setup({
     {
       "SmiteshP/nvim-navic",
       lazy = true,
-      init = function()
-        vim.g.navic_silence = false
-
-        local M = {}
-
-        function M.on_attach(on_attach)
-          vim.api.nvim_create_autocmd('LspAttach', {
-            callback = function(args)
-              local buffer = args.buf
-              local client = vim.lsp.get_client_by_id(args.data.client_id)
-              on_attach(client, buffer)
-            end,
-          })
-        end
-
-        M.on_attach(function(client, buffer)
-          if client.server_capabilities.documentSymbolProvider then
-            require("nvim-navic").attach(client, buffer)
-          end
-        end)
-      end,
       opts = function()
         return {
           separator = " ",
           highlight = true,
           depth_limit = 5,
-          -- icons = require("lazyvim.config").icons.kinds,
         }
       end,
     },
     {
       'j-hui/fidget.nvim',
+      event = { "BufReadPre", "BufNewFile" },
       config = true
     },
     { 'pbrisbin/vim-mkdir',       event = 'VeryLazy' }, -- :e this/does/not/exist/file.txt then :w
@@ -714,7 +689,7 @@ require('lazy').setup({
       ft = "sql",
       dependencies = { 'tpope/vim-dadbod' },
       config = function()
-        g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
+        vim.g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
         vim.keymap.set('x', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
         vim.keymap.set('n', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
         vim.keymap.set('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', { expr = true })
@@ -727,18 +702,16 @@ require('lazy').setup({
     {
       'lervag/vimtex', -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
       config = function()
-        g['vimtex_quickfix_mode']       = 0
-        g['vimtex_compiler_method']     = 'tectonic'
-        g['vimtex_view_general_viewer'] = 'okular'
+        vim.g['vimtex_quickfix_mode']       = 0
+        vim.g['vimtex_compiler_method']     = 'tectonic'
+        vim.g['vimtex_view_general_viewer'] = 'okular'
+        vim.g['vimtex_fold_enabled']        = true
       end
     },
     {
       'akinsho/toggleterm.nvim',
       version = 'v2.*',
-      opts = {
-        open_mapping = [[A-1]],
-        shading_factor = 1
-      }
+      opts = { open_mapping = [[<A-,>]], shading_factor = 1 }
     },
     {
       'echasnovski/mini.surround',                                         -- sr({ sd' <select text>sa'
@@ -769,60 +742,60 @@ require('lazy').setup({
   })
 
 -------------------- OPTIONS -------------------------------
-local width       = 80
+local width           = 80
 -- global options
-opt.backup        = false
-opt.breakindent   = true
-opt.completeopt   = 'menu,menuone,noselect' -- Completion options
-opt.conceallevel  = 3                       -- Hide * markip for bold and italic
-opt.cursorline    = true                    -- Highlight cursor line
--- opt.equalalways              = false                   -- I don't like my windows changing all the time
-opt.expandtab     = true                    -- Use spaces instead of tabs
-opt.foldlevel     = 99
-opt.foldmethod    = 'indent'
-opt.formatoptions = 'cqn1j' -- Automatic formatting options
--- opt.guicursor                = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
-opt.grepformat    = "%f:%l:%c:%m"
-opt.grepprg       = "rg --vimgrep"
-opt.ignorecase    = true  -- Ignore case
-opt.joinspaces    = false -- No double spaces with join
-opt.laststatus    = 3     -- global statusline
-opt.linebreak     = true
-opt.list          = true  -- Show some invisible characters
-opt.listchars     = "tab:▸ ,extends:>,precedes:<"
-opt.mouse         = 'a'   -- Allow the mouse
-opt.number        = true  -- Show line numbers
-opt.pumheight     = 10    -- Maximum number of entries in a popup
-opt.scrolljump    = 4     -- min. lines to scroll
-opt.scrolloff     = 4     -- Lines of context
-opt.shiftround    = true  -- Round indent
-opt.shiftwidth    = 2     -- Size of an indent
--- opt.shortmess                = 'IFc' -- Avoid showing extra message on completion
-opt.shortmess:append { W = true, I = true, c = true }
-opt.showbreak     = '↪  '
-opt.showbreak     = '↪  '
-opt.showmatch     = true
-opt.showmode      = false -- Don't show mode since we have a statusline
-opt.sidescrolloff = 8     -- Columns of context
-opt.signcolumn    = 'yes' -- Show sign column
-opt.smartcase     = true  -- Don't ignore case with capitals
-opt.smartindent   = true  -- Insert indents automatically
-opt.spelllang     = { "en_GB" }
-opt.softtabstop   = 2
-opt.splitbelow    = true  -- Put new windows below current
-opt.splitright    = true  -- Put new windows right of current
-opt.swapfile      = false
-opt.tabstop       = 2     -- Number of spaces tabs count for
-opt.termguicolors = true  -- True color support
-opt.textwidth     = width -- Maximum width of text
-opt.timeoutlen    = 100   -- mapping timeout
-opt.undodir       = '/home/hvaria/.nvim/undo'
-opt.undofile      = true
-opt.updatetime    = 200                 -- make updates faster and trigger CursorHold
-opt.wildmode      = "longest:full,full" -- Command-line completion mode
-opt.winminwidth   = 5                   -- Minimum window width
-opt.wrap          = false               -- Disable line wrap
-opt.writebackup   = false
+vim.opt.backup        = false
+vim.opt.breakindent   = true
+vim.opt.completeopt   = 'menu,menuone,noselect,noinsert' -- Completion options
+vim.opt.conceallevel  = 3                                -- Hide * markip for bold and italic
+vim.opt.cursorline    = true                             -- Highlight cursor line
+-- vim.opt.equalalways              = false                   -- I don't like my windows changing all the time
+vim.opt.expandtab     = true                             -- Use spaces instead of tabs
+vim.opt.foldlevel     = 99
+vim.opt.foldmethod    = 'indent'
+vim.opt.formatoptions = 'cqn1j' -- Automatic formatting options
+-- vim.opt.guicursor                = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
+vim.opt.grepformat    = "%f:%l:%c:%m"
+vim.opt.grepprg       = "rg --vimgrep"
+vim.opt.ignorecase    = true  -- Ignore case
+vim.opt.joinspaces    = false -- No double spaces with join
+vim.opt.laststatus    = 3     -- global statusline
+vim.opt.linebreak     = true
+vim.opt.list          = true  -- Show some invisible characters
+vim.opt.listchars     = "tab:▸ ,extends:>,precedes:<"
+vim.opt.mouse         = 'a'   -- Allow the mouse
+vim.opt.number        = true  -- Show line numbers
+vim.opt.pumheight     = 10    -- Maximum number of entries in a popup
+vim.opt.scrolljump    = 4     -- min. lines to scroll
+vim.opt.scrolloff     = 4     -- Lines of context
+vim.opt.shiftround    = true  -- Round indent
+vim.opt.shiftwidth    = 2     -- Size of an indent
+-- vim.opt.shortmess                = 'IFc' -- Avoid showing extra message on completion
+vim.opt.shortmess:append { W = true, I = true, c = true }
+vim.opt.showbreak     = '↪  '
+vim.opt.showbreak     = '↪  '
+vim.opt.showmatch     = true
+vim.opt.showmode      = false   -- Don't show mode since we have a statusline
+vim.opt.sidescrolloff = 8       -- Columns of context
+vim.opt.signcolumn    = 'yes:1' -- Show sign column
+vim.opt.smartcase     = true    -- Don't ignore case with capitals
+vim.opt.smartindent   = true    -- Insert indents automatically
+vim.opt.spelllang     = { "en_GB" }
+vim.opt.softtabstop   = 2
+vim.opt.splitbelow    = true  -- Put new windows below current
+vim.opt.splitright    = true  -- Put new windows right of current
+vim.opt.swapfile      = false
+vim.opt.tabstop       = 2     -- Number of spaces tabs count for
+vim.opt.termguicolors = true  -- True color support
+vim.opt.textwidth     = width -- Maximum width of text
+vim.opt.timeoutlen    = 100   -- mapping timeout
+vim.opt.undodir       = '/home/hvaria/.nvim/undo'
+vim.opt.undofile      = true
+vim.opt.updatetime    = 200                 -- make updates faster and trigger CursorHold
+vim.opt.wildmode      = "longest:full,full" -- Command-line completion mode
+vim.opt.winminwidth   = 5                   -- Minimum window width
+vim.opt.wrap          = false               -- Disable line wrap
+vim.opt.writebackup   = false
 
 -------------------- MAPPINGS ------------------------------
 -- Personal common tasks
@@ -836,7 +809,6 @@ vim.keymap.set('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
 vim.keymap.set('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
 vim.keymap.set('n', '<C-f>', '<cmd>FzfLua grep<CR>')
 vim.keymap.set('n', '<C-b>', '<cmd>FzfLua blines<CR>')
-vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
 
 -- Escape
 vim.keymap.set('i', 'jk', '<ESC>', { noremap = false })
