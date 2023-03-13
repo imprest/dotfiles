@@ -278,6 +278,19 @@ require('lazy').setup({
           }
         })
       end,
+      keys = {
+        {
+          "<a-l>",
+          function()
+            return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>"
+          end,
+          expr = true,
+          silent = true,
+          mode = "i",
+        },
+        { "<a-l>", function() require("luasnip").jump(1) end,  mode = "s" },
+        { "<a-h>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
+      },
     },
     -- auto completion
     {
@@ -354,24 +367,18 @@ require('lazy').setup({
             documentation = cmp.config.window.bordered(border_opts),
           },
           mapping = {
-            ["<Up>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior
-                .Select },
-            ["<Down>"] = cmp.mapping.select_next_item { behavior = cmp
-                .SelectBehavior.Select },
-            ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior
-                .Insert },
-            ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior
-                .Insert },
-            ["<C-k>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior
-                .Insert },
-            ["<C-j>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior
-                .Insert },
+            ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+            ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
             ["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
             ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
             ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
             ["<C-y>"] = cmp.config.disable,
             ["<C-e>"] = cmp.mapping { i = cmp.mapping.abort(), c = cmp.mapping.close() },
-            ["<CR>"] = cmp.mapping.confirm { select = false },
+            ["<CR>"] = cmp.mapping.confirm { select = true },
+            ["<S-CR>"] = cmp.mapping.confirm({
+              behavior = cmp.ConfirmBehavior.Replace,
+              select = true,
+            }),
             ["<Tab>"] = cmp.mapping(function(fallback)
               if cmp.visible() then
                 cmp.select_next_item()
@@ -759,23 +766,24 @@ vim.opt.cursorline    = true                    -- Highlight cursor line
 vim.opt.expandtab     = true                    -- Use spaces instead of tabs
 vim.opt.foldlevel     = 99
 vim.opt.foldmethod    = 'indent'
-vim.opt.formatoptions = 'cqn1j' -- Automatic formatting options
+vim.opt.formatoptions = 'cqn1jl' -- Automatic formatting options
+vim.cmd [[set formatoptions-=ro]]
 -- vim.opt.guicursor                = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
-vim.opt.grepformat    = "%f:%l:%c:%m"
-vim.opt.grepprg       = "rg --vimgrep"
-vim.opt.ignorecase    = true  -- Ignore case
-vim.opt.joinspaces    = false -- No double spaces with join
-vim.opt.laststatus    = 3     -- global statusline
-vim.opt.linebreak     = true
-vim.opt.list          = true  -- Show some invisible characters
-vim.opt.listchars     = "tab:▸ ,extends:>,precedes:<"
-vim.opt.mouse         = 'a'   -- Allow the mouse
-vim.opt.number        = true  -- Show line numbers
-vim.opt.pumheight     = 10    -- Maximum number of entries in a popup
-vim.opt.scrolljump    = 4     -- min. lines to scroll
-vim.opt.scrolloff     = 4     -- Lines of context
-vim.opt.shiftround    = true  -- Round indent
-vim.opt.shiftwidth    = 2     -- Size of an indent
+vim.opt.grepformat = "%f:%l:%c:%m"
+vim.opt.grepprg    = "rg --vimgrep"
+vim.opt.ignorecase = true  -- Ignore case
+vim.opt.joinspaces = false -- No double spaces with join
+vim.opt.laststatus = 3     -- global statusline
+vim.opt.linebreak  = true
+vim.opt.list       = true  -- Show some invisible characters
+vim.opt.listchars  = "tab:▸ ,extends:>,precedes:<"
+vim.opt.mouse      = 'a'   -- Allow the mouse
+vim.opt.number     = true  -- Show line numbers
+vim.opt.pumheight  = 10    -- Maximum number of entries in a popup
+vim.opt.scrolljump = 4     -- min. lines to scroll
+vim.opt.scrolloff  = 4     -- Lines of context
+vim.opt.shiftround = true  -- Round indent
+vim.opt.shiftwidth = 2     -- Size of an indent
 -- vim.opt.shortmess                = 'IFc' -- Avoid showing extra message on completion
 vim.opt.shortmess:append { W = true, I = true, c = true }
 vim.opt.showbreak     = '↪  '
@@ -857,8 +865,8 @@ vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decreas
 vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
 -- buffers
-vim.keymap.set("n", "<A-h>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
-vim.keymap.set("n", "<A-l>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "<Right>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
+vim.keymap.set("n", "<Left>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
 vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
 
@@ -907,7 +915,7 @@ wk.register({
   ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
   ["v"] = { '<C-w>v<C-w>l', 'Split vertical' },
   ["w"] = { "<cmd>w!<CR>", "Save" },
-  ["x"] = { "<cmd>BufDel<CR>", "Close Buffer" },        -- bufdel plugin
+  ["d"] = { "<cmd>BufDel<CR>", "Close Buffer" },        -- bufdel plugin
   ["z"] = { "<cmd>Lazy<CR>", "Lazy [Plugin Manager]" }, -- lazy plugin
   l = {
     name = "LSP",
@@ -969,17 +977,22 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- On entering a terminal switch to insert mode by default
-vim.api.nvim_create_autocmd("BufEnter", {
+vim.api.nvim_create_autocmd({ "BufEnter", "BufNew", "TermOpen" }, {
   group = augroup("term_group"),
   pattern = "term://*",
-  command = 'startinsert'
+  callback = function()
+    vim.cmd [[startinsert]]
+    vim.cmd [[setlocal nonumber norelativenumber nospell signcolumn=auto]]
+  end
 })
 
 -- Elixir autocommands like abbreviation of pipe as pp
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup("elixir_group"),
   pattern = "elixir,eelixir",
-  command = 'iab pp \\|>'
+  callback = function()
+    vim.cmd [[iab pp \|>]]
+  end
 })
 
 -- SQL cmp
@@ -997,5 +1010,16 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*.{ex,exs,heex,css,scss,js,ts,tsx,json,lua}",
   callback = function()
     vim.lsp.buf.format()
+  end
+})
+
+-- Help Buffer
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("help"),
+  pattern = "help",
+  callback = function()
+    vim.cmd [[wincmd L | vert res 83<CR>]]
+    vim.cmd [[nnoremap <buffer><cr> <c-]>]]
+    vim.cmd [[nnoremap <buffer><bs> <c-T>]]
   end
 })
