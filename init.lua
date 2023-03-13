@@ -193,7 +193,8 @@ require('lazy').setup({
         end
 
         local lspconfig = require("lspconfig")
-        local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+        local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol
+          .make_client_capabilities())
 
         lspconfig.elixirls.setup {
           on_attach = on_attach,
@@ -218,7 +219,8 @@ require('lazy').setup({
           -- lazy-load schemastore when needed
           on_new_config = function(new_config)
             new_config.settings.json.schemas = new_config.settings.json.schemas or {}
-            vim.list_extend(new_config.settings.json.schemas, require("schemastore").json.schemas())
+            vim.list_extend(new_config.settings.json.schemas,
+              require("schemastore").json.schemas())
           end,
           settings = {
             json = {
@@ -302,12 +304,14 @@ require('lazy').setup({
         if not snip_status_ok then return end
         local border_opts = {
           border = "single",
-          winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
+          winhighlight =
+          "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
         }
 
-        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
         -- If you want insert `(` after select function or method item
-        cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
+        local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+        cmp.event:on('confirm_done',
+          cmp_autopairs.on_confirm_done({ filetypes = { tex = false } }))
 
         local has_words_before = function()
           unpack = unpack or table.unpack
@@ -320,14 +324,14 @@ require('lazy').setup({
 
         return {
           formatting = {
-            format = lspkind.cmp_format({
+            format = lspkind_status_ok and lspkind.cmp_format({
                   -- mode = 'symbol',
                   maxwidth = 50,
                   ellipsis_char = '...',
                 }) or nil
           },
           completion = {
-            completeopt = "menu,menuone,noselect,noinsert",
+            completeopt = "menu,menuone,noselect",
           },
           snippet = {
             expand = function(args)
@@ -350,12 +354,18 @@ require('lazy').setup({
             documentation = cmp.config.window.bordered(border_opts),
           },
           mapping = {
-            ["<Up>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Select },
-            ["<Down>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Select },
-            ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
-            ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
-            ["<C-k>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
-            ["<C-j>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+            ["<Up>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior
+                .Select },
+            ["<Down>"] = cmp.mapping.select_next_item { behavior = cmp
+                .SelectBehavior.Select },
+            ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior
+                .Insert },
+            ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior
+                .Insert },
+            ["<C-k>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior
+                .Insert },
+            ["<C-j>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior
+                .Insert },
             ["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
             ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
             ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
@@ -619,6 +629,14 @@ require('lazy').setup({
         },
       }
     },
+    {
+      'cohama/lexima.vim',
+      lazy = false,
+      config = function()
+        vim.g['lexima_no_defualt_rules'] = true
+        vim.g['lexima_enable_endwise_rules'] = 1
+      end
+    },
 
     -- easily jump to any location and enhanced f/t motions for Leap
     {
@@ -664,18 +682,6 @@ require('lazy').setup({
         show_trailing_blankline_indent = false,
         show_current_context = true,
       },
-    },
-    -- lsp symbol navigation for lualine
-    {
-      "SmiteshP/nvim-navic",
-      lazy = true,
-      opts = function()
-        return {
-          separator = " ",
-          highlight = true,
-          depth_limit = 5,
-        }
-      end,
     },
     {
       'j-hui/fidget.nvim',
@@ -746,11 +752,11 @@ local width           = 80
 -- global options
 vim.opt.backup        = false
 vim.opt.breakindent   = true
-vim.opt.completeopt   = 'menu,menuone,noselect,noinsert' -- Completion options
-vim.opt.conceallevel  = 3                                -- Hide * markip for bold and italic
-vim.opt.cursorline    = true                             -- Highlight cursor line
+vim.opt.completeopt   = 'menu,menuone,noselect' -- Completion options
+vim.opt.conceallevel  = 3                       -- Hide * markip for bold and italic
+vim.opt.cursorline    = true                    -- Highlight cursor line
 -- vim.opt.equalalways              = false                   -- I don't like my windows changing all the time
-vim.opt.expandtab     = true                             -- Use spaces instead of tabs
+vim.opt.expandtab     = true                    -- Use spaces instead of tabs
 vim.opt.foldlevel     = 99
 vim.opt.foldmethod    = 'indent'
 vim.opt.formatoptions = 'cqn1j' -- Automatic formatting options
