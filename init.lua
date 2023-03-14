@@ -1,4 +1,4 @@
--- Based of https://github.com/LazyVim/LazyVim
+-- Based of https://github.com/LazyVim/LazyVim & https://astronvim.com
 -------------------- HELPERS -------------------------------
 vim.g['loaded_python_provider'] = 1
 vim.g['python3_host_prog'] = '/usr/bin/python3'
@@ -44,7 +44,7 @@ require('lazy').setup({
     {
       'NvChad/nvim-colorizer.lua',
       cmd = 'ColorizerToggle',
-      opts = { 'css', 'javascript', html = { mode = 'foreground', } }
+      config = true
     },
     -- session management
     {
@@ -84,7 +84,7 @@ require('lazy').setup({
     {
       'akinsho/bufferline.nvim',
       version = "v3.*",
-      dependencies = { "ojroques/nvim-bufdel", "nvim-tree/nvim-web-devicons" },
+      dependencies = { "famiu/bufdelete.nvim", "nvim-tree/nvim-web-devicons" },
       opts = {
         -- run require("bufferline.nvim").setup({ highlights = { fill = "#ee44f5" } })
         highlights = { fill = { bg = "" } },
@@ -143,9 +143,9 @@ require('lazy').setup({
       'ibhagwan/fzf-lua',
       event = "VeryLazy",
       dependencies = { 'vijaymarupudi/nvim-fzf' },
-      opts = {
-        winopts = { preview = { default = 'bat_native' } }
-      }
+      config = function()
+        require "fzf-lua".setup({ "max-perf" })
+      end
     },
     -- LSP
     {
@@ -292,11 +292,12 @@ require('lazy').setup({
         { "<a-h>", function() require("luasnip").jump(-1) end, mode = { "i", "s" } },
       },
     },
-    -- auto completion
+    -- Better Escape
     {
-      "windwp/nvim-autopairs",
-      config = true
+      'max397574/better-escape.nvim', config = true
     },
+    -- auto completion
+    { "windwp/nvim-autopairs",    config = true },
     {
       "hrsh7th/nvim-cmp",
       version = false,       -- last release is way too old
@@ -602,6 +603,15 @@ require('lazy').setup({
       },
     },
     {
+      'stevearc/aerial.nvim',
+      opts = {
+        on_attach = function(bufnr)
+          vim.keymap.set('n', '<A-d>', '<cmd>AerialPrev<CR>', { buffer = bufnr })
+          vim.keymap.set('n', '<A-f>', '<cmd>AerialNext<CR>', { buffer = bufnr })
+        end
+      }
+    },
+    {
       'alvan/vim-closetag',
       ft = 'html, heex, elixir, typescript, tsx, eelixir',
       config = function()
@@ -614,10 +624,14 @@ require('lazy').setup({
       dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' }, -- Allow commenting embedded lang in files
       config = function()
         require('Comment').setup({
-          pre_hook = require('ts_context_commentstring.integrations.comment_nvim')
-              .create_pre_hook()
+          pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
         })
       end
+    },
+    {
+      'nmac427/guess-indent.nvim',
+      event = { "BufReadPost", "BufNewFile" },
+      config = true
     },
     {
       'nvim-treesitter/nvim-treesitter',
@@ -626,7 +640,7 @@ require('lazy').setup({
       event = { "BufReadPost", "BufNewFile" },
       opts = {
         highlight = { enable = true },
-        indent = { enable = true, disable = { "python" } },
+        -- indent = { enable = true, disable = { "python" } }, -- guess-indent works better and faster
         context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
         ensure_installed = {
           "vim", "regex", "lua", "bash", "markdown", "markdown_inline",
@@ -695,8 +709,8 @@ require('lazy').setup({
       event = { "BufReadPre", "BufNewFile" },
       config = true
     },
-    { 'pbrisbin/vim-mkdir',       event = 'VeryLazy' }, -- :e this/does/not/exist/file.txt then :w
-    { 'justinmk/vim-gtfo',        event = 'VeryLazy' }, -- gof open file in filemanager
+    { 'pbrisbin/vim-mkdir', event = 'VeryLazy' }, -- :e this/does/not/exist/file.txt then :w
+    { 'justinmk/vim-gtfo',  event = 'VeryLazy' }, -- gof open file in filemanager
     {
       'kristijanhusak/vim-dadbod-completion',
       ft = "sql",
@@ -723,6 +737,7 @@ require('lazy').setup({
     },
     {
       'akinsho/toggleterm.nvim',
+      cmd = { "ToggleTerm", "TermExec" },
       version = 'v2.*',
       opts = { open_mapping = [[<A-,>]], shading_factor = 1 }
     },
@@ -734,7 +749,7 @@ require('lazy').setup({
         require('mini.surround').setup()
       end,
     },
-    { 'mg979/vim-visual-multi', event = "VeryLazy" },
+    { 'mg979/vim-visual-multi', version = false, event = "VeryLazy" },
   },
   {
     checker = { enabled = true },
@@ -755,7 +770,7 @@ require('lazy').setup({
   })
 
 -------------------- OPTIONS -------------------------------
-local width           = 80
+local width           = 85
 -- global options
 vim.opt.backup        = false
 vim.opt.breakindent   = true
@@ -816,18 +831,12 @@ vim.opt.writebackup   = false
 -- map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
 vim.keymap.set('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files()<CR>")
 vim.keymap.set('n', '<BS>', '<cmd>nohlsearch<CR>')
-vim.keymap.set('v', '<BS>', '<ESC>')
 vim.keymap.set('n', '<F4>', '<cmd>set spell!<CR>')
 vim.keymap.set('n', '<F5>', '<cmd>ColorizerToggle<CR>')
 vim.keymap.set('i', '<C-u>', '<C-g>u<C-u>') -- Delete lines in insert mode
 vim.keymap.set('i', '<C-w>', '<C-g>u<C-w>') -- Delete words in insert mode
 vim.keymap.set('n', '<C-f>', '<cmd>FzfLua grep<CR>')
 vim.keymap.set('n', '<C-b>', '<cmd>FzfLua blines<CR>')
-
--- Escape
-vim.keymap.set('i', 'jk', '<ESC>', { noremap = false })
-vim.keymap.set('t', 'jk', '<ESC>', { noremap = false })
-vim.keymap.set('t', '<ESC>', '&filetype == "fzf" ? "\\<ESC>" : "\\<C-\\>\\<C-n>"', { expr = true })
 
 -- Easier movement
 vim.keymap.set('n', 'q', '<C-w>c')
@@ -897,6 +906,29 @@ vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>update<cr><esc>", { desc =
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
+-- LazyGit function
+local Terminal = require('toggleterm.terminal').Terminal
+local lazygit = Terminal:new({
+  cmd = "lazygit",
+  dir = "git_dir",
+  direction = "float",
+  float_opts = {
+    border = "double",
+  },
+  -- function to run on opening the terminal
+  on_open = function(term)
+    vim.cmd("startinsert!")
+    vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
+  end,
+  -- function to run on closing the terminal
+  on_close = function(_)
+    vim.cmd("startinsert!")
+  end,
+})
+function _G.lazygit_toggle()
+  lazygit:toggle()
+end
+
 -- which-key
 local wk = require('which-key')
 wk.register({
@@ -907,15 +939,14 @@ wk.register({
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
   ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
   ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
-  ["gg"] = { '<cmd>TermExec cmd="lazygit" direction=float<CR>', "lazygit" },
+  ["gg"] = { '<cmd>lua _G.lazygit_toggle()<CR>', "lazygit" },
   ["<leader>"] = { '<C-^>', 'Last buffer' },
   ["m"] = { "<cmd>Mason<cr>", "Mason [LSP Manager]" }, -- mason plugin
-  ["q"] = { "<cmd>q!<CR>", "Quit" },
   ["r"] = { '<cmd>FzfLua oldfiles<CR>', "Recent Files" },
   ["s"] = { '<cmd>split<CR>', 'Split horizontal' },
   ["v"] = { '<C-w>v<C-w>l', 'Split vertical' },
   ["w"] = { "<cmd>w!<CR>", "Save" },
-  ["d"] = { "<cmd>BufDel<CR>", "Close Buffer" },        -- bufdel plugin
+  ["d"] = { "<cmd>Bdelete<CR>", "Close Buffer" },       -- bufdelete plugin
   ["z"] = { "<cmd>Lazy<CR>", "Lazy [Plugin Manager]" }, -- lazy plugin
   l = {
     name = "LSP",
@@ -976,13 +1007,20 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- On entering a terminal switch to insert mode by default
+-- Terminal autocommands
+function _G.set_terminal_keymaps()
+  local opts = { buffer = 0 }
+  vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
+  vim.keymap.set('t', 'jk', [[<C-\><C-n>]], opts)
+end
+
 vim.api.nvim_create_autocmd({ "BufEnter", "BufNew", "TermOpen" }, {
   group = augroup("term_group"),
   pattern = "term://*",
   callback = function()
     vim.cmd [[startinsert]]
     vim.cmd [[setlocal nonumber norelativenumber nospell signcolumn=auto]]
+    vim.cmd [[lua set_terminal_keymaps()]]
   end
 })
 
