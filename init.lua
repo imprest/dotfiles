@@ -600,13 +600,6 @@ require('lazy').setup({
       }
     },
     {
-      'alvan/vim-closetag',
-      ft = 'html, heex, elixir, typescript, tsx, eelixir',
-      config = function()
-        vim.g['closetag_filenames'] = '*.html, *.vue, *.heex, *.svelte'
-      end
-    },
-    {
       'numToStr/Comment.nvim',
       event = "VeryLazy",
       dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' }, -- Allow commenting embedded lang in files
@@ -625,8 +618,16 @@ require('lazy').setup({
       'nvim-treesitter/nvim-treesitter',
       version = false,
       build = ':TSUpdate',
+      dependencies = { "windwp/nvim-ts-autotag", "RRethy/nvim-treesitter-endwise" },
       event = { "BufReadPost", "BufNewFile" },
       opts = {
+        autotag = {
+          enable = true, -- windwp/nvim-ts-autotag
+          filetypes = {
+            'html', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'svelte', 'vue', 'tsx', 'jsx',
+            'rescript', 'xml', 'php', 'markdown', 'glimmer', 'handlebars', 'hbs', 'heex' }
+        },
+        endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
         highlight = { enable = true },
         -- indent = { enable = true, disable = { "python" } }, -- guess-indent works better and faster
         context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
@@ -648,14 +649,6 @@ require('lazy').setup({
       },
       config = function(_, opts)
         require("nvim-treesitter.configs").setup(opts)
-      end
-    },
-    {
-      'cohama/lexima.vim',
-      lazy = false,
-      config = function()
-        vim.g['lexima_no_defualt_rules'] = true
-        vim.g['lexima_enable_endwise_rules'] = 1
       end
     },
 
