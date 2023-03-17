@@ -78,8 +78,10 @@ require('lazy').setup({
       lazy = false,       -- make sure we load this during startup if it is your main colorscheme
       priority = 1000,    -- make sure to load this before all the other start plugins
       config = function() -- load the colorscheme here
+        -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
+        vim.cmd [[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]]
         vim.cmd([[colorscheme doom-one]])
-      end,
+      end
     },
     {
       'akinsho/bufferline.nvim',
@@ -179,6 +181,15 @@ require('lazy').setup({
           severity_sort = true,
         })
 
+        -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
+        -- To instead override globally for all lsp borders
+        local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+        function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+          opts = opts or {}
+          opts.border = opts.border or 'single'
+          return orig_util_open_floating_preview(contents, syntax, opts, ...)
+        end
+
         -- Customize LSP behavior
         local on_attach = function(_, bufnr)
           -- Mappings | See `:help vim.lsp.*` for documentation on any of the below functions
@@ -188,7 +199,7 @@ require('lazy').setup({
           vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
           vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
           vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-          vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, bufopts)
+          vim.keymap.set('n', 'gS', vim.lsp.buf.signature_help, bufopts)
           vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
         end
 
@@ -448,7 +459,7 @@ require('lazy').setup({
         require 'lualine'.setup {
           options = {
             icons_enabled = true,
-            theme = 'onedark',
+            -- theme = 'onedark',
             globalstatus = true,
             component_separators = { left = '', right = '' },
             section_separators = { left = '', right = '' },
@@ -460,8 +471,14 @@ require('lazy').setup({
               -- mode
               function() return " " end,
               padding = { left = 0, right = 0 }
-            } },
+            }
+            },
             lualine_b = {
+              { 'fileformat' },
+              { 'filesize',  cond = conditions.buffer_not_empty },
+              { "filename",  symbols = { path = 3, modified = "  ", readonly = "", unnamed = "" } },
+            },
+            lualine_c = {
               {
                 -- 'branch'
                 "b:gitsigns_head",
@@ -469,32 +486,10 @@ require('lazy').setup({
                 cond = conditions.hide_in_width
               },
               {
-                "filetype",
-                icon_only = true,
-                separator = "",
-                padding = { left = 1, right = 0 }
-              },
-              {
-                "filename",
-                path = 3,
-                symbols = {
-                  modified = "  ",
-                  readonly = "",
-                  unnamed = ""
-                }
-              },
-            },
-            lualine_c = {
-              { 'filesize', cond = conditions.buffer_not_empty },
-              {
                 -- 'diff'
                 "diff",
                 source = diff_source,
-                symbols = {
-                  added = " ",
-                  modified = " ",
-                  removed = " "
-                }
+                symbols = { added = " ", modified = " ", removed = " " }
               },
             },
             lualine_x = {
@@ -502,12 +497,7 @@ require('lazy').setup({
                 -- 'diagnostics'
                 "diagnostics",
                 sources = { "nvim_diagnostic" },
-                symbols = {
-                  error = " ",
-                  warn = " ",
-                  info = " ",
-                  hint = "Ⓗ "
-                }
+                symbols = { error = " ", warn = " ", info = " ", hint = " " }
               },
               {
                 -- lazy package manager status
@@ -534,12 +524,11 @@ require('lazy').setup({
                   end
                   return msg
                 end,
-                -- icon = ' ',
                 cond = conditions.hide_in_width,
               },
             },
-            lualine_y = {},
-            lualine_z = { '%3l:%3c' }
+            lualine_y = { 'encoding', 'filetype' },
+            lualine_z = { 'progress', '%3l:%3c' }
           },
           inactive_sections = {
             lualine_a = { 'filename' },
@@ -560,8 +549,7 @@ require('lazy').setup({
       cmd = "Neotree",
       dependencies = { "MunifTanjim/nui.nvim" },
       keys = {
-        { "<F2>",   '<cmd>Neotree toggle<CR>', desc = "Toggle NeoTree" },
-        { "<C-\\>", '<cmd>Neotree toggle<CR>', desc = "Toggle NeoTree" }
+        { "<F2>", '<cmd>Neotree toggle<CR>', desc = "Toggle NeoTree" },
       },
       deactivate = function()
         vim.cmd([[Neotree close]])
@@ -583,7 +571,7 @@ require('lazy').setup({
           follow_current_file = true,
         },
         window = {
-          width = "22",
+          width = "28",
           mappings = {
             ["<space>"] = "none",
           },
@@ -648,7 +636,19 @@ require('lazy').setup({
           "erlang", "elixir", "eex", "heex",
           "ledger", "lua", "toml", "zig"
         },
-      }
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = "<C-space>",
+            node_incremental = "<C-space>",
+            scope_incremental = "<nop>",
+            node_decremental = "<C-\\>",
+          },
+        },
+      },
+      config = function(_, opts)
+        require("nvim-treesitter.configs").setup(opts)
+      end
     },
     {
       'cohama/lexima.vim',
@@ -874,8 +874,8 @@ vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decreas
 vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
 -- buffers
-vim.keymap.set("n", "<Right>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
-vim.keymap.set("n", "<Left>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "<Right>", "<cmd>BufferLineCycleNext<cr>", { desc = "Prev buffer" })
+vim.keymap.set("n", "<Left>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Next buffer" })
 vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
 

@@ -29,7 +29,7 @@ sudo pacman -Syu zsh ranger neovim python-pynvim fzf ripgrep bat \
 # optional
 # weechat pdfarranger
 # gnome-terminal text/background Gnome | palette Tango
-# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Fira Code Retina 10'"
+# dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Fira Code Retina 9'"
 # size 9 in qterminal for fira mono retina 
 # konsole font size JetBrains Mono SemiBold 10
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Inconsolata SemiBold 12'"
@@ -45,7 +45,6 @@ git config --global user.name  "Hardik Varia"
 # neovim
 mkdir -p ~/.config/nvim
 ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
-nvim +PackerSync
 
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
