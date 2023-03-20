@@ -43,8 +43,9 @@ require('lazy').setup({
     },
     {
       'NvChad/nvim-colorizer.lua',
+      ft = { 'javascript', 'typescript', 'typescriptreact', 'css', 'html' },
       cmd = 'ColorizerToggle',
-      config = true
+      opts = { user_default_options = { tailwind = true } }
     },
     -- session management
     {
@@ -320,7 +321,8 @@ require('lazy').setup({
         "hrsh7th/cmp-path",
         'saadparwaiz1/cmp_luasnip',
         'kdheepak/cmp-latex-symbols',
-        'onsails/lspkind-nvim'
+        'onsails/lspkind-nvim',
+        { 'roobert/tailwindcss-colorizer-cmp.nvim', config = true }
       },
       opts = function()
         local cmp = require("cmp")
@@ -347,13 +349,18 @@ require('lazy').setup({
               nil
         end
 
+        local format_kinds = lspkind_status_ok and
+            lspkind.cmp_format({ mode = 'symbol', maxwidth = 50, ellipsis_char = '...' }) or nil
+
         return {
           formatting = {
-            format = lspkind_status_ok and lspkind.cmp_format({
-                  -- mode = 'symbol',
-                  maxwidth = 50,
-                  ellipsis_char = '...',
-                }) or nil
+            -- ref: https://www.youtube.com/watch?v=_NiWhZeR-MY
+            format = function(entry, item)
+              if format_kinds ~= nil then
+                format_kinds(entry, item) -- add icons
+                return require('tailwindcss-colorizer-cmp').formatter(entry, item)
+              end
+            end
           },
           completion = {
             completeopt = "menu,menuone,noselect",
