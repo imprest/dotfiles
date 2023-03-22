@@ -684,7 +684,11 @@ require('lazy').setup({
       'nvim-treesitter/nvim-treesitter',
       version = false,
       build = ':TSUpdate',
-      dependencies = { "windwp/nvim-ts-autotag", "RRethy/nvim-treesitter-endwise" },
+      dependencies = { {
+        "windwp/nvim-ts-autotag",
+        ft = { 'html', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'svelte', 'vue',
+          'tsx', 'jsx', 'rescript', 'xml', 'php', 'markdown', 'glimmer', 'handlebars', 'hbs', 'heex' }
+      }, "RRethy/nvim-treesitter-endwise" },
       event = { "BufReadPost", "BufNewFile" },
       opts = {
         autotag = {
