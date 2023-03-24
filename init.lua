@@ -139,7 +139,6 @@ require('lazy').setup({
         { "[[", desc = "Prev Reference" },
       },
     },
-    'airblade/vim-rooter',
     'elixir-editors/vim-elixir',
     { 'ethanholz/nvim-lastplace', config = true },
     {
