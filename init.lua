@@ -191,7 +191,7 @@ require('lazy').setup({
         end
 
         -- Customize LSP behavior
-        local on_attach = function(_, bufnr)
+        local on_attach = function(client, bufnr)
           -- Mappings | See `:help vim.lsp.*` for documentation on any of the below functions
           local bufopts = { noremap = true, silent = true, buffer = bufnr }
           vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, bufopts)
@@ -201,6 +201,12 @@ require('lazy').setup({
           vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
           vim.keymap.set('n', 'gS', vim.lsp.buf.signature_help, bufopts)
           vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+          if client.name == "tsserver" then
+            vim.keymap.set('n', '<leader>co', '<cmd>TypescriptOrganizeImports<CR>',
+              { buffer = bufnr, desc = "Organize Imports" })
+            vim.keymap.set('n', '<leader>cR', '<cmd>TypescriptRenameFile<CR>',
+              { buffer = bufnr, desc = "Rename File" })
+          end
         end
 
         local lspconfig = require("lspconfig")
@@ -254,13 +260,23 @@ require('lazy').setup({
           },
         })
 
-        local servers = { 'tailwindcss' }
+        local servers = { 'tailwindcss', 'svelte', 'eslint' }
         for _, lsp in ipairs(servers) do
           lspconfig[lsp].setup {
             on_attach = on_attach,
             capabilities = capabilities
           }
         end
+      end
+    },
+    -- Null-ls
+    {
+      "jay-babu/mason-null-ls.nvim",
+      dependencies = { 'jose-elias-alvarez/null-ls.nvim', 'williamboman/mason.nvim' },
+      config = function()
+        require('mason-null-ls').setup({
+          automatic_setup = true,
+        })
       end
     },
     -- snippets
@@ -531,9 +547,8 @@ require('lazy').setup({
             }
             },
             lualine_b = {
-              { 'fileformat' },
-              { 'filesize',  cond = conditions.buffer_not_empty },
-              { "filename",  symbols = { path = 3, modified = "  ", readonly = "", unnamed = "" } },
+              { 'filesize', cond = conditions.buffer_not_empty },
+              { "filename", symbols = { path = 3, modified = "  ", readonly = "", unnamed = "" } },
             },
             lualine_c = {
               {
@@ -584,7 +599,7 @@ require('lazy').setup({
                 cond = conditions.hide_in_width,
               },
             },
-            lualine_y = { 'encoding', 'filetype' },
+            lualine_y = { 'filetype', 'fileformat', 'encoding' },
             lualine_z = { 'progress', '%3l:%3c' }
           },
           inactive_sections = {
@@ -674,11 +689,11 @@ require('lazy').setup({
         })
       end
     },
-    {
-      'nmac427/guess-indent.nvim',
-      event = { "BufReadPost", "BufNewFile" },
-      config = true
-    },
+    -- {
+    --   'nmac427/guess-indent.nvim',
+    --   event = { "BufReadPost", "BufNewFile" },
+    --   config = true
+    -- },
     {
       'nvim-treesitter/nvim-treesitter',
       version = false,
@@ -696,9 +711,9 @@ require('lazy').setup({
             'html', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'svelte', 'vue', 'tsx', 'jsx',
             'rescript', 'xml', 'php', 'markdown', 'glimmer', 'handlebars', 'hbs', 'heex' }
         },
-        endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
+        endwise = { enable = true },                                       -- RRethy/nvim-treesitter-endwise
         highlight = { enable = true },
-        -- indent = { enable = true, disable = { "python" } }, -- guess-indent works better and faster
+        indent = { enable = true, disable = { "python" } },                -- guess-indent is better and faster
         context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
         ensure_installed = {
           "vim", "regex", "lua", "bash", "markdown", "markdown_inline",
@@ -756,16 +771,16 @@ require('lazy').setup({
       dependencies = { 'nvim-lua/plenary.nvim' },
       opts = { current_line_blame = false }
     },
-    {
-      "lukas-reineke/indent-blankline.nvim",
-      event = { "BufReadPost", "BufNewFile" },
-      opts = {
-        char = "┊",
-        filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
-        show_trailing_blankline_indent = false,
-        show_current_context = true,
-      },
-    },
+    -- {
+    --   "lukas-reineke/indent-blankline.nvim",
+    --   event = { "BufReadPost", "BufNewFile" },
+    --   opts = {
+    --     char = "┊",
+    --     filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
+    --     show_trailing_blankline_indent = false,
+    --     show_current_context = true,
+    --   },
+    -- },
     {
       'j-hui/fidget.nvim',
       event = { "BufReadPre", "BufNewFile" },
