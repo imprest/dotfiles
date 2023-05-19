@@ -140,6 +140,14 @@ require('lazy').setup({
       },
     },
     'elixir-editors/vim-elixir',
+    {
+      'leafOfTree/vim-svelte-plugin',
+      ft = { "svelte" },
+      config = function()
+        vim.g['vim_svelte_plugin_use_typescript'] = 1
+        vim.g['vim_svelte_plugin_use_foldexpr']   = 1
+      end
+    },
     { 'ethanholz/nvim-lastplace', config = true },
     {
       'ibhagwan/fzf-lua',
@@ -192,6 +200,9 @@ require('lazy').setup({
 
         -- Customize LSP behavior
         local on_attach = function(client, bufnr)
+          -- Enable completion triggered by <c-x><c-o>
+          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+
           -- Mappings | See `:help vim.lsp.*` for documentation on any of the below functions
           local bufopts = { noremap = true, silent = true, buffer = bufnr }
           vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, bufopts)
@@ -218,7 +229,7 @@ require('lazy').setup({
           capabilities = capabilities,
           settings = {
             elixirLS = {
-              dialyzerEnabled = false,
+              dialyzerEnabled = true,
               fetchDeps = false
             }
           }
@@ -260,7 +271,7 @@ require('lazy').setup({
           },
         })
 
-        local servers = { 'tailwindcss', 'svelte', 'eslint' }
+        local servers = { 'tailwindcss', 'svelte' }
         for _, lsp in ipairs(servers) do
           lspconfig[lsp].setup {
             on_attach = on_attach,
@@ -309,7 +320,8 @@ require('lazy').setup({
         {
           "<a-l>",
           function()
-            return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>"
+            return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or
+                "<tab>"
           end,
           expr = true,
           silent = true,
@@ -325,10 +337,30 @@ require('lazy').setup({
       cmd = { "TroubleToggle", "Trouble" },
       opts = { use_diagnostic_signs = true },
       keys = {
-        { "<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>",  desc = "Document Diagnostics (Trouble)" },
-        { "<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics (Trouble)" },
-        { "<leader>xL", "<cmd>TroubleToggle loclist<cr>",               desc = "Location List (Trouble)" },
-        { "<leader>xQ", "<cmd>TroubleToggle quickfix<cr>",              desc = "Quickfix List (Trouble)" },
+        {
+          "<leader>xx",
+          "<cmd>TroubleToggle document_diagnostics<cr>",
+          desc =
+          "Document Diagnostics (Trouble)"
+        },
+        {
+          "<leader>xX",
+          "<cmd>TroubleToggle workspace_diagnostics<cr>",
+          desc =
+          "Workspace Diagnostics (Trouble)"
+        },
+        {
+          "<leader>xL",
+          "<cmd>TroubleToggle loclist<cr>",
+          desc =
+          "Location List (Trouble)"
+        },
+        {
+          "<leader>xQ",
+          "<cmd>TroubleToggle quickfix<cr>",
+          desc =
+          "Quickfix List (Trouble)"
+        },
         {
           "[q",
           function()
@@ -362,10 +394,30 @@ require('lazy').setup({
       config = true,
       -- stylua: ignore
       keys = {
-        { "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
-        { "[t",         function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
-        { "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Todo (Trouble)" },
-        { "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",      desc = "Todo/Fix/Fixme (Trouble)" },
+        {
+          "]t",
+          function() require("todo-comments").jump_next() end,
+          desc =
+          "Next todo comment"
+        },
+        {
+          "[t",
+          function() require("todo-comments").jump_prev() end,
+          desc =
+          "Previous todo comment"
+        },
+        {
+          "<leader>xt",
+          "<cmd>TodoTrouble<cr>",
+          desc =
+          "Todo (Trouble)"
+        },
+        {
+          "<leader>xT",
+          "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
+          desc =
+          "Todo/Fix/Fixme (Trouble)"
+        },
       },
     },
 
@@ -424,7 +476,8 @@ require('lazy').setup({
             format = function(entry, item)
               if format_kinds ~= nil then
                 format_kinds(entry, item) -- add icons
-                return require('tailwindcss-colorizer-cmp').formatter(entry, item)
+                return require('tailwindcss-colorizer-cmp').formatter(
+                  entry, item)
               end
             end
           },
@@ -452,8 +505,10 @@ require('lazy').setup({
             documentation = cmp.config.window.bordered(border_opts),
           },
           mapping = {
-            ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
-            ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+            ["<C-n>"] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior
+                .Insert },
+            ["<C-p>"] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior
+                .Insert },
             ["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
             ["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(4), { "i", "c" }),
             ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
@@ -548,7 +603,15 @@ require('lazy').setup({
             },
             lualine_b = {
               { 'filesize', cond = conditions.buffer_not_empty },
-              { "filename", symbols = { path = 3, modified = "  ", readonly = "", unnamed = "" } },
+              {
+                "filename",
+                symbols = {
+                  path = 3,
+                  modified = "  ",
+                  readonly = "",
+                  unnamed = ""
+                }
+              },
             },
             lualine_c = {
               {
@@ -561,7 +624,11 @@ require('lazy').setup({
                 -- 'diff'
                 "diff",
                 source = diff_source,
-                symbols = { added = " ", modified = " ", removed = " " }
+                symbols = {
+                  added = " ",
+                  modified = " ",
+                  removed = " "
+                }
               },
             },
             lualine_x = {
@@ -569,7 +636,12 @@ require('lazy').setup({
                 -- 'diagnostics'
                 "diagnostics",
                 sources = { "nvim_diagnostic" },
-                symbols = { error = " ", warn = " ", info = " ", hint = " " }
+                symbols = {
+                  error = " ",
+                  warn = " ",
+                  info = " ",
+                  hint = " "
+                }
               },
               {
                 -- lazy package manager status
@@ -643,7 +715,7 @@ require('lazy').setup({
           follow_current_file = true,
         },
         window = {
-          width = "30",
+          width = "24",
           mappings = {
             ["<space>"] = "none",
           },
@@ -685,41 +757,39 @@ require('lazy').setup({
       dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' }, -- Allow commenting embedded lang in files
       config = function()
         require('Comment').setup({
-          pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
+          pre_hook = require('ts_context_commentstring.integrations.comment_nvim')
+              .create_pre_hook()
         })
       end
     },
-    -- {
-    --   'nmac427/guess-indent.nvim',
-    --   event = { "BufReadPost", "BufNewFile" },
-    --   config = true
-    -- },
+    {
+      'nmac427/guess-indent.nvim',
+      event = { "BufReadPost", "BufNewFile" },
+      config = true
+    },
     {
       'nvim-treesitter/nvim-treesitter',
       version = false,
       build = ':TSUpdate',
       dependencies = { {
         "windwp/nvim-ts-autotag",
-        ft = { 'html', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'svelte', 'vue',
-          'tsx', 'jsx', 'rescript', 'xml', 'php', 'markdown', 'glimmer', 'handlebars', 'hbs', 'heex' }
+        ft = { 'html', 'javascript', 'typescript', 'svelte', 'vue', 'xml', 'markdown', 'heex' }
       }, "RRethy/nvim-treesitter-endwise" },
       event = { "BufReadPost", "BufNewFile" },
       opts = {
         autotag = {
           enable = true, -- windwp/nvim-ts-autotag
-          filetypes = {
-            'html', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'svelte', 'vue', 'tsx', 'jsx',
-            'rescript', 'xml', 'php', 'markdown', 'glimmer', 'handlebars', 'hbs', 'heex' }
+          filetypes = { 'html', 'javascript', 'typescript', 'svelte', 'vue', 'xml', 'markdown', 'heex' }
         },
-        endwise = { enable = true },                                       -- RRethy/nvim-treesitter-endwise
+        endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
         highlight = { enable = true },
-        indent = { enable = true, disable = { "python" } },                -- guess-indent is better and faster
+        -- indent = { enable = true, disable = { "python" } },            -- guess-indent is better and faster
         context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
         ensure_installed = {
-          "vim", "regex", "lua", "bash", "markdown", "markdown_inline",
-          "css", "html", "javascript", "json", "typescript", "tsx",
+          "vim", "regex", "lua", "markdown", "markdown_inline",
+          "css", "html", "javascript", "json", "typescript",
           "erlang", "elixir", "eex", "heex",
-          "ledger", "lua", "toml", "zig"
+          "ledger", "toml" --, "zig"
         },
         incremental_selection = {
           enable = true,
@@ -727,7 +797,7 @@ require('lazy').setup({
             init_selection = "<C-space>",
             node_incremental = "<C-space>",
             scope_incremental = "<nop>",
-            node_decremental = "<C-\\>",
+            node_decremental = "<space>",
           },
         },
       },
@@ -853,7 +923,7 @@ vim.opt.backup        = false
 vim.opt.breakindent   = true
 vim.opt.completeopt   = 'menu,menuone,noselect' -- Completion options
 vim.opt.conceallevel  = 3                       -- Hide * markip for bold and italic
-vim.opt.cursorline    = true                    -- Highlight cursor line
+vim.opt.cursorline    = false                   -- Highlight cursor line
 -- vim.opt.equalalways              = false                   -- I don't like my windows changing all the time
 vim.opt.expandtab     = true                    -- Use spaces instead of tabs
 vim.opt.foldlevel     = 99
@@ -1122,7 +1192,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- LSP autocommands like format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
   group = augroup("lsp_format"),
-  pattern = "*.{ex,exs,heex,css,scss,js,ts,tsx,json,lua}",
+  pattern = "*.{ex,exs,heex,css,scss,svelte,js,ts,json,lua}",
   callback = function()
     vim.lsp.buf.format()
   end
