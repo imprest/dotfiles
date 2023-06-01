@@ -47,33 +47,6 @@ require('lazy').setup({
       cmd = 'ColorizerToggle',
       opts = { user_default_options = { tailwind = true } }
     },
-    -- session management
-    {
-      "folke/persistence.nvim",
-      event = "BufReadPre",
-      opts = { options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals" } },
-      -- stylua: ignore
-      keys = {
-        {
-          "<leader>qs",
-          function() require("persistence").load() end,
-          desc =
-          "Restore Session"
-        },
-        {
-          "<leader>ql",
-          function() require("persistence").load({ last = true }) end,
-          desc =
-          "Restore Last Session"
-        },
-        {
-          "<leader>qd",
-          function() require("persistence").stop() end,
-          desc =
-          "Don't Save Current Session"
-        },
-      },
-    },
     {
       "NTBBloodbath/doom-one.nvim",
       lazy = false,       -- make sure we load this during startup if it is your main colorscheme
@@ -89,7 +62,6 @@ require('lazy').setup({
       version = "v3.*",
       dependencies = { "famiu/bufdelete.nvim", "nvim-tree/nvim-web-devicons" },
       opts = {
-        -- run require("bufferline.nvim").setup({ highlights = { fill = "#ee44f5" } })
         highlights = { fill = { bg = "" } },
         options = {
           always_show_bufferline = true,
@@ -104,7 +76,7 @@ require('lazy').setup({
         }
       }
     },
-    -- references
+    -- references i.e. highlight same work undercursor
     {
       "RRethy/vim-illuminate",
       event = { "BufReadPost", "BufNewFile" },
@@ -139,7 +111,6 @@ require('lazy').setup({
         { "[[", desc = "Prev Reference" },
       },
     },
-    'elixir-editors/vim-elixir',
     {
       'leafOfTree/vim-svelte-plugin',
       ft = { "svelte" },
@@ -162,6 +133,8 @@ require('lazy').setup({
       'neovim/nvim-lspconfig',
       event = { "BufReadPre", "BufNewFile" },
       dependencies = {
+        { "slashmili/alchemist.vim" },
+        { 'elixir-editors/vim-elixir' },
         { "jose-elias-alvarez/typescript.nvim" },
         { 'b0o/schemastore.nvim',              version = false },
         { 'williamboman/mason.nvim',           config = true },
@@ -229,8 +202,7 @@ require('lazy').setup({
           capabilities = capabilities,
           settings = {
             elixirLS = {
-              dialyzerEnabled = true,
-              fetchDeps = false
+              dialyzerEnabled = true
             }
           }
         }
@@ -1027,19 +999,19 @@ vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer"
 vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
 
 -- Try and center these motions to the middle of the screen
-vim.keymap.set({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
-vim.keymap.set('n', 'n', 'nzz', { silent = true })
-vim.keymap.set('n', 'N', 'Nzz', { silent = true })
-vim.keymap.set('n', '*', '*zz', { silent = true })
-vim.keymap.set('n', '#', '#zz', { silent = true })
-vim.keymap.set('n', 'g*', 'g*zz', { silent = true })
-vim.keymap.set('n', 'g#', 'g#zz', { silent = true })
-vim.keymap.set('n', '<C-o>', '<C-o>zz', { silent = true })
-vim.keymap.set('n', '<C-i>', '<C-i>zz', { silent = true })
-vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
-vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
-vim.keymap.set('n', 'u', 'uzz', { silent = true })
-vim.keymap.set('n', '<C-r>', '<C-r>zz', { silent = true })
+-- vim.keymap.set({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
+-- vim.keymap.set('n', 'n', 'nzz', { silent = true })
+-- vim.keymap.set('n', 'N', 'Nzz', { silent = true })
+-- vim.keymap.set('n', '*', '*zz', { silent = true })
+-- vim.keymap.set('n', '#', '#zz', { silent = true })
+-- vim.keymap.set('n', 'g*', 'g*zz', { silent = true })
+-- vim.keymap.set('n', 'g#', 'g#zz', { silent = true })
+-- vim.keymap.set('n', '<C-o>', '<C-o>zz', { silent = true })
+-- vim.keymap.set('n', '<C-i>', '<C-i>zz', { silent = true })
+-- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
+-- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
+-- vim.keymap.set('n', 'u', 'uzz', { silent = true })
+-- vim.keymap.set('n', '<C-r>', '<C-r>zz', { silent = true })
 
 -- Add undo break-points
 vim.keymap.set("i", ",", ",<c-g>u")
