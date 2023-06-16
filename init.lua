@@ -410,7 +410,7 @@ require('lazy').setup({
         "hrsh7th/cmp-buffer",
         "hrsh7th/cmp-path",
         'saadparwaiz1/cmp_luasnip',
-        'kdheepak/cmp-latex-symbols',
+        -- 'kdheepak/cmp-latex-symbols',
         'onsails/lspkind-nvim',
         { 'roobert/tailwindcss-colorizer-cmp.nvim', config = true }
       },
@@ -513,11 +513,11 @@ require('lazy').setup({
             end, { "i", "s" }),
           },
           sources = cmp.config.sources({
-            { name = "nvim_lsp",      priority = 1000 },
-            { name = "luasnip",       priority = 750 },
-            { name = "buffer",        priority = 500 },
-            { name = "path",          priority = 250 },
-            { name = "latex_symbols", priority = 200 }
+            { name = "nvim_lsp", priority = 1000 },
+            { name = "luasnip",  priority = 750 },
+            { name = "buffer",   priority = 500 },
+            { name = "path",     priority = 250 }
+            -- { name = "latex_symbols", priority = 200 }
           }),
           experimental = {
             ghost_text = {
@@ -823,11 +823,11 @@ require('lazy').setup({
     --     show_current_context = true,
     --   },
     -- },
-    {
-      'j-hui/fidget.nvim',
-      event = { "BufReadPre", "BufNewFile" },
-      config = true
-    },
+    -- {
+    --   'j-hui/fidget.nvim',
+    --   event = { "BufReadPre", "BufNewFile" },
+    --   config = true
+    -- },
     { 'pbrisbin/vim-mkdir', event = 'VeryLazy' }, -- :e this/does/not/exist/file.txt then :w
     { 'justinmk/vim-gtfo',  event = 'VeryLazy' }, -- gof open file in filemanager
     {
@@ -845,15 +845,15 @@ require('lazy').setup({
         vim.keymap.set('n', '<leader>dd', '<Plug>(DBExeLine)')
       end
     },
-    {
-      'lervag/vimtex', -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
-      config = function()
-        vim.g['vimtex_quickfix_mode']       = 0
-        vim.g['vimtex_compiler_method']     = 'tectonic'
-        vim.g['vimtex_view_general_viewer'] = 'okular'
-        vim.g['vimtex_fold_enabled']        = true
-      end
-    },
+    -- {
+    --   'lervag/vimtex', -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
+    --   config = function()
+    --     vim.g['vimtex_quickfix_mode']       = 0
+    --     vim.g['vimtex_compiler_method']     = 'tectonic'
+    --     vim.g['vimtex_view_general_viewer'] = 'okular'
+    --     vim.g['vimtex_fold_enabled']        = true
+    --   end
+    -- },
     {
       'akinsho/toggleterm.nvim',
       cmd = { "ToggleTerm", "TermExec" },
