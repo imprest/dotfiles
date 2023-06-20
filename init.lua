@@ -142,8 +142,7 @@ require('lazy').setup({
           'williamboman/mason-lspconfig.nvim',
           opts = {
             ensure_installed = {
-              "lua_ls", "elixirls", "cssls", "html", "jsonls", "tsserver",
-              "tailwindcss", "texlab" }
+              "lua_ls", "elixirls", "cssls", "html", "jsonls", "tsserver", "tailwindcss", "svelte" }
           }
         }
       },
