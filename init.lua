@@ -242,7 +242,7 @@ require('lazy').setup({
           },
         })
 
-        local servers = { 'tailwindcss', 'svelte' }
+        local servers = { 'tailwindcss', 'svelte', 'typst_lsp' }
         for _, lsp in ipairs(servers) do
           lspconfig[lsp].setup {
             on_attach = on_attach,
@@ -843,6 +843,9 @@ require('lazy').setup({
         vim.keymap.set('o', '<leader>d', '<Plug>(DBExe)')
         vim.keymap.set('n', '<leader>dd', '<Plug>(DBExeLine)')
       end
+    },
+    {
+      'kaarmu/typst.vim', ft = 'typst', lazy = false
     },
     -- {
     --   'lervag/vimtex', -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
