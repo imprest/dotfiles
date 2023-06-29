@@ -133,11 +133,16 @@ require('lazy').setup({
       'neovim/nvim-lspconfig',
       event = { "BufReadPre", "BufNewFile" },
       dependencies = {
-        { "slashmili/alchemist.vim" },
         { 'elixir-editors/vim-elixir' },
         { "jose-elias-alvarez/typescript.nvim" },
-        { 'b0o/schemastore.nvim',              version = false },
-        { 'williamboman/mason.nvim',           config = true },
+        {
+          'b0o/schemastore.nvim',
+          version = false
+        },
+        {
+          'williamboman/mason.nvim',
+          opts = { ui = { border = "rounded" } }
+        },
         {
           'williamboman/mason-lspconfig.nvim',
           opts = {
@@ -707,13 +712,14 @@ require('lazy').setup({
       -- stylua: ignore
       keys = {
         {
-          "<leader>S",
+          "<A-s>",
           function() require("spectre").open() end,
           desc = "Replace in files (Spectre)"
         },
       },
     },
     {
+      -- Code skimming or outline for quick navigation
       'stevearc/aerial.nvim',
       opts = {
         on_attach = function(bufnr)
@@ -757,10 +763,10 @@ require('lazy').setup({
         -- indent = { enable = true, disable = { "python" } },            -- guess-indent is better and faster
         context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
         ensure_installed = {
-          "vim", "regex", "lua", "markdown", "markdown_inline",
+          "vim", "lua", "markdown", "markdown_inline",
           "css", "html", "javascript", "json", "typescript",
           "erlang", "elixir", "eex", "heex",
-          "ledger", "toml" --, "zig"
+          "ledger" --, "toml", "zig", "regex"
         },
         incremental_selection = {
           enable = true,
@@ -778,34 +784,34 @@ require('lazy').setup({
     },
 
     -- easily jump to any location and enhanced f/t motions for Leap
-    {
-      "ggandor/flit.nvim",
-      keys = function()
-        local ret = {}
-        for _, key in ipairs({ "f", "F", "t", "T" }) do
-          ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
-        end
-        return ret
-      end,
-      opts = { labeled_modes = "nx" },
-    },
-    {
-      "ggandor/leap.nvim",
-      keys = {
-        { "s",  mode = { "n", "x", "o" }, desc = "Leap forward to" },
-        { "S",  mode = { "n", "x", "o" }, desc = "Leap backward to" },
-        { "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
-      },
-      config = function(_, opts)
-        local leap = require("leap")
-        for k, v in pairs(opts) do
-          leap.opts[k] = v
-        end
-        leap.add_default_mappings(true)
-        vim.keymap.del({ "x", "o" }, "x")
-        vim.keymap.del({ "x", "o" }, "X")
-      end,
-    },
+    -- {
+    --   "ggandor/flit.nvim",
+    --   keys = function()
+    --     local ret = {}
+    --     for _, key in ipairs({ "f", "F", "t", "T" }) do
+    --       ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
+    --     end
+    --     return ret
+    --   end,
+    --   opts = { labeled_modes = "nx" },
+    -- },
+    -- {
+    --   "ggandor/leap.nvim",
+    --   keys = {
+    --     { "s",  mode = { "n", "x", "o" }, desc = "Leap forward to" },
+    --     { "S",  mode = { "n", "x", "o" }, desc = "Leap backward to" },
+    --     { "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
+    --   },
+    --   config = function(_, opts)
+    --     local leap = require("leap")
+    --     for k, v in pairs(opts) do
+    --       leap.opts[k] = v
+    --     end
+    --     leap.add_default_mappings(true)
+    --     vim.keymap.del({ "x", "o" }, "x")
+    --     vim.keymap.del({ "x", "o" }, "X")
+    --   end,
+    -- },
     {
       'lewis6991/gitsigns.nvim',
       event = { "BufReadPre", "BufNewFile" },
@@ -871,9 +877,45 @@ require('lazy').setup({
       end,
     },
     { 'mg979/vim-visual-multi', version = false, event = "VeryLazy" },
+    {
+      'folke/noice.nvim',
+      event = "VeryLazy",
+      opts = {
+        lsp = {
+          override = {
+            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+            ["vim.lsp.util.stylize_markdown"] = true,
+            ["cmp.entry.get_documentation"] = true,
+          },
+        },
+        routes = {
+          {
+            filter = {
+              event = "msg_show",
+              any = {
+                { find = "%d+L, %d+B" },
+                { find = "; after #%d+" },
+                { find = "; before #%d+" },
+              },
+            },
+            view = "mini",
+          },
+        },
+        presets = {
+          bottom_search = true,
+          command_palette = true,
+          long_message_to_split = true,
+          inc_rename = true,
+        },
+      },
+      dependencies = {
+        "MunifTanjim/nui.nvim", "rcarriga/nvim-notify"
+      }
+    }
   },
   {
-    checker = { enabled = true },
+    -- checker = { enabled = true },
+    ui = { border = "rounded" },
     performance = {
       rtp = {
         disabled_plugins = {
@@ -989,10 +1031,10 @@ vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 
 -- Resize window using <ctrl> arrow keys
-vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
-vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
-vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
-vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
+vim.keymap.set("n", "<A-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
+vim.keymap.set("n", "<A-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
+vim.keymap.set("n", "<A-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
+vim.keymap.set("n", "<A-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
 -- buffers
 vim.keymap.set("n", "<Right>", "<cmd>BufferLineCycleNext<cr>", { desc = "Prev buffer" })
@@ -1057,8 +1099,9 @@ wk.register({
   ["."] = { "<ESC><CMD>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", "Comment" }
 }, { prefix = "<leader>", mode = 'v' })
 wk.register({
+  ["a"] = { '<cmd>AerialToggle!<CR>', "AerialToggle" },
   ["b"] = { '<cmd>FzfLua buffers<CR>', "Buffers" },
-  ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
+  -- ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
   ["f"] = { '<cmd>FzfLua files<CR>', "Files" },
   ["gg"] = { '<cmd>lua _G.lazygit_toggle()<CR>', "lazygit" },
   ["<leader>"] = { '<C-^>', 'Last buffer' },
