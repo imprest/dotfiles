@@ -667,6 +667,7 @@ require('lazy').setup({
     {
       "nvim-neo-tree/neo-tree.nvim",
       cmd = "Neotree",
+      version = "v2.*",
       dependencies = { "MunifTanjim/nui.nvim" },
       keys = {
         { "<F2>", '<cmd>Neotree toggle<CR>', desc = "Toggle NeoTree" },
@@ -685,6 +686,7 @@ require('lazy').setup({
       end,
       opts = {
         close_if_last_window = true,
+        enable_git_status = false,
         source_selector = { statusline = true },
         filesystem = {
           bind_to_cwd = false,
@@ -818,16 +820,16 @@ require('lazy').setup({
       dependencies = { 'nvim-lua/plenary.nvim' },
       opts = { current_line_blame = false }
     },
-    -- {
-    --   "lukas-reineke/indent-blankline.nvim",
-    --   event = { "BufReadPost", "BufNewFile" },
-    --   opts = {
-    --     char = "┊",
-    --     filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
-    --     show_trailing_blankline_indent = false,
-    --     show_current_context = true,
-    --   },
-    -- },
+    {
+      "lukas-reineke/indent-blankline.nvim",
+      event = { "BufReadPost", "BufNewFile" },
+      opts = {
+        -- char = "┊",
+        filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
+        show_trailing_blankline_indent = false,
+        show_current_context = false,
+      },
+    },
     -- {
     --   'j-hui/fidget.nvim',
     --   event = { "BufReadPre", "BufNewFile" },
@@ -877,6 +879,7 @@ require('lazy').setup({
       end,
     },
     { 'mg979/vim-visual-multi', version = false, event = "VeryLazy" },
+    { 'karb94/neoscroll.nvim',  config = true },
     {
       'folke/noice.nvim',
       event = "VeryLazy",
@@ -903,7 +906,7 @@ require('lazy').setup({
         },
         presets = {
           bottom_search = true,
-          command_palette = true,
+          command_palette = false,
           long_message_to_split = true,
           inc_rename = true,
         },
@@ -1043,19 +1046,19 @@ vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer"
 vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
 
 -- Try and center these motions to the middle of the screen
--- vim.keymap.set({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
--- vim.keymap.set('n', 'n', 'nzz', { silent = true })
--- vim.keymap.set('n', 'N', 'Nzz', { silent = true })
--- vim.keymap.set('n', '*', '*zz', { silent = true })
--- vim.keymap.set('n', '#', '#zz', { silent = true })
--- vim.keymap.set('n', 'g*', 'g*zz', { silent = true })
--- vim.keymap.set('n', 'g#', 'g#zz', { silent = true })
--- vim.keymap.set('n', '<C-o>', '<C-o>zz', { silent = true })
--- vim.keymap.set('n', '<C-i>', '<C-i>zz', { silent = true })
+vim.keymap.set({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
+vim.keymap.set('n', 'n', 'nzz', { silent = true })
+vim.keymap.set('n', 'N', 'Nzz', { silent = true })
+vim.keymap.set('n', '*', '*zz', { silent = true })
+vim.keymap.set('n', '#', '#zz', { silent = true })
+vim.keymap.set('n', 'g*', 'g*zz', { silent = true })
+vim.keymap.set('n', 'g#', 'g#zz', { silent = true })
+vim.keymap.set('n', '<C-o>', '<C-o>zz', { silent = true })
+vim.keymap.set('n', '<C-i>', '<C-i>zz', { silent = true })
 -- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
 -- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
--- vim.keymap.set('n', 'u', 'uzz', { silent = true })
--- vim.keymap.set('n', '<C-r>', '<C-r>zz', { silent = true })
+vim.keymap.set('n', 'u', 'uzz', { silent = true })
+vim.keymap.set('n', '<C-r>', '<C-r>zz', { silent = true })
 
 -- Add undo break-points
 vim.keymap.set("i", ",", ",<c-g>u")
