@@ -23,8 +23,8 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu zsh ranger neovim python-pynvim fzf ripgrep bat \
-  ttf-firacode-nerd ttf-jetbrains-mono-nerd exa starship trash-cli lazygit fd ncdu\
+sudo pacman -Syu zsh ranger neovim python-pynvim fzf ripgrep bat lf wezterm \
+  ttf-firacode-nerd ttf-jetbrains-mono ttf-jetbrains-mono-nerd exa starship trash-cli lazygit fd ncdu\
   erlang elixir fop wxgtk inotify-tools postgresql
 # optional
 # weechat pdfarranger
