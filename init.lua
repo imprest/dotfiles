@@ -936,18 +936,20 @@ require('lazy').setup({
   })
 
 -------------------- OPTIONS -------------------------------
-local width           = 85
+local width            = 85
 -- global options
-vim.opt.backup        = false
-vim.opt.breakindent   = true
-vim.opt.completeopt   = 'menu,menuone,noselect' -- Completion options
-vim.opt.conceallevel  = 3                       -- Hide * markip for bold and italic
-vim.opt.cursorline    = false                   -- Highlight cursor line
+vim.opt.backup         = false
+vim.opt.breakindent    = true
+vim.opt.completeopt    = 'menu,menuone,noselect' -- Completion options
+vim.opt.conceallevel   = 3                       -- Hide * markip for bold and italic
+vim.opt.cursorline     = false                   -- Highlight cursor line
 -- vim.opt.equalalways              = false                   -- I don't like my windows changing all the time
-vim.opt.expandtab     = true                    -- Use spaces instead of tabs
-vim.opt.foldlevel     = 99
-vim.opt.foldmethod    = 'indent'
-vim.opt.formatoptions = 'cqn1jl' -- Automatic formatting options
+vim.opt.expandtab      = true                    -- Use spaces instead of tabs
+vim.opt.foldlevel      = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable     = true
+vim.opt.foldmethod     = 'indent'
+vim.opt.formatoptions  = 'cqn1jl' -- Automatic formatting options
 vim.cmd [[set formatoptions-=ro]]
 -- vim.opt.guicursor                = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
 vim.opt.grepformat = "%f:%l:%c:%m"
