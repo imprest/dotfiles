@@ -256,16 +256,6 @@ require('lazy').setup({
         end
       end
     },
-    -- Null-ls
-    {
-      "jay-babu/mason-null-ls.nvim",
-      dependencies = { 'jose-elias-alvarez/null-ls.nvim', 'williamboman/mason.nvim' },
-      config = function()
-        require('mason-null-ls').setup({
-          automatic_setup = true,
-        })
-      end
-    },
     -- snippets
     {
       "L3MON4D3/LuaSnip",
@@ -765,10 +755,10 @@ require('lazy').setup({
         -- indent = { enable = true, disable = { "python" } },            -- guess-indent is better and faster
         context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
         ensure_installed = {
-          "vim", "lua", "markdown", "markdown_inline",
+          "vim", "lua", "markdown", "markdown_inline", "bash", "regex",
           "css", "html", "javascript", "json", "typescript",
           "erlang", "elixir", "eex", "heex",
-          "ledger" --, "toml", "zig", "regex"
+          "ledger" --, "toml", "zig"
         },
         incremental_selection = {
           enable = true,
@@ -942,7 +932,7 @@ vim.opt.backup         = false
 vim.opt.breakindent    = true
 vim.opt.completeopt    = 'menu,menuone,noselect' -- Completion options
 vim.opt.conceallevel   = 3                       -- Hide * markip for bold and italic
-vim.opt.cursorline     = false                   -- Highlight cursor line
+vim.opt.cursorline     = true                    -- Highlight cursor line
 -- vim.opt.equalalways              = false                   -- I don't like my windows changing all the time
 vim.opt.expandtab      = true                    -- Use spaces instead of tabs
 vim.opt.foldlevel      = 99
@@ -1059,8 +1049,8 @@ vim.keymap.set('n', '<C-o>', '<C-o>zz', { silent = true })
 vim.keymap.set('n', '<C-i>', '<C-i>zz', { silent = true })
 -- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
 -- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
-vim.keymap.set('n', 'u', 'uzz', { silent = true })
-vim.keymap.set('n', '<C-r>', '<C-r>zz', { silent = true })
+-- vim.keymap.set('n', 'u', 'uzz', { silent = true })
+-- vim.keymap.set('n', '<C-r>', '<C-r>zz', { silent = true })
 
 -- Add undo break-points
 vim.keymap.set("i", ",", ",<c-g>u")
