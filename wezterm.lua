@@ -35,8 +35,8 @@ table.insert(mykeys, { key = "j", mods = "CTRL|ALT", action = act.AdjustPaneSize
 table.insert(mykeys, { key = "k", mods = "CTRL|ALT", action = act.AdjustPaneSize { "Up", 1 } })
 table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize { "Right", 1 } })
 
-config.font = wezterm.font('JetBrains Mono', { weight = 'Bold', italic = false, stretch = "Normal" })
-config.font_size = 10.0
+config.font = wezterm.font('JetBrains Mono', { weight = 'Medium', italic = false, stretch = "Normal" })
+config.font_size = 10.5
 config.harfbuzz_features = {
   'calt=1',
   'clig=1',
@@ -80,7 +80,7 @@ config.window_padding = {
 }
 config.audible_bell = "Disabled"
 config.scrollback_lines = 10000
-config.color_scheme = "DoomOne" -- "OneDark (base16)"
+config.color_scheme = "OneDark (base16)"
 config.exit_behavior = "Close"
 config.keys = mykeys
 
