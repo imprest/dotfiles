@@ -36,7 +36,7 @@ table.insert(mykeys, { key = "k", mods = "CTRL|ALT", action = act.AdjustPaneSize
 table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize { "Right", 1 } })
 
 config.font = wezterm.font('JetBrains Mono', { weight = 'Medium', italic = false, stretch = "Normal" })
-config.font_size = 10.5
+config.font_size = 10.85
 config.harfbuzz_features = {
   'calt=1',
   'clig=1',
