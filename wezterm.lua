@@ -36,7 +36,7 @@ table.insert(mykeys, { key = "k", mods = "CTRL|ALT", action = act.AdjustPaneSize
 table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize { "Right", 1 } })
 
 config.font = wezterm.font('JetBrains Mono', { weight = 'Medium', italic = false, stretch = "Normal" })
-config.font_size = 10.85
+config.font_size = 10
 config.harfbuzz_features = {
   'calt=1',
   'clig=1',
@@ -46,9 +46,9 @@ config.harfbuzz_features = {
   -- 'ss01',
   -- 'ss02',
   -- 'ss19', -- == !=
-  'cv01', -- l
+  -- 'cv01', -- l
   -- 'cv02', -- t
-  'cv03', -- g
+  -- 'cv03', -- g
   -- 'cv04', -- j
   -- 'cv05', -- l
   -- 'cv06', -- m
@@ -63,9 +63,9 @@ config.harfbuzz_features = {
   -- 'cv16', -- Q
   -- 'cv17', -- f
   -- 'cv18', -- 269
-  'cv19', -- 8
+  -- 'cv19', -- 8
   -- 'cv20', -- 5
-  'cv99'  -- "Highlights Cyrillic Cc for debugging purposes"
+  'cv99' -- "Highlights Cyrillic Cc for debugging purposes"
 }
 config.default_cursor_style = "SteadyBar"
 config.force_reverse_video_cursor = true

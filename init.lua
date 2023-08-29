@@ -134,6 +134,7 @@ require('lazy').setup({
       event = { "BufReadPre", "BufNewFile" },
       dependencies = {
         { 'elixir-editors/vim-elixir' },
+        { 'elixir-tools/elixir-tools.nvim' },
         { "jose-elias-alvarez/typescript.nvim" },
         {
           'b0o/schemastore.nvim',
@@ -147,7 +148,7 @@ require('lazy').setup({
           'williamboman/mason-lspconfig.nvim',
           opts = {
             ensure_installed = {
-              "lua_ls", "elixirls", "cssls", "html", "jsonls", "tsserver", "tailwindcss", "svelte" }
+              "lua_ls", "cssls", "html", "jsonls", "tsserver", "tailwindcss", "svelte" }
           }
         }
       },
@@ -195,19 +196,39 @@ require('lazy').setup({
             vim.keymap.set('n', '<leader>cR', '<cmd>TypescriptRenameFile<CR>',
               { buffer = bufnr, desc = "Rename File" })
           end
+          if client.name == "elixirls" then
+            vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
+            vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
+            vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
+          end
         end
 
         local lspconfig = require("lspconfig")
         local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol
           .make_client_capabilities())
 
-        lspconfig.elixirls.setup {
-          on_attach = on_attach,
-          capabilities = capabilities,
-          settings = {
-            elixirLS = {
-              dialyzerEnabled = true
-            }
+        -- lspconfig.elixirls.setup {
+        --   on_attach = on_attach,
+        --   capabilities = capabilities,
+        --   settings = {
+        --     elixirLS = {
+        --       dialyzerEnabled = true
+        --     }
+        --   }
+        -- }
+        local elixir = require("elixir")
+        local elixirls = require("elixir.elixirls")
+
+        elixir.setup {
+          nextls = { enable = true },
+          credo = { enable = true },
+          elixirls = {
+            enable = true,
+            settings = elixirls.settings {
+              dialyzerEnabled = false,
+              enableTestLenses = false,
+            },
+            on_attach = on_attach
           }
         }
 
@@ -750,9 +771,9 @@ require('lazy').setup({
           enable = true, -- windwp/nvim-ts-autotag
           filetypes = { 'html', 'javascript', 'typescript', 'svelte', 'vue', 'xml', 'markdown', 'heex' }
         },
-        endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
+        endwise = { enable = true },                                       -- RRethy/nvim-treesitter-endwise
         highlight = { enable = true },
-        -- indent = { enable = true, disable = { "python" } },            -- guess-indent is better and faster
+        indent = { enable = true, disable = { "python" } },                -- guess-indent is better and faster
         context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
         ensure_installed = {
           "vim", "lua", "markdown", "markdown_inline", "bash", "regex",
@@ -832,7 +853,7 @@ require('lazy').setup({
       ft = "sql",
       dependencies = { 'tpope/vim-dadbod' },
       config = function()
-        vim.g['db'] = "postgresql://hvaria:@localhost/mgp_dev"
+        vim.g['db'] = "postgresql://postgres:@localhost/mgp_dev"
         vim.keymap.set('x', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
         vim.keymap.set('n', '<Plug>(DBExe)', 'db#op_exec()', { expr = true })
         vim.keymap.set('n', '<Plug>(DBExeLine)', 'db#op_exec() . \'_\'', { expr = true })
