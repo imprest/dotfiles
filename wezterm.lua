@@ -35,7 +35,8 @@ table.insert(mykeys, { key = "j", mods = "CTRL|ALT", action = act.AdjustPaneSize
 table.insert(mykeys, { key = "k", mods = "CTRL|ALT", action = act.AdjustPaneSize { "Up", 1 } })
 table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize { "Right", 1 } })
 
-config.font = wezterm.font('JetBrains Mono', { weight = 'Medium', italic = false, stretch = "Normal" })
+config.line_height = 1.1
+config.font = wezterm.font('JetBrains Mono', { weight = 'DemiBold', italic = false, stretch = "Normal" })
 config.font_size = 10
 config.harfbuzz_features = {
   'calt=1',
@@ -72,8 +73,8 @@ config.force_reverse_video_cursor = true
 config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = false
 config.window_decorations = "RESIZE"
-config.initial_cols = 128
-config.initial_rows = 34
+config.initial_cols = 130
+config.initial_rows = 38
 config.window_padding = {
   left = 0,
   right = 0,
