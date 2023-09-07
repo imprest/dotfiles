@@ -38,6 +38,7 @@ table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize
 config.line_height = 1.1
 config.font = wezterm.font('JetBrains Mono', { weight = 'DemiBold', italic = false, stretch = "Normal" })
 config.font_size = 9.5
+config.warn_about_missing_glyphs = false
 config.harfbuzz_features = {
   'calt=1',
   'clig=1',
@@ -69,6 +70,9 @@ config.harfbuzz_features = {
   'cv99' -- "Highlights Cyrillic Cc for debugging purposes"
 }
 config.default_cursor_style = "SteadyBar"
+config.animation_fps = 1
+config.cursor_blink_ease_in = 'Constant'
+config.cursor_blink_ease_out = 'Constant'
 config.force_reverse_video_cursor = true
 config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = false

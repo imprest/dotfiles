@@ -76,41 +76,6 @@ require('lazy').setup({
         }
       }
     },
-    -- references i.e. highlight same work undercursor
-    {
-      "RRethy/vim-illuminate",
-      event = { "BufReadPost", "BufNewFile" },
-      opts = { delay = 200 },
-      config = function(_, opts)
-        require("illuminate").configure(opts)
-
-        local function map(key, dir, buffer)
-          vim.keymap.set("n", key, function()
-              require("illuminate")["goto_" .. dir .. "_reference"](false)
-            end,
-            {
-              desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference",
-              buffer = buffer
-            })
-        end
-
-        map("]]", "next")
-        map("[[", "prev")
-
-        -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
-        vim.api.nvim_create_autocmd("FileType", {
-          callback = function()
-            local buffer = vim.api.nvim_get_current_buf()
-            map("]]", "next", buffer)
-            map("[[", "prev", buffer)
-          end,
-        })
-      end,
-      keys = {
-        { "]]", desc = "Next Reference" },
-        { "[[", desc = "Prev Reference" },
-      },
-    },
     {
       'leafOfTree/vim-svelte-plugin',
       ft = { "svelte" },
@@ -268,7 +233,7 @@ require('lazy').setup({
           },
         })
 
-        local servers = { 'tailwindcss', 'svelte', 'typst_lsp' }
+        local servers = { 'tailwindcss', 'svelte' } -- , 'typst_lsp' }
         for _, lsp in ipairs(servers) do
           lspconfig[lsp].setup {
             on_attach = on_attach,
@@ -422,10 +387,11 @@ require('lazy').setup({
       -- these dependencies will only be loaded when cmp loads
       dependencies = {
         "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/cmp-nvim-lsp-signature-help",
         "hrsh7th/cmp-buffer",
         "hrsh7th/cmp-path",
         'saadparwaiz1/cmp_luasnip',
-        -- 'kdheepak/cmp-latex-symbols',
+        'kdheepak/cmp-latex-symbols',
         'onsails/lspkind-nvim',
         { 'roobert/tailwindcss-colorizer-cmp.nvim', config = true }
       },
@@ -455,7 +421,7 @@ require('lazy').setup({
         end
 
         local format_kinds = lspkind_status_ok and
-            lspkind.cmp_format({ mode = 'symbol', maxwidth = 50, ellipsis_char = '...' }) or nil
+            lspkind.cmp_format({ maxwidth = 50, ellipsis_char = '...' }) or nil
 
         return {
           formatting = {
@@ -469,6 +435,7 @@ require('lazy').setup({
             end
           },
           completion = {
+            keyword_length = 3,
             completeopt = "menu,menuone,noselect",
           },
           snippet = {
@@ -501,7 +468,7 @@ require('lazy').setup({
             ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
             ["<C-y>"] = cmp.config.disable,
             ["<C-e>"] = cmp.mapping { i = cmp.mapping.abort(), c = cmp.mapping.close() },
-            ["<CR>"] = cmp.mapping.confirm { select = true },
+            ["<CR>"] = cmp.mapping.confirm({ select = true }),
             ["<S-CR>"] = cmp.mapping.confirm({
               behavior = cmp.ConfirmBehavior.Replace,
               select = true,
@@ -528,11 +495,12 @@ require('lazy').setup({
             end, { "i", "s" }),
           },
           sources = cmp.config.sources({
-            { name = "nvim_lsp", priority = 1000 },
-            { name = "luasnip",  priority = 750 },
-            { name = "buffer",   priority = 500 },
-            { name = "path",     priority = 250 }
-            -- { name = "latex_symbols", priority = 200 }
+            { name = "nvim_lsp",                priority = 1000 },
+            { name = "nvim_lsp_signature_help", priority = 900 },
+            { name = "luasnip",                 priority = 750 },
+            { name = "buffer",                  priority = 500 },
+            { name = "path",                    priority = 250 },
+            { name = "latex_symbols",           priority = 200 }
           }),
           experimental = {
             ghost_text = {
@@ -771,9 +739,9 @@ require('lazy').setup({
           enable = true, -- windwp/nvim-ts-autotag
           filetypes = { 'html', 'javascript', 'typescript', 'svelte', 'vue', 'xml', 'markdown', 'heex' }
         },
-        endwise = { enable = true },                                       -- RRethy/nvim-treesitter-endwise
+        endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
         highlight = { enable = true },
-        indent = { enable = true, disable = { "python" } },                -- guess-indent is better and faster
+        -- indent = { enable = true, disable = { "python" } },                -- guess-indent is better and faster
         context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
         ensure_installed = {
           "vim", "lua", "markdown", "markdown_inline", "bash", "regex",
@@ -795,36 +763,6 @@ require('lazy').setup({
         require("nvim-treesitter.configs").setup(opts)
       end
     },
-
-    -- easily jump to any location and enhanced f/t motions for Leap
-    -- {
-    --   "ggandor/flit.nvim",
-    --   keys = function()
-    --     local ret = {}
-    --     for _, key in ipairs({ "f", "F", "t", "T" }) do
-    --       ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
-    --     end
-    --     return ret
-    --   end,
-    --   opts = { labeled_modes = "nx" },
-    -- },
-    -- {
-    --   "ggandor/leap.nvim",
-    --   keys = {
-    --     { "s",  mode = { "n", "x", "o" }, desc = "Leap forward to" },
-    --     { "S",  mode = { "n", "x", "o" }, desc = "Leap backward to" },
-    --     { "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
-    --   },
-    --   config = function(_, opts)
-    --     local leap = require("leap")
-    --     for k, v in pairs(opts) do
-    --       leap.opts[k] = v
-    --     end
-    --     leap.add_default_mappings(true)
-    --     vim.keymap.del({ "x", "o" }, "x")
-    --     vim.keymap.del({ "x", "o" }, "X")
-    --   end,
-    -- },
     {
       'lewis6991/gitsigns.nvim',
       event = { "BufReadPre", "BufNewFile" },
@@ -832,20 +770,8 @@ require('lazy').setup({
       opts = { current_line_blame = false }
     },
     {
-      "lukas-reineke/indent-blankline.nvim",
-      event = { "BufReadPost", "BufNewFile" },
-      opts = {
-        -- char = "┊",
-        filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
-        show_trailing_blankline_indent = false,
-        show_current_context = false,
-      },
+      'j-hui/fidget.nvim', tag = "legacy", event = "LspAttach", config = true
     },
-    -- {
-    --   'j-hui/fidget.nvim',
-    --   event = { "BufReadPre", "BufNewFile" },
-    --   config = true
-    -- },
     { 'pbrisbin/vim-mkdir', event = 'VeryLazy' }, -- :e this/does/not/exist/file.txt then :w
     { 'justinmk/vim-gtfo',  event = 'VeryLazy' }, -- gof open file in filemanager
     {
@@ -863,18 +789,18 @@ require('lazy').setup({
         vim.keymap.set('n', '<leader>dd', '<Plug>(DBExeLine)')
       end
     },
-    {
-      'kaarmu/typst.vim', ft = 'typst', lazy = false
-    },
     -- {
-    --   'lervag/vimtex', -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
-    --   config = function()
-    --     vim.g['vimtex_quickfix_mode']       = 0
-    --     vim.g['vimtex_compiler_method']     = 'tectonic'
-    --     vim.g['vimtex_view_general_viewer'] = 'okular'
-    --     vim.g['vimtex_fold_enabled']        = true
-    --   end
+    --   'kaarmu/typst.vim', ft = 'typst', lazy = false
     -- },
+    {
+      'lervag/vimtex', -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
+      config = function()
+        vim.g['vimtex_quickfix_mode']       = 0
+        vim.g['vimtex_compiler_method']     = 'tectonic'
+        vim.g['vimtex_view_general_viewer'] = 'evince'
+        vim.g['vimtex_fold_enabled']        = true
+      end
+    },
     {
       'akinsho/toggleterm.nvim',
       cmd = { "ToggleTerm", "TermExec" },
@@ -891,41 +817,6 @@ require('lazy').setup({
     },
     { 'mg979/vim-visual-multi', version = false, event = "VeryLazy" },
     { 'karb94/neoscroll.nvim',  config = true },
-    {
-      'folke/noice.nvim',
-      event = "VeryLazy",
-      opts = {
-        lsp = {
-          override = {
-            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-            ["vim.lsp.util.stylize_markdown"] = true,
-            ["cmp.entry.get_documentation"] = true,
-          },
-        },
-        routes = {
-          {
-            filter = {
-              event = "msg_show",
-              any = {
-                { find = "%d+L, %d+B" },
-                { find = "; after #%d+" },
-                { find = "; before #%d+" },
-              },
-            },
-            view = "mini",
-          },
-        },
-        presets = {
-          bottom_search = true,
-          command_palette = false,
-          long_message_to_split = true,
-          inc_rename = true,
-        },
-      },
-      dependencies = {
-        "MunifTanjim/nui.nvim", "rcarriga/nvim-notify"
-      }
-    }
   },
   {
     -- checker = { enabled = true },
@@ -953,16 +844,16 @@ vim.opt.backup         = false
 vim.opt.breakindent    = true
 vim.opt.completeopt    = 'menu,menuone,noselect' -- Completion options
 vim.opt.conceallevel   = 3                       -- Hide * markip for bold and italic
-vim.opt.cursorline     = true                    -- Highlight cursor line
--- vim.opt.equalalways              = false                   -- I don't like my windows changing all the time
+vim.opt.cursorline     = false                   -- Highlight cursor line
+vim.opt.equalalways    = false                   -- I don't like my windows changing all the time
 vim.opt.expandtab      = true                    -- Use spaces instead of tabs
 vim.opt.foldlevel      = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable     = true
 vim.opt.foldmethod     = 'indent'
-vim.opt.formatoptions  = 'cqn1jl' -- Automatic formatting options
+vim.opt.formatoptions  = 'qn1jl' -- Automatic formatting options
 vim.cmd [[set formatoptions-=ro]]
--- vim.opt.guicursor                = 'i-ci-ve:ver25,r-cr:hor20,o:hor50' --,a:blinkon1'
+vim.opt.guicursor  = 'i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1'
 vim.opt.grepformat = "%f:%l:%c:%m"
 vim.opt.grepprg    = "rg --vimgrep"
 vim.opt.ignorecase = true  -- Ignore case
@@ -1002,7 +893,7 @@ vim.opt.undofile      = true
 vim.opt.updatetime    = 200                 -- make updates faster and trigger CursorHold
 vim.opt.wildmode      = "longest:full,full" -- Command-line completion mode
 vim.opt.winminwidth   = 5                   -- Minimum window width
-vim.opt.wrap          = false               -- Disable line wrap
+vim.opt.wrap          = true                -- Disable line wrap
 vim.opt.writebackup   = false
 
 -------------------- MAPPINGS ------------------------------
