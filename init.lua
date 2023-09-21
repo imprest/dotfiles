@@ -155,6 +155,9 @@ require('lazy').setup({
           vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
           vim.keymap.set('n', 'gS', vim.lsp.buf.signature_help, bufopts)
           vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+          if vim.lsp.inlay_hint then
+            vim.keymap.set("n", "<leader>uh", function() vim.lsp.inlay_hint(0, nil) end, { desc = "Toggle Inlay Hints" })
+          end
           if client.name == "tsserver" then
             vim.keymap.set('n', '<leader>co', '<cmd>TypescriptOrganizeImports<CR>',
               { buffer = bufnr, desc = "Organize Imports" })
@@ -200,7 +203,7 @@ require('lazy').setup({
         lspconfig.lua_ls.setup {
           on_attach = on_attach,
           capabilities = capabilities,
-          settings = { Lua = { diagnostics = { globals = { "vim" } } } }
+          settings = { Lua = { hint = { enable = true }, diagnostics = { globals = { "vim" } } } }
         }
 
         lspconfig.jsonls.setup {
