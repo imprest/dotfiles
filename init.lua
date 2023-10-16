@@ -30,13 +30,13 @@ require("lazy").setup({
         -- the presets plugin, adds help for a bunch of default keybindings in Neovim
         -- No actual key bindings are created
         presets = {
-          operators = false, -- adds help for operators like d, y, ...
-          motions = false, -- adds help for motions
+          operators = false,    -- adds help for operators like d, y, ...
+          motions = false,      -- adds help for motions
           text_objects = false, -- help for text objects triggered after entering an operator
-          windows = true, -- default bindings on <c-w>
-          nav = true, -- misc bindings to work with windows
-          z = true, -- bindings for folds, spelling and others prefixed with z
-          g = true, -- bindings for prefixed with g
+          windows = true,       -- default bindings on <c-w>
+          nav = true,           -- misc bindings to work with windows
+          z = true,             -- bindings for folds, spelling and others prefixed with z
+          g = true,             -- bindings for prefixed with g
         },
       },
     },
@@ -49,8 +49,8 @@ require("lazy").setup({
   },
   {
     "NTBBloodbath/doom-one.nvim",
-    lazy = false, -- make sure we load this during startup if it is your main colorscheme
-    priority = 1000, -- make sure to load this before all the other start plugins
+    lazy = false,       -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000,    -- make sure to load this before all the other start plugins
     config = function() -- load the colorscheme here
       -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
       vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]])
@@ -159,8 +159,8 @@ require("lazy").setup({
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
         vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
+        vim.keymap.set("n", "<c-k>", vim.lsp.buf.signature_help, bufopts)
         vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
-        vim.keymap.set("n", "gS", vim.lsp.buf.signature_help, bufopts)
         vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
         if vim.lsp.inlay_hint then
           vim.keymap.set("n", "<leader>uh", function()
@@ -174,17 +174,22 @@ require("lazy").setup({
             "<cmd>TypescriptOrganizeImports<CR>",
             { buffer = bufnr, desc = "Organize Imports" }
           )
-          vim.keymap.set("n", "<leader>cR", "<cmd>TypescriptRenameFile<CR>", { buffer = bufnr, desc = "Rename File" })
+          vim.keymap.set("n", "<leader>cR", "<cmd>TypescriptRenameFile<CR>",
+            { buffer = bufnr, desc = "Rename File" })
         end
         if client.name == "elixirls" then
-          vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
-          vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
-          vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
+          vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>",
+            { buffer = true, noremap = true })
+          vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>",
+            { buffer = true, noremap = true })
+          vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>",
+            { buffer = true, noremap = true })
         end
       end
 
       local lspconfig = require("lspconfig")
-      local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+      local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol
+        .make_client_capabilities())
 
       -- lspconfig.elixirls.setup {
       --   on_attach = on_attach,
@@ -223,7 +228,8 @@ require("lazy").setup({
         -- lazy-load schemastore when needed
         on_new_config = function(new_config)
           new_config.settings.json.schemas = new_config.settings.json.schemas or {}
-          vim.list_extend(new_config.settings.json.schemas, require("schemastore").json.schemas())
+          vim.list_extend(new_config.settings.json.schemas,
+            require("schemastore").json.schemas())
         end,
         settings = {
           json = {
@@ -235,9 +241,9 @@ require("lazy").setup({
       -- jose-elias-alvarez/typescript.nvim
       require("typescript").setup({
         disable_commands = false, -- prevent the plugin from creating Vim commands
-        debug = false, -- enable debug logging for commands
+        debug = false,            -- enable debug logging for commands
         go_to_source_definition = {
-          fallback = true, -- fall back to standard LSP definition on failure
+          fallback = true,        -- fall back to standard LSP definition on failure
         },
         server = {
           on_attach = on_attach,
@@ -319,7 +325,7 @@ require("lazy").setup({
       local lsnip = require("luasnip")
       require("luasnip.loaders.from_lua").load({ paths = "~/dotfiles/snippets/" })
       lsnip.config.set_config({
-        history = true, -- keep around last snippet local to jump back
+        history = true,                            -- keep around last snippet local to jump back
         updateevents = "TextChanged,TextChangedI", -- update changes as you type
         delete_check_events = "TextChanged",
         enable_autosnippets = true,
@@ -413,33 +419,33 @@ require("lazy").setup({
     cmd = { "TodoTrouble" },
     event = { "BufReadPost", "BufNewFile" },
     config = true,
-      -- stylua: ignore
-      keys = {
-        {
-          "]t",
-          function() require("todo-comments").jump_next() end,
-          desc =
-          "Next todo comment"
-        },
-        {
-          "[t",
-          function() require("todo-comments").jump_prev() end,
-          desc =
-          "Previous todo comment"
-        },
-        {
-          "<leader>xt",
-          "<cmd>TodoTrouble<cr>",
-          desc =
-          "Todo (Trouble)"
-        },
-        {
-          "<leader>xT",
-          "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
-          desc =
-          "Todo/Fix/Fixme (Trouble)"
-        },
+    -- stylua: ignore
+    keys = {
+      {
+        "]t",
+        function() require("todo-comments").jump_next() end,
+        desc =
+        "Next todo comment"
       },
+      {
+        "[t",
+        function() require("todo-comments").jump_prev() end,
+        desc =
+        "Previous todo comment"
+      },
+      {
+        "<leader>xt",
+        "<cmd>TodoTrouble<cr>",
+        desc =
+        "Todo (Trouble)"
+      },
+      {
+        "<leader>xT",
+        "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
+        desc =
+        "Todo/Fix/Fixme (Trouble)"
+      },
+    },
   },
 
   -- Better Escape
@@ -449,10 +455,10 @@ require("lazy").setup({
   },
 
   -- auto completion
-  { "windwp/nvim-autopairs", config = true },
+  { "windwp/nvim-autopairs",    config = true },
   {
     "hrsh7th/nvim-cmp",
-    version = false, -- last release is way too old
+    version = false,       -- last release is way too old
     event = "InsertEnter", -- load cmp on InsertEnter
     -- these dependencies will only be loaded when cmp loads
     dependencies = {
@@ -484,10 +490,12 @@ require("lazy").setup({
       local has_words_before = function()
         unpack = unpack or table.unpack
         local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+        return col ~= 0 and
+            vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
       end
 
-      local format_kinds = lspkind_status_ok and lspkind.cmp_format({ maxwidth = 50, ellipsis_char = "..." }) or nil
+      local format_kinds = lspkind_status_ok and
+          lspkind.cmp_format({ maxwidth = 50, ellipsis_char = "..." }) or nil
 
       return {
         formatting = {
@@ -558,12 +566,12 @@ require("lazy").setup({
           end, { "i", "s" }),
         },
         sources = cmp.config.sources({
-          { name = "nvim_lsp", priority = 1000 },
+          { name = "nvim_lsp",                priority = 1000 },
           { name = "nvim_lsp_signature_help", priority = 900 },
-          { name = "luasnip", priority = 750 },
-          { name = "buffer", priority = 500 },
-          { name = "path", priority = 250 },
-          { name = "latex_symbols", priority = 200 },
+          { name = "luasnip",                 priority = 750 },
+          { name = "buffer",                  priority = 500 },
+          { name = "path",                    priority = 250 },
+          { name = "latex_symbols",           priority = 200 },
         }),
         experimental = {
           ghost_text = {
@@ -705,7 +713,7 @@ require("lazy").setup({
   {
     "nvim-neo-tree/neo-tree.nvim",
     cmd = "Neotree",
-    version = "v2.*",
+    version = "v3.*",
     dependencies = { "MunifTanjim/nui.nvim" },
     keys = {
       { "<F2>", "<cmd>Neotree toggle<CR>", desc = "Toggle NeoTree" },
@@ -798,11 +806,12 @@ require("lazy").setup({
     opts = {
       autotag = {
         enable = true, -- windwp/nvim-ts-autotag
-        filetypes = { "html", "javascript", "typescript", "svelte", "vue", "xml", "markdown", "heex" },
+        filetypes = { "html", "javascript", "typescript", "svelte", "vue", "xml", "markdown",
+          "heex" },
       },
-      endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
+      endwise = { enable = true },                                       -- RRethy/nvim-treesitter-endwise
       highlight = { enable = true },
-      indent = { enable = true, disable = { "python" } }, -- guess-indent is better and faster
+      indent = { enable = true, disable = { "python" } },                -- guess-indent is better and faster
       context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
       ensure_installed = {
         "vim",
@@ -828,7 +837,7 @@ require("lazy").setup({
         keymaps = {
           init_selection = "<C-space>",
           node_incremental = "<C-space>",
-          scope_incremental = "<nop>",
+          scope_incremental = "<c-s>",
           node_decremental = "<space>",
         },
       },
@@ -850,7 +859,7 @@ require("lazy").setup({
     config = true,
   },
   { "pbrisbin/vim-mkdir", event = "VeryLazy" }, -- :e this/does/not/exist/file.txt then :w
-  { "justinmk/vim-gtfo", event = "VeryLazy" }, -- gof open file in filemanager
+  { "justinmk/vim-gtfo",  event = "VeryLazy" }, -- gof open file in filemanager
   {
     "kristijanhusak/vim-dadbod-completion",
     ft = "sql",
@@ -885,15 +894,16 @@ require("lazy").setup({
     opts = { open_mapping = [[<A-,>]], shading_factor = 1 },
   },
   {
-    "echasnovski/mini.surround", -- sr({ sd' <select text>sa'
+    "echasnovski/mini.surround",                                         -- sr({ sd' <select text>sa'
     keys = { "sr", "sh", "sf", "sF", "sd", "sn", { "sa", mode = "v" } }, -- Only load on these keystrokes
     version = false,
     config = function()
       require("mini.surround").setup()
     end,
   },
-  { "mg979/vim-visual-multi", version = false, event = "VeryLazy" },
-  { "karb94/neoscroll.nvim", config = true },
+  { "mg979/vim-visual-multi", version = false,                       event = "VeryLazy" },
+  { "karb94/neoscroll.nvim",  config = true },
+  { "kevinhwang91/nvim-ufo",  require = 'kevinhwang91/promise-async' }
 }, {
   -- checker = { enabled = true },
   ui = { border = "rounded" },
@@ -916,13 +926,15 @@ require("lazy").setup({
 -------------------- OPTIONS -------------------------------
 local width = 85
 -- global options
+vim.opt.hlsearch = false
 vim.opt.backup = false
 vim.opt.breakindent = true
 vim.opt.completeopt = "menu,menuone,noselect" -- Completion options
-vim.opt.conceallevel = 3 -- Hide * markip for bold and italic
-vim.opt.cursorline = false -- Highlight cursor line
-vim.opt.equalalways = false -- I don't like my windows changing all the time
-vim.opt.expandtab = true -- Use spaces instead of tabs
+vim.opt.conceallevel = 3                      -- Hide * markip for bold and italic
+vim.opt.cursorline = false                    -- Highlight cursor line
+vim.opt.equalalways = false                   -- I don't like my windows changing all the time
+vim.opt.expandtab = true                      -- Use spaces instead of tabs
+vim.opt.foldcolumn = '1'                      -- '0' is not bad
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
@@ -932,44 +944,44 @@ vim.cmd([[set formatoptions-=ro]])
 vim.opt.guicursor = "i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1"
 vim.opt.grepformat = "%f:%l:%c:%m"
 vim.opt.grepprg = "rg --vimgrep"
-vim.opt.ignorecase = true -- Ignore case
+vim.opt.ignorecase = true  -- Ignore case
 vim.opt.joinspaces = false -- No double spaces with join
-vim.opt.laststatus = 3 -- global statusline
+vim.opt.laststatus = 3     -- global statusline
 vim.opt.linebreak = true
-vim.opt.list = true -- Show some invisible characters
+vim.opt.list = true        -- Show some invisible characters
 vim.opt.listchars = "tab:▸ ,extends:>,precedes:<"
-vim.opt.mouse = "a" -- Allow the mouse
-vim.opt.number = true -- Show line numbers
-vim.opt.pumheight = 10 -- Maximum number of entries in a popup
-vim.opt.scrolljump = 4 -- min. lines to scroll
-vim.opt.scrolloff = 4 -- Lines of context
-vim.opt.shiftround = true -- Round indent
-vim.opt.shiftwidth = 2 -- Size of an indent
+vim.opt.mouse = "a"        -- Allow the mouse
+vim.opt.number = true      -- Show line numbers
+vim.opt.pumheight = 10     -- Maximum number of entries in a popup
+vim.opt.scrolljump = 4     -- min. lines to scroll
+vim.opt.scrolloff = 4      -- Lines of context
+vim.opt.shiftround = true  -- Round indent
+vim.opt.shiftwidth = 2     -- Size of an indent
 -- vim.opt.shortmess                = 'IFc' -- Avoid showing extra message on completion
 vim.opt.shortmess:append({ W = true, I = true, c = true })
 vim.opt.showbreak = "↪  "
 vim.opt.showbreak = "↪  "
 vim.opt.showmatch = true
-vim.opt.showmode = false -- Don't show mode since we have a statusline
-vim.opt.sidescrolloff = 8 -- Columns of context
+vim.opt.showmode = false     -- Don't show mode since we have a statusline
+vim.opt.sidescrolloff = 8    -- Columns of context
 vim.opt.signcolumn = "yes:1" -- Show sign column
-vim.opt.smartcase = true -- Don't ignore case with capitals
+vim.opt.smartcase = true     -- Don't ignore case with capitals
 -- vim.opt.smartindent   = true    -- Insert indents automatically
 vim.opt.spelllang = { "en_GB" }
 vim.opt.softtabstop = 2
-vim.opt.splitbelow = true -- Put new windows below current
-vim.opt.splitright = true -- Put new windows right of current
+vim.opt.splitbelow = true    -- Put new windows below current
+vim.opt.splitright = true    -- Put new windows right of current
 vim.opt.swapfile = false
-vim.opt.tabstop = 2 -- Number of spaces tabs count for
+vim.opt.tabstop = 2          -- Number of spaces tabs count for
 vim.opt.termguicolors = true -- True color support
-vim.opt.textwidth = width -- Maximum width of text
-vim.opt.timeoutlen = 100 -- mapping timeout
+vim.opt.textwidth = width    -- Maximum width of text
+vim.opt.timeoutlen = 300     -- mapping timeout
 vim.opt.undodir = "/home/hvaria/.nvim/undo"
 vim.opt.undofile = true
-vim.opt.updatetime = 200 -- make updates faster and trigger CursorHold
+vim.opt.updatetime = 250               -- make updates faster and trigger CursorHold
 vim.opt.wildmode = "longest:full,full" -- Command-line completion mode
-vim.opt.winminwidth = 5 -- Minimum window width
-vim.opt.wrap = true -- Disable line wrap
+vim.opt.winminwidth = 5                -- Minimum window width
+vim.opt.wrap = true                    -- Disable line wrap
 vim.opt.writebackup = false
 
 -------------------- MAPPINGS ------------------------------
@@ -1046,11 +1058,15 @@ vim.keymap.set("i", ".", ".<c-g>u")
 vim.keymap.set("i", ";", ";<c-g>u")
 
 -- save file
-vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>update<cr><esc>", { desc = "Save file" })
+vim.keymap.set({ "i", "v", "n", "s" }, "<leader>w", "<cmd>update<cr><esc>", { desc = "Save file" })
 
 -- better indenting
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
+
+-- ufo key bindings
+vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 
 -- which-key
 local wk = require("which-key")
@@ -1069,7 +1085,7 @@ wk.register({
   ["s"] = { "<cmd>split<CR>", "Split horizontal" },
   ["v"] = { "<C-w>v<C-w>l", "Split vertical" },
   ["w"] = { "<cmd>w!<CR>", "Save" },
-  ["d"] = { "<cmd>Bdelete<CR>", "Close Buffer" }, -- bufdelete plugin
+  ["d"] = { "<cmd>Bdelete<CR>", "Close Buffer" },       -- bufdelete plugin
   ["z"] = { "<cmd>Lazy<CR>", "Lazy [Plugin Manager]" }, -- lazy plugin
   l = {
     name = "LSP",
@@ -1108,7 +1124,7 @@ end
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
   callback = function()
-    vim.highlight.on_yank({ hi_group = "IncSearch", timeout = 200, on_visual = true })
+    vim.highlight.on_yank()
   end,
 })
 
