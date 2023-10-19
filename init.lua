@@ -787,15 +787,16 @@ require("lazy").setup({
   },
   -- search/replace in multiple files
   {
-    "windwp/nvim-spectre", --,
-    -- stylua: ignore
-    -- keys = {
-    --   {
-    --     "<A-s>",
-    --     function() require("spectre").open() end,
-    --     desc = "Replace in files (Spectre)"
-    --   },
-    -- },
+    "windwp/nvim-spectre",
+    keys = {
+      {
+        "<A-s>",
+        function()
+          require("spectre").open()
+        end,
+        desc = "Replace in files (spectre)",
+      },
+    },
   },
   {
     -- Code skimming or outline for quick navigation
