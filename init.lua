@@ -85,13 +85,25 @@ require("lazy").setup({
     end,
   },
   { "ethanholz/nvim-lastplace", config = true },
+  -- Fuzzy Finder (files, lsp, etc)
   {
-    "ibhagwan/fzf-lua",
-    event = "VeryLazy",
-    dependencies = { "vijaymarupudi/nvim-fzf" },
-    config = function()
-      require("fzf-lua").setup({ "max-perf" })
-    end,
+    "nvim-telescope/telescope.nvim",
+    tag = "0.1.4",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      -- Fuzzy Finder Algorithm which requires local dependencies to be built.
+      -- Only load if `make` is available. Make sure you have the system
+      -- requirements installed.
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        -- NOTE: If you are having trouble with this installation,
+        --       refer to the README for telescope-fzf-native for more instructions.
+        build = "make",
+        cond = function()
+          return vim.fn.executable("make") == 1
+        end,
+      },
+    },
   },
   -- LSP
   {
@@ -107,7 +119,16 @@ require("lazy").setup({
       },
       {
         "williamboman/mason.nvim",
-        opts = { ui = { border = "rounded" } },
+        opts = {
+          ui = {
+            border = "rounded",
+            icons = {
+              package_installed = "✓",
+              package_pending = "➜",
+              package_uninstalled = "✗",
+            },
+          },
+        },
       },
       {
         "williamboman/mason-lspconfig.nvim",
@@ -186,31 +207,47 @@ require("lazy").setup({
       local lspconfig = require("lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-      -- lspconfig.elixirls.setup {
-      --   on_attach = on_attach,
-      --   capabilities = capabilities,
-      --   settings = {
-      --     elixirLS = {
-      --       dialyzerEnabled = true
-      --     }
-      --   }
-      -- }
-      local elixir = require("elixir")
-      local elixirls = require("elixir.elixirls")
-
-      elixir.setup({
-        nextls = { enable = true },
-        credo = { enable = true },
-        elixirls = {
-          enable = true,
-          settings = elixirls.settings({
+      lspconfig.elixirls.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+          elixirLS = {
             dialyzerEnabled = false,
-            enableTestLenses = false,
-          }),
-          on_attach = on_attach,
-          capabilities = capabilities,
+          },
         },
       })
+
+      -- local elixir = require("elixir")
+      -- local elixirls = require("elixir.elixirls")
+      --
+      -- elixir.setup({
+      --   nextls = {
+      --     enable = false,
+      --     port = 9000,
+      --     cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
+      --     init_options = {
+      --       mix_env = "dev",
+      --       mix_target = "host",
+      --       experimental = {
+      --         completions = {
+      --           enable = true, -- control if completions are enabled. defaults to false
+      --         },
+      --       },
+      --     },
+      --     on_attach = on_attach,
+      --     capabilities = capabilities,
+      --   },
+      --   credo = { enable = true },
+      --   elixirls = {
+      --     enable = true,
+      --     settings = elixirls.settings({
+      --       dialyzerEnabled = false,
+      --       enableTestLenses = false,
+      --     }),
+      --     on_attach = on_attach,
+      --     capabilities = capabilities,
+      --   },
+      -- })
 
       lspconfig.lua_ls.setup({
         on_attach = on_attach,
@@ -481,12 +518,6 @@ require("lazy").setup({
     },
   },
 
-  -- Better Escape
-  {
-    "max397574/better-escape.nvim",
-    config = true,
-  },
-
   -- auto completion
   { "windwp/nvim-autopairs", config = true },
   {
@@ -539,7 +570,6 @@ require("lazy").setup({
           end,
         },
         completion = {
-          keyword_length = 3,
           completeopt = "menu,menuone,noselect",
         },
         snippet = {
@@ -767,7 +797,7 @@ require("lazy").setup({
       source_selector = { statusline = true },
       filesystem = {
         bind_to_cwd = false,
-        follow_current_file = true,
+        follow_current_file = { enabled = true },
       },
       window = {
         width = "26",
@@ -818,11 +848,7 @@ require("lazy").setup({
       })
     end,
   },
-  -- {
-  --   'nmac427/guess-indent.nvim',
-  --   event = { "BufReadPost", "BufNewFile" },
-  --   config = true
-  -- },
+
   {
     "nvim-treesitter/nvim-treesitter",
     version = false,
@@ -859,6 +885,7 @@ require("lazy").setup({
         "svelte",
         "erlang",
         "elixir",
+        "sql",
         "eex",
         "heex",
         "ledger", --, "toml", "zig"
@@ -935,7 +962,7 @@ require("lazy").setup({
   { "mg979/vim-visual-multi", version = false, event = "VeryLazy" },
   { "karb94/neoscroll.nvim", config = true },
 }, {
-  checker = { enabled = true },
+  checker = { enabled = true, notify = false },
   ui = { border = "rounded" },
   performance = {
     rtp = {
@@ -1017,14 +1044,19 @@ vim.opt.writebackup = false
 -------------------- MAPPINGS ------------------------------
 -- Personal common tasks
 -- map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
-vim.keymap.set("n", "<C-p>", "<cmd>lua require('fzf-lua').git_files()<CR>")
+vim.keymap.set("n", "<C-p>", "<cmd>lua require('telescope.builtin').git_files()<CR>")
 vim.keymap.set("n", "<BS>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<F4>", "<cmd>set spell!<CR>")
 vim.keymap.set("n", "<F5>", "<cmd>ColorizerToggle<CR>")
 vim.keymap.set("i", "<C-u>", "<C-g>u<C-u>") -- Delete lines in insert mode
 vim.keymap.set("i", "<C-w>", "<C-g>u<C-w>") -- Delete words in insert mode
-vim.keymap.set("n", "<C-f>", "<cmd>FzfLua grep<CR>")
-vim.keymap.set("n", "<C-b>", "<cmd>FzfLua blines<CR>")
+
+-- Telescope bindings
+local builtin = require("telescope.builtin")
+vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find Files" })
+vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
+vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
+vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help Tags" })
 
 -- Easier movement
 vim.keymap.set("n", "q", "<C-w>c")
@@ -1036,6 +1068,10 @@ vim.keymap.set("v", "L", "g_")
 -- better up/down
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+
+-- beter escape
+vim.keymap.set("i", "jk", "<Esc>")
+vim.keymap.set("i", "jj", "<Esc>")
 
 -- Move to window using the <ctrl> hjkl keys
 vim.keymap.set("t", "<C-h>", "<C-\\><C-N><C-w>h")
@@ -1107,12 +1143,10 @@ wk.register({
 }, { prefix = "<leader>", mode = "v" })
 wk.register({
   ["a"] = { "<cmd>AerialToggle!<CR>", "AerialToggle" },
-  ["b"] = { "<cmd>FzfLua buffers<CR>", "Buffers" },
-  -- ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
-  ["f"] = { "<cmd>FzfLua files<CR>", "Files" },
+  ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
   ["<leader>"] = { "<C-^>", "Last buffer" },
   ["m"] = { "<cmd>Mason<cr>", "Mason [LSP Manager]" }, -- mason plugin
-  ["r"] = { "<cmd>FzfLua oldfiles<CR>", "Recent Files" },
+  ["r"] = { "<cmd>lua require('telescope.builtin').oldfiles()<CR>", "Recent Files" },
   ["s"] = { "<cmd>split<CR>", "Split horizontal" },
   ["v"] = { "<C-w>v<C-w>l", "Split vertical" },
   ["w"] = { "<cmd>w!<CR>", "Save" },
