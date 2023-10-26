@@ -85,25 +85,61 @@ require("lazy").setup({
     end,
   },
   { "ethanholz/nvim-lastplace", config = true },
+  { "stevearc/dressing.nvim", event = "VeryLazy" },
   -- Fuzzy Finder (files, lsp, etc)
   {
     "nvim-telescope/telescope.nvim",
     tag = "0.1.4",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      -- Fuzzy Finder Algorithm which requires local dependencies to be built.
-      -- Only load if `make` is available. Make sure you have the system
-      -- requirements installed.
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
         build = "make",
         cond = function()
           return vim.fn.executable("make") == 1
         end,
       },
+      {
+        "paopaol/telescope-git-diffs.nvim",
+        dependencies = {
+          "nvim-lua/plenary.nvim",
+          "sindrets/diffview.nvim",
+        },
+      },
     },
+    config = function()
+      local telescope = require("telescope")
+
+      telescope.setup({
+        pickers = {
+          buffers = {
+            theme = "dropdown",
+            previewer = false,
+          },
+        },
+        defaults = {
+          sorting_strategy = "ascending",
+          layout_config = {
+            prompt_position = "top",
+            vertical = { mirror = false, width = 0.5, height = 0.5 },
+            horizontal = { mirror = false, height = 0.5 },
+          },
+        },
+      })
+
+      telescope.load_extension("git_diffs")
+      telescope.load_extension("fzf")
+
+      local builtin = require("telescope.builtin")
+      vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find Files" })
+      vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
+      vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
+      vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help Tags" })
+      vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "Find Word" })
+      vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Commands" })
+      vim.keymap.set("n", "<leader>fcc", builtin.command_history, { desc = "Commands History" })
+      vim.keymap.set("n", "<leader>fss", builtin.search_history, { desc = "Search History" })
+    end,
   },
   -- LSP
   {
@@ -176,13 +212,14 @@ require("lazy").setup({
 
         -- Mappings | See `:help vim.lsp.*` for documentation on any of the below functions
         local bufopts = { noremap = true, silent = true, buffer = bufnr }
-        vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, bufopts)
+        local builtin = require("telescope.builtin")
+        vim.keymap.set("n", "gt", builtin.lsp_type_definitions, bufopts)
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
-        vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+        vim.keymap.set("n", "gd", builtin.lsp_definitions, bufopts)
         vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
         vim.keymap.set("n", "<c-k>", vim.lsp.buf.signature_help, bufopts)
-        vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
-        vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
+        vim.keymap.set("n", "gi", builtin.lsp_implementations, bufopts)
+        vim.keymap.set("n", "gr", builtin.lsp_references, bufopts)
         if vim.lsp.inlay_hint then
           vim.keymap.set("n", "<leader>uh", function()
             vim.lsp.inlay_hint(0, nil)
@@ -207,47 +244,47 @@ require("lazy").setup({
       local lspconfig = require("lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-      lspconfig.elixirls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          elixirLS = {
-            dialyzerEnabled = false,
-          },
-        },
-      })
-
-      -- local elixir = require("elixir")
-      -- local elixirls = require("elixir.elixirls")
-      --
-      -- elixir.setup({
-      --   nextls = {
-      --     enable = false,
-      --     port = 9000,
-      --     cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
-      --     init_options = {
-      --       mix_env = "dev",
-      --       mix_target = "host",
-      --       experimental = {
-      --         completions = {
-      --           enable = true, -- control if completions are enabled. defaults to false
-      --         },
-      --       },
-      --     },
-      --     on_attach = on_attach,
-      --     capabilities = capabilities,
-      --   },
-      --   credo = { enable = true },
-      --   elixirls = {
-      --     enable = true,
-      --     settings = elixirls.settings({
+      -- lspconfig.elixirls.setup({
+      --   on_attach = on_attach,
+      --   capabilities = capabilities,
+      --   settings = {
+      --     elixirLS = {
       --       dialyzerEnabled = false,
-      --       enableTestLenses = false,
-      --     }),
-      --     on_attach = on_attach,
-      --     capabilities = capabilities,
+      --     },
       --   },
       -- })
+
+      local elixir = require("elixir")
+      local elixirls = require("elixir.elixirls")
+
+      elixir.setup({
+        nextls = {
+          enable = false,
+          port = 9000,
+          cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
+          init_options = {
+            mix_env = "dev",
+            mix_target = "host",
+            experimental = {
+              completions = {
+                enable = true, -- control if completions are enabled. defaults to false
+              },
+            },
+          },
+          on_attach = on_attach,
+          capabilities = capabilities,
+        },
+        credo = { enable = true },
+        elixirls = {
+          enable = true,
+          settings = elixirls.settings({
+            dialyzerEnabled = false,
+            enableTestLenses = true,
+          }),
+          on_attach = on_attach,
+          capabilities = capabilities,
+        },
+      })
 
       lspconfig.lua_ls.setup({
         on_attach = on_attach,
@@ -570,7 +607,7 @@ require("lazy").setup({
           end,
         },
         completion = {
-          completeopt = "menu,menuone,noselect",
+          completeopt = "menu,menuone,preview,noselect",
         },
         snippet = {
           expand = function(args)
@@ -1051,13 +1088,6 @@ vim.keymap.set("n", "<F5>", "<cmd>ColorizerToggle<CR>")
 vim.keymap.set("i", "<C-u>", "<C-g>u<C-u>") -- Delete lines in insert mode
 vim.keymap.set("i", "<C-w>", "<C-g>u<C-w>") -- Delete words in insert mode
 
--- Telescope bindings
-local builtin = require("telescope.builtin")
-vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find Files" })
-vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
-vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
-vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help Tags" })
-
 -- Easier movement
 vim.keymap.set("n", "q", "<C-w>c")
 vim.keymap.set("n", "H", "^")
@@ -1156,30 +1186,33 @@ wk.register({
   ["t"] = { "<cmd>ToggleTermSendCurrentLine<cr>", "Send Current Line to Term" },
   l = {
     name = "LSP",
-    a = { "<cmd>FzfLua lsp_code_actions<cr>", "Code Action" },
+    a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
     c = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-    d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
-    D = { "<cmd>FzfLua lsp_document_diagnostics<cr>", "Buffer Diagnostics" },
+    d = { "<cmd>lua require('telescope.builtin').lsp_definitions()<cr>", "Definition" },
+    D = { "<cmd>lua require('telescope.builtin').diagnostics({bufnr=0})<cr>", "Buffer Diagnostics" },
     f = { "<cmd>lua vim.lsp.buf.format()<cr>", "Format" },
-    i = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Implementation" },
+    i = { "<cmd>lua require('telescope.builtin').lsp_implementations()<cr>", "Implementation" },
     j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
     k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
     l = { "<cmd>LspInfo<cr>", "Info" },
-    t = { "<cmd>lua vim.lsp.buf.type_definition()<cr>", "Type Definition" },
-    w = { "<cmd>FzfLua lsp_workspace_diagnostics<cr>", "Diagnostics" },
+    t = { "<cmd>lua require('telescope.builtin').lsp_type_definitions()<cr>", "Type Definition" },
+    w = { "<cmd>lua require('telescope.builtin').diagnostics()<cr>", "Diagnostics" },
     q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
-    r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
-    s = { "<cmd>FzfLua lsp_document_symbols<cr>", "Document Symbols" },
-    S = { "<cmd>FzfLua lsp_workspace_symbols<cr>", "Workspace Symbols" },
+    R = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+    r = { "<cmd>lua require('telescope.builtin').lsp_references()<cr>", "References" },
+    I = { "<cmd>lua require('telescope.builtin').lsp_incoming_calls()<cr>", "Incoming calls" },
+    O = { "<cmd>lua require('telescope.builtin').lsp_outgoing_calls()<cr>", "Outgoing calls" },
+    s = { "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", "Document Symbols" },
+    S = { "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<cr>", "Workspace Symbols" },
     h = { "<cmd>lua vim.lsp.inlay_hint(0, nil)<cr>", "Toggle Inlay Hints" },
   },
   g = {
     name = "Git",
-    f = { "<cmd>FzfLua git_files<cr>", "Git Files" },
-    c = { "<cmd>FzfLua git_commits<cr>", "Commits" },
-    b = { "<cmd>FzfLua git_bcommits<cr>", "Buffer Commits" },
-    B = { "<cmd>FzfLua git_branches<cr>", "Branches" },
-    s = { "<cmd>FzfLua git_status<cr>", "Status" },
+    c = { "<cmd>lua require('telescope.builtin').git_commits()<cr>", "Commits" },
+    b = { "<cmd>lua require('telescope.builtin').git_bcommits()<cr>", "Buffer Commits" },
+    B = { "<cmd>lua require('telescope.builtin').git_branches()<cr>", "Branches" },
+    s = { "<cmd>lua require('telescope.builtin').git_status()<cr>", "Status" },
+    d = { "<cmd>lua require('telescope').extensions.git_diffs.diff_commits()<cr>", "Diff history" },
   },
 }, { prefix = "<leader>" })
 
