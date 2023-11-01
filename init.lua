@@ -43,7 +43,7 @@ require("lazy").setup({
   },
   {
     "NvChad/nvim-colorizer.lua",
-    ft = { "javascript", "typescript", "typescriptreact", "css", "html" },
+    ft = { "javascript", "typescript", "typescriptreact", "css", "html", "postcss" },
     cmd = "ColorizerToggle",
     opts = { user_default_options = { tailwind = true } },
   },
@@ -351,7 +351,16 @@ require("lazy").setup({
         },
       })
 
-      local servers = { "tailwindcss", "svelte", "cssls" } -- , 'typst_lsp' }
+      -- CSS
+      lspconfig.cssls.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        settings = {
+          css = { lint = { unknownAtRules = "ignore" } },
+        },
+      })
+
+      local servers = { "tailwindcss", "svelte" } -- , 'typst_lsp' }
       for _, lsp in ipairs(servers) do
         lspconfig[lsp].setup({
           on_attach = on_attach,
@@ -1281,6 +1290,9 @@ vim.api.nvim_create_autocmd("FileType", {
     require("cmp").setup.buffer({ sources = { { name = "vim-dadbod-completion" } } })
   end,
 })
+
+-- Postcss
+vim.filetype.add({ extension = { postcss = "css" } })
 
 -- LSP autocommands like format on save
 -- vim.api.nvim_create_autocmd("BufWritePre", {
