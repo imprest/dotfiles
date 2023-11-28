@@ -128,5 +128,6 @@ alias mach_list_systemctl="systemctl list-unit-files --state=enabled"
 fpath=(${ASDF_DIR}/completions $fpath) # append completions to fpath
 # initialise completions with ZSH's compinit
 autoload -Uz compinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
+# (( ${+_comps} )) && _comps[zinit]=_zinit
+compinit
 eval "$(starship init zsh)"
