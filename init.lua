@@ -885,8 +885,18 @@ require("lazy").setup({
     },
   },
   {
+    "JoosepAlviste/nvim-ts-context-commentstring",
+    lazy = false,
+    config = function()
+      require("ts_context_commentstring").setup({
+        enable_autocmd = false,
+      })
+      vim.g["skip_ts_context_commentstring_module"] = true
+    end,
+  },
+  {
     "numToStr/Comment.nvim",
-    event = "VeryLazy",
+    lazy = false,
     dependencies = { "JoosepAlviste/nvim-ts-context-commentstring" }, -- Allow commenting embedded lang in files
     config = function()
       require("Comment").setup({
@@ -915,7 +925,7 @@ require("lazy").setup({
       endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
       highlight = { enable = true },
       indent = { enable = true, disable = { "python" } }, -- guess-indent is better and faster
-      context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
+      -- context_commentstring = { enable = true, enable_autocmd = false }, -- nvim-ts-context-commentstring
       ensure_installed = {
         "vim",
         "lua",
