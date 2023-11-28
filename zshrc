@@ -1,19 +1,12 @@
 # Initialise Zinit if not installed
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-ZINIT_DIR="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit"
-if [[ ! -d $ZINIT_HOME ]]; then
-    print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
-    command mkdir -p "$ZINIT_DIR"
-    command chmod g-rwX "$ZINIT_DIR"
-    command git clone https://github.com/zdharma-continuum/zinit "$ZINIT_HOME" && \
-        print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" || \
-        print -P "%F{160}▓▒░ The clone has failed.%f%b"
-fi
-
+[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 source "${ZINIT_HOME}/zinit.zsh"
 
+
 zinit ice wait lucid
-zinit for \
+zinit wait lucid for \
   light-mode agkozak/zsh-z \
   light-mode zsh-users/zsh-autosuggestions \
   light-mode zsh-users/zsh-completions \
@@ -43,7 +36,7 @@ setopt inc_append_history # append history list to the history file
 setopt share_history      # share command history data (important for multiple parallel zsh sessions!)
 
 # Exports
-export TERMINAL=konsole
+export TERMINAL=gnome-terminal
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export LANG=en_GB.UTF-8
@@ -135,5 +128,5 @@ alias mach_list_systemctl="systemctl list-unit-files --state=enabled"
 fpath=(${ASDF_DIR}/completions $fpath) # append completions to fpath
 # initialise completions with ZSH's compinit
 autoload -Uz compinit
-compinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
 eval "$(starship init zsh)"
