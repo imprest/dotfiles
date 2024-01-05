@@ -47,14 +47,21 @@ require("lazy").setup({
     cmd = "ColorizerToggle",
     opts = { user_default_options = { tailwind = true } },
   },
+  -- {
+  --   "NTBBloodbath/doom-one.nvim",
+  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
+  --   priority = 1000, -- make sure to load this before all the other start plugins
+  --   config = function() -- load the colorscheme here
+  --     -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
+  --     vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]])
+  --     vim.cmd([[colorscheme doom-one]])
+  --   end,
+  -- },
   {
-    "NTBBloodbath/doom-one.nvim",
-    lazy = false, -- make sure we load this during startup if it is your main colorscheme
-    priority = 1000, -- make sure to load this before all the other start plugins
-    config = function() -- load the colorscheme here
-      -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
-      vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]])
-      vim.cmd([[colorscheme doom-one]])
+    "navarasu/onedark.nvim",
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme("onedark")
     end,
   },
   {
@@ -242,17 +249,31 @@ require("lazy").setup({
       end
 
       local lspconfig = require("lspconfig")
+      local configs = require("lspconfig.configs")
+
       local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-      -- lspconfig.elixirls.setup({
-      --   on_attach = on_attach,
-      --   capabilities = capabilities,
-      --   settings = {
-      --     elixirLS = {
-      --       dialyzerEnabled = false,
-      --     },
-      --   },
-      -- })
+      local lexical_config = {
+        filetypes = { "elixir", "eelixir", "heex" },
+        cmd = { "/home/hvaria/lexical/_build/dev/package/lexical/bin/start_lexical.sh" },
+        settings = {},
+      }
+
+      if not configs.lexical then
+        configs.lexical = {
+          default_config = {
+            filetypes = lexical_config.filetypes,
+            cmd = lexical_config.cmd,
+            root_dir = function(fname)
+              return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
+            end,
+            -- optional settings
+            settings = lexical_config.settings,
+          },
+        }
+      end
+
+      lspconfig.lexical.setup({})
 
       local elixir = require("elixir")
       local elixirls = require("elixir.elixirls")
@@ -412,7 +433,6 @@ require("lazy").setup({
         },
         format_on_save = {
           lsp_fallback = true,
-          async = false,
           timeout_ms = 500,
         },
       })
@@ -420,7 +440,6 @@ require("lazy").setup({
       vim.keymap.set({ "n", "v" }, "<leader>p", function()
         conform.format({
           lsp_fallback = true,
-          async = false,
           timeout_ms = 500,
         })
       end, { desc = "Format file or range (in visual mode)" })
@@ -481,6 +500,7 @@ require("lazy").setup({
   -- better diagnostics list and others
   {
     "folke/trouble.nvim",
+
     cmd = { "TroubleToggle", "Trouble" },
     opts = { use_diagnostic_signs = true },
     keys = {
@@ -590,7 +610,7 @@ require("lazy").setup({
       end
       local border_opts = {
         border = "single",
-        winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
+        winhighlight = "CursorLine:Visual",
       }
 
       -- If you want insert `(` after select function or method item
@@ -692,38 +712,13 @@ require("lazy").setup({
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
     config = function()
-      local window_width_limit = 70
-      local conditions = {
-        buffer_not_empty = function()
-          return vim.fn.empty(vim.fn.expand("%:t")) ~= 1
-        end,
-        hide_in_width = function()
-          return vim.fn.winwidth(0) > window_width_limit
-        end,
-        check_git_workspace = function()
-          local filepath = vim.fn.expand("%:p:h")
-          local gitdir = vim.fn.finddir(".git", filepath .. ";")
-          return gitdir and #gitdir > 0 and #gitdir < #filepath
-        end,
-      }
-      local function diff_source()
-        local gitsigns = vim.b.gitsigns_status_dict
-        if gitsigns then
-          return {
-            added = gitsigns.added,
-            modified = gitsigns.changed,
-            removed = gitsigns.removed,
-          }
-        end
-      end
-
       require("lualine").setup({
         options = {
           icons_enabled = true,
-          -- theme = 'onedark',
+          theme = "onedark",
           globalstatus = true,
-          component_separators = { left = "", right = "" },
-          section_separators = { left = "", right = "" },
+          component_separators = "|",
+          section_separators = "",
           disabled_filetypes = { "Telescope", "Outline", "dashboard" },
           always_divide_middle = true,
         },
@@ -737,71 +732,6 @@ require("lazy").setup({
               padding = { left = 0, right = 0 },
             },
           },
-          lualine_b = {
-            { "filesize", cond = conditions.buffer_not_empty },
-            {
-              "filename",
-              symbols = {
-                path = 3,
-                modified = "  ",
-                readonly = "",
-                unnamed = "",
-              },
-            },
-          },
-          lualine_c = {
-            {
-              -- 'branch'
-              "b:gitsigns_head",
-              icon = "",
-              cond = conditions.hide_in_width,
-            },
-            {
-              -- 'diff'
-              "diff",
-              source = diff_source,
-            },
-          },
-          lualine_x = {
-            {
-              -- 'diagnostics'
-              "diagnostics",
-              sources = { "nvim_diagnostic" },
-              symbols = {
-                error = " ",
-                warn = " ",
-                info = " ",
-                hint = " ",
-              },
-            },
-            {
-              -- lazy package manager status
-              require("lazy.status").updates,
-              cond = require("lazy.status").has_updates,
-              color = { fg = "#ff9e64" },
-            },
-            {
-              -- 'lsp'
-              function()
-                local msg = ""
-                local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
-                local clients = vim.lsp.get_active_clients()
-                if next(clients) == nil then
-                  return msg
-                end
-                for _, client in ipairs(clients) do
-                  local filetypes = client.config.filetypes
-                  if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-                    return client.name
-                  end
-                end
-                return msg
-              end,
-              cond = conditions.hide_in_width,
-            },
-          },
-          lualine_y = { "encoding", "fileformat", "filetype" },
-          lualine_z = { "progress", "%3l:%3c" },
         },
         inactive_sections = {
           lualine_a = { "filename" },
@@ -1017,6 +947,24 @@ require("lazy").setup({
   },
   { "mg979/vim-visual-multi", version = false, event = "VeryLazy" },
   { "karb94/neoscroll.nvim", config = true },
+  {
+    "vim-test/vim-test",
+    config = function()
+      vim.cmd([[
+        function! BufferTermStrategy(cmd)
+          exec 'te ' . a:cmd
+        endfunction
+
+        let g:test#custom_strategies = {'bufferterm': function('BufferTermStrategy')}
+        let g:test#strategy = 'bufferterm'
+      ]])
+    end,
+    keys = {
+      { "<leader>Tf", "<cmd>TestFile<cr>", silent = true, desc = "Run this file" },
+      { "<leader>Tn", "<cmd>TestNearest<cr>", silent = true, desc = "Run nearest test" },
+      { "<leader>Tl", "<cmd>TestLast<cr>", silent = true, desc = "Run last test" },
+    },
+  },
 }, {
   checker = { enabled = true, notify = false },
   ui = { border = "rounded" },
@@ -1039,10 +987,10 @@ require("lazy").setup({
 -------------------- OPTIONS -------------------------------
 local width = 85
 -- global options
-vim.opt.hlsearch = false
+vim.opt.hlsearch = true
 vim.opt.backup = false
 vim.opt.breakindent = true
-vim.opt.completeopt = "menu,menuone,noselect" -- Completion options
+vim.opt.completeopt = "menuone,noselect" -- Completion options
 vim.opt.conceallevel = 3 -- Hide * markip for bold and italic
 vim.opt.cursorline = false -- Highlight cursor line
 vim.opt.equalalways = false -- I don't like my windows changing all the time
@@ -1051,7 +999,8 @@ vim.opt.foldcolumn = "0" -- '0' is not bad
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
--- vim.opt.foldmethod = "indent"
+vim.opt.foldmethod = "indent" -- expr
+-- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.opt.formatoptions = "q1jl" -- Automatic formatting options
 vim.cmd([[set formatoptions-=ro]])
 vim.opt.guicursor = "i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1"
@@ -1099,7 +1048,6 @@ vim.opt.writebackup = false
 
 -------------------- MAPPINGS ------------------------------
 -- Personal common tasks
--- map('n', '<C-p>', "<cmd>lua require('fzf-lua').git_files({ winopts = { preview = { hidden = 'hidden' } } })<CR>")
 vim.keymap.set("n", "<C-p>", "<cmd>lua require('telescope.builtin').git_files()<CR>")
 vim.keymap.set("n", "<BS>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<F4>", "<cmd>set spell!<CR>")
@@ -1118,7 +1066,10 @@ vim.keymap.set("v", "L", "g_")
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 
--- beter escape
+-- gF is a more useful default than gF
+vim.keymap.set("n", "gf", "gF", { silent = true })
+
+-- better escape
 vim.keymap.set("i", "jk", "<Esc>")
 vim.keymap.set("i", "jj", "<Esc>")
 
@@ -1162,10 +1113,10 @@ vim.keymap.set("n", "g*", "g*zz", { silent = true })
 vim.keymap.set("n", "g#", "g#zz", { silent = true })
 vim.keymap.set("n", "<C-o>", "<C-o>zz", { silent = true })
 vim.keymap.set("n", "<C-i>", "<C-i>zz", { silent = true })
+vim.keymap.set("n", "u", "uzz", { silent = true })
+vim.keymap.set("n", "<C-r>", "<C-r>zz", { silent = true })
 -- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
 -- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
--- vim.keymap.set('n', 'u', 'uzz', { silent = true })
--- vim.keymap.set('n', '<C-r>', '<C-r>zz', { silent = true })
 
 -- Add undo break-points
 vim.keymap.set("i", ",", ",<c-g>u")
@@ -1321,5 +1272,33 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.cmd([[wincmd L | vert res 83<CR>]])
     vim.cmd([[nnoremap <buffer><cr> <c-]>]])
     vim.cmd([[nnoremap <buffer><bs> <c-T>]])
+  end,
+})
+
+-- Autocmd to save folds for a file
+-- https://github.com/AstroNvim/AstroNvim/blob/271c9c3f71c2e315cb16c31276dec81ddca6a5a6/lua/astronvim/autocmds.lua#L98-L120
+local view_group = vim.api.nvim_create_augroup("auto_view", { clear = true })
+vim.api.nvim_create_autocmd({ "BufWinLeave", "BufWritePost", "WinLeave" }, {
+  desc = "Save view with mkview for real files",
+  group = view_group,
+  callback = function(args)
+    if vim.b[args.buf].view_activated then
+      vim.cmd.mkview({ mods = { emsg_silent = true } })
+    end
+  end,
+})
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  desc = "Try to load file view if available and enable view saving for real files",
+  group = view_group,
+  callback = function(args)
+    if not vim.b[args.buf].view_activated then
+      local filetype = vim.api.nvim_get_option_value("filetype", { buf = args.buf })
+      local buftype = vim.api.nvim_get_option_value("buftype", { buf = args.buf })
+      local ignore_filetypes = { "gitcommit", "gitrebase", "svg", "hgcommit" }
+      if buftype == "" and filetype and filetype ~= "" and not vim.tbl_contains(ignore_filetypes, filetype) then
+        vim.b[args.buf].view_activated = true
+        vim.cmd.loadview({ mods = { emsg_silent = true } })
+      end
+    end
   end,
 })
