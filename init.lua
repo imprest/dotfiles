@@ -153,6 +153,7 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
+      { "dgagn/diagflow.nvim", event = "LspAttach", opts = {} },
       { "elixir-editors/vim-elixir" },
       { "elixir-tools/elixir-tools.nvim" },
       { "jose-elias-alvarez/typescript.nvim" },
