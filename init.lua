@@ -967,7 +967,7 @@ require("lazy").setup({
     },
   },
 }, {
-  checker = { enabled = true, notify = false },
+  checker = { enabled = false, notify = false },
   ui = { border = "rounded" },
   performance = {
     rtp = {
