@@ -69,7 +69,7 @@ require("lazy").setup({
     version = "v3.*",
     dependencies = { "famiu/bufdelete.nvim", "nvim-tree/nvim-web-devicons" },
     opts = {
-      highlights = { fill = { bg = "" } },
+      highlights = { fill = { bg = "" }, buffer_selected = { italic = false, bold = false } },
       options = {
         always_show_bufferline = true,
         show_buffer_close_icons = false,
@@ -274,7 +274,10 @@ require("lazy").setup({
         }
       end
 
-      lspconfig.lexical.setup({})
+      lspconfig.lexical.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+      })
 
       local elixir = require("elixir")
       local elixirls = require("elixir.elixirls")
@@ -298,7 +301,7 @@ require("lazy").setup({
         },
         credo = { enable = true },
         elixirls = {
-          enable = true,
+          enable = false,
           settings = elixirls.settings({
             dialyzerEnabled = false,
             enableTestLenses = true,
@@ -1255,15 +1258,6 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Postcss
 vim.filetype.add({ extension = { postcss = "css" } })
-
--- LSP autocommands like format on save
--- vim.api.nvim_create_autocmd("BufWritePre", {
---   group = augroup("lsp_format"),
---   pattern = "*.{ex,exs,heex}",
---   callback = function()
---     vim.lsp.buf.format()
---   end,
--- })
 
 -- Help Buffer
 vim.api.nvim_create_autocmd("FileType", {
