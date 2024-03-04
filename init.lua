@@ -47,23 +47,26 @@ require("lazy").setup({
     cmd = "ColorizerToggle",
     opts = { user_default_options = { tailwind = true } },
   },
-  -- {
-  --   "NTBBloodbath/doom-one.nvim",
-  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
-  --   priority = 1000, -- make sure to load this before all the other start plugins
-  --   config = function() -- load the colorscheme here
-  --     -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
-  --     vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]])
-  --     vim.cmd([[colorscheme doom-one]])
-  --   end,
-  -- },
   {
-    "navarasu/onedark.nvim",
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme("onedark")
+    "NTBBloodbath/doom-one.nvim",
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
+    init = function()
+      vim.g.doom_one_plugin_telescope = true
+    end,
+    config = function() -- load the colorscheme here
+      -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
+      vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]])
+      vim.cmd([[colorscheme doom-one]])
     end,
   },
+  -- {
+  --   "navarasu/onedark.nvim",
+  --   priority = 1000,
+  --   config = function()
+  --     vim.cmd.colorscheme("onedark")
+  --   end,
+  -- },
   {
     "akinsho/bufferline.nvim",
     version = "v3.*",
@@ -720,7 +723,7 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           icons_enabled = true,
-          theme = "onedark",
+          -- theme = "onedark",
           globalstatus = true,
           component_separators = "|",
           section_separators = "",
