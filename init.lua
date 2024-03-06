@@ -850,7 +850,20 @@ require("lazy").setup({
     dependencies = {
       {
         "windwp/nvim-ts-autotag",
-        ft = { "html", "javascript", "typescript", "svelte", "vue", "xml", "markdown", "heex" },
+        ft = {
+          "html",
+          "javascript",
+          "typescript",
+          "javascriptreact",
+          "typescriptreact",
+          "svelte",
+          "vue",
+          "tsx",
+          "jsx",
+          "xml",
+          "markdown",
+          "heex",
+        },
       },
       "RRethy/nvim-treesitter-endwise",
     },
@@ -858,7 +871,20 @@ require("lazy").setup({
     opts = {
       autotag = {
         enable = true, -- windwp/nvim-ts-autotag
-        filetypes = { "html", "javascript", "typescript", "svelte", "vue", "xml", "markdown", "heex" },
+        filetypes = {
+          "html",
+          "javascript",
+          "typescript",
+          "javascriptreact",
+          "typescriptreact",
+          "svelte",
+          "vue",
+          "tsx",
+          "jsx",
+          "xml",
+          "markdown",
+          "heex",
+        },
       },
       endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
       highlight = { enable = true },
@@ -876,6 +902,7 @@ require("lazy").setup({
         "javascript",
         "json",
         "typescript",
+        "tsx",
         "svelte",
         "erlang",
         "elixir",
