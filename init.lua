@@ -4,16 +4,18 @@ vim.g["loaded_python_provider"] = 1
 vim.g["python3_host_prog"] = "/usr/bin/python3"
 vim.g.mapleader = ","
 vim.g.maplocalleader = ";"
+vim.g.have_nerd_font = true
 
 -------------------- LAZY.NVIM -----------------------------
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy/lazy.nvim"
   vim.fn.system({
     "git",
     "clone",
     "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
     "--branch=stable", -- latest stable release
+    lazyrepo,
     lazypath,
   })
 end
@@ -48,18 +50,27 @@ require("lazy").setup({
     opts = { user_default_options = { tailwind = true } },
   },
   {
-    "NTBBloodbath/doom-one.nvim",
-    lazy = false, -- make sure we load this during startup if it is your main colorscheme
-    priority = 1000, -- make sure to load this before all the other start plugins
+    "folke/tokyonight.nvim",
+    priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
-      vim.g.doom_one_plugin_telescope = true
-    end,
-    config = function() -- load the colorscheme here
-      -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
-      vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]])
-      vim.cmd([[colorscheme doom-one]])
+      vim.cmd.colorscheme("tokyonight-night")
+      -- You can configure highlights by doing something like:
+      -- vim.cmd.hi 'Comment gui=none'
     end,
   },
+  -- {
+  --   "NTBBloodbath/doom-one.nvim",
+  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
+  --   priority = 1000, -- make sure to load this before all the other start plugins
+  --   init = function()
+  --     vim.g.doom_one_plugin_telescope = true
+  --   end,
+  --   config = function() -- load the colorscheme here
+  --     -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
+  --     vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]])
+  --     vim.cmd([[colorscheme doom-one]])
+  --   end,
+  -- },
   -- {
   --   "navarasu/onedark.nvim",
   --   priority = 1000,
@@ -70,7 +81,7 @@ require("lazy").setup({
   {
     "akinsho/bufferline.nvim",
     version = "v3.*",
-    dependencies = { "famiu/bufdelete.nvim", "nvim-tree/nvim-web-devicons" },
+    dependencies = { "famiu/bufdelete.nvim", { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font } },
     opts = {
       highlights = { fill = { bg = "" }, buffer_selected = { italic = false, bold = false } },
       options = {
@@ -99,7 +110,8 @@ require("lazy").setup({
   -- Fuzzy Finder (files, lsp, etc)
   {
     "nvim-telescope/telescope.nvim",
-    tag = "0.1.4",
+    event = "VimEnter",
+    branch = "0.1.x",
     dependencies = {
       "nvim-lua/plenary.nvim",
       {
@@ -109,6 +121,7 @@ require("lazy").setup({
           return vim.fn.executable("make") == 1
         end,
       },
+      { "nvim-telescope/telescope-ui-select.nvim" },
       {
         "paopaol/telescope-git-diffs.nvim",
         dependencies = {
@@ -127,6 +140,11 @@ require("lazy").setup({
             previewer = false,
           },
         },
+        extensions = {
+          ["ui-select"] = {
+            require("telescope.themes").get_dropdown(),
+          },
+        },
         defaults = {
           sorting_strategy = "ascending",
           layout_config = {
@@ -139,6 +157,7 @@ require("lazy").setup({
 
       telescope.load_extension("git_diffs")
       telescope.load_extension("fzf")
+      telescope.load_extension("ui-select")
 
       local builtin = require("telescope.builtin")
       vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find Files" })
@@ -149,17 +168,23 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Commands" })
       vim.keymap.set("n", "<leader>fcc", builtin.command_history, { desc = "Commands History" })
       vim.keymap.set("n", "<leader>fss", builtin.search_history, { desc = "Search History" })
+
+      vim.keymap.set("n", "<leader>/", function()
+        builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
+          winblend = 10,
+          previewer = false,
+        }))
+      end, { desc = "[/] Fuzzily search in current buffer" })
     end,
   },
   -- LSP
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      { "dgagn/diagflow.nvim", event = "LspAttach", opts = {} },
-      { "elixir-editors/vim-elixir" },
-      { "elixir-tools/elixir-tools.nvim" },
-      { "jose-elias-alvarez/typescript.nvim" },
+      { "dgagn/diagflow.nvim", event = "LspAttach", opts = {} }, -- put diagnostic msg @ top right corner
+      "elixir-editors/vim-elixir",
+      "elixir-tools/elixir-tools.nvim",
+      "jose-elias-alvarez/typescript.nvim",
       {
         "b0o/schemastore.nvim",
         version = false,
@@ -191,8 +216,18 @@ require("lazy").setup({
           },
         },
       },
+      "WhoIsSethDaniel/mason-tool-installer.nvim",
     },
     config = function()
+      -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
+      -- To instead override globally for all lsp borders
+      local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+      function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+        opts = opts or {}
+        opts.border = opts.border or "single"
+        return orig_util_open_floating_preview(contents, syntax, opts, ...)
+      end
+
       -- ref: LazyVim & https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
       -- lsp_diagnostics
       local signs = { Error = " ", Warn = " ", Hint = "⨁ ", Info = " " }
@@ -207,140 +242,62 @@ require("lazy").setup({
         severity_sort = true,
       })
 
-      -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
-      -- To instead override globally for all lsp borders
-      local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-      function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-        opts = opts or {}
-        opts.border = opts.border or "single"
-        return orig_util_open_floating_preview(contents, syntax, opts, ...)
-      end
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
+        callback = function(event)
+          local map = function(keys, func, desc)
+            vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+          end
 
-      -- Customize LSP behavior
-      local on_attach = function(client, bufnr)
-        -- Enable completion triggered by <c-x><c-o>
-        vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+          map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+          map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+          map("gi", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+          map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+          map("<leader>ls", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+          map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+          map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+          map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
+          map("K", vim.lsp.buf.hover, "Hover Documentation")
+          map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+          if vim.lsp.inlay_hint then
+            map("<leader>uh", function()
+              vim.lsp.inlay_hint(0, nil)
+            end, "Toggle Inlay Hints")
+          end
 
-        -- Mappings | See `:help vim.lsp.*` for documentation on any of the below functions
-        local bufopts = { noremap = true, silent = true, buffer = bufnr }
-        local builtin = require("telescope.builtin")
-        vim.keymap.set("n", "gt", builtin.lsp_type_definitions, bufopts)
-        vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
-        vim.keymap.set("n", "gd", builtin.lsp_definitions, bufopts)
-        vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
-        vim.keymap.set("n", "<c-k>", vim.lsp.buf.signature_help, bufopts)
-        vim.keymap.set("n", "gi", builtin.lsp_implementations, bufopts)
-        vim.keymap.set("n", "gr", builtin.lsp_references, bufopts)
-        if vim.lsp.inlay_hint then
-          vim.keymap.set("n", "<leader>uh", function()
-            vim.lsp.inlay_hint(0, nil)
-          end, { desc = "Toggle Inlay Hints" })
-        end
-        if client.name == "tsserver" then
-          vim.keymap.set(
-            "n",
-            "<leader>co",
-            "<cmd>TypescriptOrganizeImports<CR>",
-            { buffer = bufnr, desc = "Organize Imports" }
-          )
-          vim.keymap.set("n", "<leader>cR", "<cmd>TypescriptRenameFile<CR>", { buffer = bufnr, desc = "Rename File" })
-        end
-        if client.name == "elixirls" then
-          vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
-          vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
-          vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
-        end
-      end
+          -- Highlight references under the cursor and clear hl when moving cursor
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.server_capabilities.documentHighlightProvider then
+            vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+              buffer = event.buf,
+              callback = vim.lsp.buf.document_highlight,
+            })
 
-      local lspconfig = require("lspconfig")
-      -- local configs = require("lspconfig.configs")
+            vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+              buffer = event.buf,
+              callback = vim.lsp.buf.clear_references,
+            })
+          end
 
-      local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+          if client.name == "tsserver" then
+            map("<leader>o", "<cmd>TypescriptOrganizeImports<CR>", "Organize Imports")
+            map("<leader>R", "<cmd>TypescriptRenameFile<CR>", "Rename File")
+          end
 
-      -- local lexical_config = {
-      --   filetypes = { "elixir", "eelixir", "heex" },
-      --   cmd = { "/home/hvaria/lexical/_build/dev/package/lexical/bin/start_lexical.sh" },
-      --   settings = {},
-      -- }
-      --
-      -- if not configs.lexical then
-      --   configs.lexical = {
-      --     default_config = {
-      --       filetypes = lexical_config.filetypes,
-      --       cmd = lexical_config.cmd,
-      --       root_dir = function(fname)
-      --         return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
-      --       end,
-      --       -- optional settings
-      --       settings = lexical_config.settings,
-      --     },
-      --   }
-      -- end
-      --
-      -- lspconfig.lexical.setup({
-      --   on_attach = on_attach,
-      --   capabilities = capabilities,
-      -- })
-
-      local elixir = require("elixir")
-      local elixirls = require("elixir.elixirls")
-
-      elixir.setup({
-        nextls = {
-          enable = false,
-          port = 9000,
-          cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
-          init_options = {
-            mix_env = "dev",
-            mix_target = "host",
-            experimental = {
-              completions = {
-                enable = true, -- control if completions are enabled. defaults to false
-              },
-            },
-          },
-          on_attach = on_attach,
-          capabilities = capabilities,
-        },
-        credo = { enable = true },
-        elixirls = {
-          enable = true,
-          settings = elixirls.settings({
-            dialyzerEnabled = false,
-            enableTestLenses = true,
-            suggestSpecs = true,
-          }),
-          on_attach = on_attach,
-          capabilities = capabilities,
-        },
-      })
-
-      lspconfig.lua_ls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          Lua = {
-            telemetry = { enable = false },
-            hint = { enable = true },
-            diagnostics = { globals = { "vim" } },
-          },
-        },
-      })
-
-      lspconfig.jsonls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        -- lazy-load schemastore when needed
-        on_new_config = function(new_config)
-          new_config.settings.json.schemas = new_config.settings.json.schemas or {}
-          vim.list_extend(new_config.settings.json.schemas, require("schemastore").json.schemas())
+          if client.name == "elixirls" then
+            vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
+            vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
+            vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
+          end
         end,
-        settings = {
-          json = {
-            validate = { enable = true },
-          },
-        },
       })
+
+      -- LSP servers and clients are able to communicate to each other what features they support.
+      --  By default, Neovim doesn't support everything that is in the LSP specification.
+      --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
+      --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       -- jose-elias-alvarez/typescript.nvim
       require("typescript").setup({
@@ -349,8 +306,54 @@ require("lazy").setup({
         go_to_source_definition = {
           fallback = true, -- fall back to standard LSP definition on failure
         },
-        server = {
-          on_attach = on_attach,
+      })
+      -- Enable the following language servers
+      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
+      --
+      --  Add any additional override configuration in the following tables. Available keys are:
+      --  - cmd (table): Override the default command used to start the server
+      --  - filetypes (table): Override the default list of associated filetypes for the server
+      --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
+      --  - settings (table): Override the default settings passed when initializing the server.
+      --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local servers = {
+        lua_ls = {
+          -- cmd = {...},
+          -- filetypes = { ...},
+          settings = {
+            Lua = {
+              completion = { callSnippet = "Replace" },
+              telemetry = { enable = false },
+              hint = { enable = true },
+              diagnostics = { globals = { "vim" } },
+            },
+          },
+        },
+        -- local lexical_config = {
+        --   filetypes = { "elixir", "eelixir", "heex" },
+        --   cmd = { "/home/hvaria/lexical/_build/dev/package/lexical/bin/start_lexical.sh" },
+        --   settings = {},
+        -- }
+        --
+        -- if not configs.lexical then
+        --   configs.lexical = {
+        --     default_config = {
+        --       filetypes = lexical_config.filetypes,
+        --       cmd = lexical_config.cmd,
+        --       root_dir = function(fname)
+        --         return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
+        --       end,
+        --       -- optional settings
+        --       settings = lexical_config.settings,
+        --     },
+        --   }
+        -- end
+        --
+        -- lspconfig.lexical.setup({
+        --   on_attach = on_attach,
+        --   capabilities = capabilities,
+        -- })
+        tsserver = {
           capabilities = capabilities,
           settings = {
             completions = { completeFunctionCalls = true },
@@ -378,24 +381,78 @@ require("lazy").setup({
             },
           },
         },
-      })
+        jsonls = {
+          -- lazy-load schemastore when needed
+          on_new_config = function(new_config)
+            new_config.settings.json.schemas = new_config.settings.json.schemas or {}
+            vim.list_extend(new_config.settings.json.schemas, require("schemastore").json.schemas())
+          end,
+          settings = { json = { validate = { enable = true } } },
+        },
+        cssls = { settings = { css = { lint = { unknownAtRules = "ignore" } } } },
+        tailwindcss = {},
+        svelte = {},
+      }
 
-      -- CSS
-      lspconfig.cssls.setup({
-        on_attach = on_attach,
-        capabilities = capabilities,
-        settings = {
-          css = { lint = { unknownAtRules = "ignore" } },
+      -- Ensure the servers and tools above are installed
+      --  To check the current status of installed tools and/or manually install
+      --  other tools, you can run
+      --    :Mason
+      --
+      --  You can press `g?` for help in this menu.
+      require("mason").setup()
+
+      -- You can add other tools here that you want Mason to install
+      -- for you, so that they are available from within Neovim.
+      local ensure_installed = vim.tbl_keys(servers or {})
+      vim.list_extend(ensure_installed, {
+        "stylua", -- Used to format Lua code
+      })
+      require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+
+      require("mason-lspconfig").setup({
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            -- This handles overriding only values explicitly passed
+            -- by the server configuration above. Useful when disabling
+            -- certain features of an LSP (for example, turning off formatting for tsserver)
+            server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
+            require("lspconfig")[server_name].setup(server)
+          end,
         },
       })
 
-      local servers = { "tailwindcss", "svelte" } -- , 'typst_lsp' }
-      for _, lsp in ipairs(servers) do
-        lspconfig[lsp].setup({
-          on_attach = on_attach,
+      local elixir = require("elixir")
+      local elixirls = require("elixir.elixirls")
+
+      elixir.setup({
+        nextls = {
+          enable = false,
+          port = 9000,
+          cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
+          init_options = {
+            mix_env = "dev",
+            mix_target = "host",
+            experimental = {
+              completions = {
+                enable = true, -- control if completions are enabled. defaults to false
+              },
+            },
+          },
           capabilities = capabilities,
-        })
-      end
+        },
+        credo = { enable = true },
+        elixirls = {
+          enable = true,
+          settings = elixirls.settings({
+            dialyzerEnabled = false,
+            enableTestLenses = true,
+            suggestSpecs = true,
+          }),
+          capabilities = capabilities,
+        },
+      })
     end,
   },
   -- linter
@@ -420,14 +477,21 @@ require("lazy").setup({
       })
     end,
   },
-  -- formatter
+  -- Autoformat
   {
     "stevearc/conform.nvim",
-    event = { "BufReadPre", "BufNewFile" },
     config = function()
       local conform = require("conform")
 
       conform.setup({
+        notify_on_error = false,
+        format_on_save = function(bufnr)
+          local disabled_filetypes = { c = true, cpp = true }
+          return {
+            timeout_ms = 500,
+            lsp_fallback = not disabled_filetypes[vim.bo[bufnr].filetype],
+          }
+        end,
         formatters_by_ft = {
           javascript = { { "prettierd", "prettier" } },
           typescript = { { "prettierd", "prettier" } },
@@ -439,10 +503,6 @@ require("lazy").setup({
           markdown = { { "prettierd", "prettier" } },
           lua = { "stylua" },
         },
-        format_on_save = {
-          lsp_fallback = true,
-          timeout_ms = 500,
-        },
       })
 
       vim.keymap.set({ "n", "v" }, "<leader>p", function()
@@ -452,58 +512,6 @@ require("lazy").setup({
         })
       end, { desc = "Format file or range (in visual mode)" })
     end,
-  },
-  -- snippets
-  {
-    "L3MON4D3/LuaSnip",
-    version = "1.*",
-    build = "make install_jsregexp",
-    dependencies = {
-      "rafamadriz/friendly-snippets",
-      config = function()
-        require("luasnip.loaders.from_vscode").lazy_load()
-      end,
-    },
-    config = function()
-      local lsnip = require("luasnip")
-      require("luasnip.loaders.from_lua").load({ paths = "~/dotfiles/snippets/" })
-      lsnip.config.set_config({
-        history = true, -- keep around last snippet local to jump back
-        updateevents = "TextChanged,TextChangedI", -- update changes as you type
-        delete_check_events = "TextChanged",
-        enable_autosnippets = true,
-        ext_opts = {
-          [require("luasnip.util.types").choiceNode] = {
-            active = { virt_text = { { "·", "Question" } } },
-          },
-        },
-      })
-    end,
-    keys = {
-      {
-        "<a-l>",
-        function()
-          return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>"
-        end,
-        expr = true,
-        silent = true,
-        mode = "i",
-      },
-      {
-        "<a-l>",
-        function()
-          require("luasnip").jump(1)
-        end,
-        mode = "s",
-      },
-      {
-        "<a-h>",
-        function()
-          require("luasnip").jump(-1)
-        end,
-        mode = { "i", "s" },
-      },
-    },
   },
   -- better diagnostics list and others
   {
@@ -561,7 +569,7 @@ require("lazy").setup({
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTrouble" },
-    event = { "BufReadPost", "BufNewFile" },
+    event = "VimEnter",
     config = true,
     -- stylua: ignore
     keys = {
@@ -596,20 +604,70 @@ require("lazy").setup({
   { "windwp/nvim-autopairs", config = true },
   {
     "hrsh7th/nvim-cmp",
-    version = false, -- last release is way too old
     event = "InsertEnter", -- load cmp on InsertEnter
     -- these dependencies will only be loaded when cmp loads
     dependencies = {
+      {
+        "L3MON4D3/LuaSnip",
+        version = "v2.*",
+        build = "make install_jsregexp",
+        dependencies = {
+          "rafamadriz/friendly-snippets",
+          config = function()
+            require("luasnip.loaders.from_vscode").lazy_load()
+          end,
+        },
+        config = function()
+          local lsnip = require("luasnip")
+          require("luasnip.loaders.from_lua").load({ paths = "~/dotfiles/snippets/" })
+          lsnip.config.set_config({
+            history = true, -- keep around last snippet local to jump back
+            updateevents = "TextChanged,TextChangedI", -- update changes as you type
+            delete_check_events = "TextChanged",
+            enable_autosnippets = true,
+            ext_opts = {
+              [require("luasnip.util.types").choiceNode] = {
+                active = { virt_text = { { "·", "Question" } } },
+              },
+            },
+          })
+        end,
+        keys = {
+          {
+            "<a-l>",
+            function()
+              return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>"
+            end,
+            expr = true,
+            silent = true,
+            mode = "i",
+          },
+          {
+            "<a-l>",
+            function()
+              require("luasnip").jump(1)
+            end,
+            mode = "s",
+          },
+          {
+            "<a-h>",
+            function()
+              require("luasnip").jump(-1)
+            end,
+            mode = { "i", "s" },
+          },
+        },
+      },
+      "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-nvim-lsp-signature-help",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "saadparwaiz1/cmp_luasnip",
       "kdheepak/cmp-latex-symbols",
       "onsails/lspkind-nvim",
       { "roobert/tailwindcss-colorizer-cmp.nvim", config = true },
     },
-    opts = function()
+    config = function()
       local cmp = require("cmp")
       local snip_status_ok, luasnip = pcall(require, "luasnip")
       local lspkind_status_ok, lspkind = pcall(require, "lspkind")
@@ -633,7 +691,7 @@ require("lazy").setup({
 
       local format_kinds = lspkind_status_ok and lspkind.cmp_format({ maxwidth = 50, ellipsis_char = "..." }) or nil
 
-      return {
+      cmp.setup({
         formatting = {
           -- ref: https://www.youtube.com/watch?v=_NiWhZeR-MY
           format = function(entry, item)
@@ -644,7 +702,7 @@ require("lazy").setup({
           end,
         },
         completion = {
-          completeopt = "menu,menuone,preview,noselect",
+          completeopt = "menu,menuone,noinsert",
         },
         snippet = {
           expand = function(args)
@@ -713,7 +771,7 @@ require("lazy").setup({
             hl_group = "LspCodeLens",
           },
         },
-      }
+      })
     end,
   },
   {
@@ -723,7 +781,7 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           icons_enabled = true,
-          -- theme = "onedark",
+          theme = "tokyonight",
           globalstatus = true,
           component_separators = "|",
           section_separators = "",
@@ -845,7 +903,6 @@ require("lazy").setup({
 
   {
     "nvim-treesitter/nvim-treesitter",
-    version = false,
     build = ":TSUpdate",
     dependencies = {
       {
@@ -867,7 +924,6 @@ require("lazy").setup({
       },
       "RRethy/nvim-treesitter-endwise",
     },
-    event = { "BufReadPost", "BufNewFile" },
     opts = {
       autotag = {
         enable = true, -- windwp/nvim-ts-autotag
@@ -1051,7 +1107,7 @@ vim.opt.mouse = "a" -- Allow the mouse
 vim.opt.number = true -- Show line numbers
 vim.opt.pumheight = 10 -- Maximum number of entries in a popup
 vim.opt.scrolljump = 4 -- min. lines to scroll
-vim.opt.scrolloff = 4 -- Lines of context
+vim.opt.scrolloff = 10 -- Lines of context
 vim.opt.shiftround = true -- Round indent
 vim.opt.shiftwidth = 2 -- Size of an indent
 -- vim.opt.shortmess                = 'IFc' -- Avoid showing extra message on completion
