@@ -22,8 +22,8 @@ set --export ERL_AFLAGS "-kernel shell_history enabled"
 
 # Erlang installer config
 set --export KERL_CONFIGURE_OPTIONS "--without-javac --without-odbc"
-set --export KERL_INSTALL_MANPAGES true
-set --export KERL_INSTALL_HTMLDOCS true
+set --export KERL_BUILD_DOCS "yes"
+set --export KERL_DOC_TARGETS "chunks"
 
 # asdf version manager
 source $HOME/.asdf/asdf.fish
@@ -32,6 +32,7 @@ source $HOME/.asdf/asdf.fish
 set --export FZF_DEFAULT_COMMAND "rg --files --follow"
 set --export FZF_DEFAULT_OPTS "--reverse"
 set --export FZF_CTRL_T_COMMAND "rg --files --follow"
+set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 # Path
 set fish_user_paths \
@@ -54,7 +55,6 @@ alias gs="git status"
 alias gl="git log --oneline --decorate -20"
 alias gla="git log --oneline --decorate --graph --all"
 alias nvimrc="$EDITOR ~/dotfiles/init.lua"
-alias weather="curl wttr.in"
 alias less='less -R'
 alias pac="pacman"
 alias paci="sudo pacman --sync"
