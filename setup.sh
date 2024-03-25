@@ -23,8 +23,8 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep bat wezterm \
-  ttf-firacode-nerd ttf-jetbrains-mono ttf-jetbrains-mono-nerd exa starship trash-cli lazygit fd ncdu\
+sudo pacman -Syu fish neovim python-pynvim fzf ripgrep bat zoxide \
+  ttf-firacode-nerd ttf-firacode exa trash-cli lazygit fd ncdu\
   erlang elixir fop wxgtk inotify-tools postgresql
 # optional
 # weechat pdfarranger
@@ -34,9 +34,6 @@ sudo pacman -Syu zsh neovim python-pynvim fzf ripgrep bat wezterm \
 # konsole font size JetBrains Mono SemiBold 10
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Inconsolata SemiBold 12'"
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'JetBrains Mono SemiBold 10'"
-
-# starship.toml
-ln -sf `pwd`/starship.toml ~/.config/starship.toml
 
 # git
 git config --global user.email "hardikvaria@gmail.com"
@@ -49,11 +46,13 @@ ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
 
-# zsh and zplug
-curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
-ln -sf ~/dotfiles/zshrc ~/.zshrc
-chsh -s /usr/bin/zsh
+# fish and fisher
+curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+ln -sf ~/dotfiles/config.fish ~/.config/fish/config.fish
+ln -sf ~/dotfiles/fish_plugins ~/.config/fish/fish_plugins
+chsh -s /bin/fish
 
 # create a file in home dir ~/.npmrc with 'ignore-scripts=true'
+echo 'ignore-scripts=true' > .npmrc
 # node global packages
 npm i -g neovim pnpm
