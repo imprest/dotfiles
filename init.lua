@@ -83,11 +83,8 @@ require("lazy").setup({
     version = "v3.*",
     dependencies = { "famiu/bufdelete.nvim", { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font } },
     opts = {
-      highlights = { fill = { bg = "" }, buffer_selected = { italic = false, bold = false } },
+      -- highlights = { fill = { bg = "" }, buffer_selected = { italic = false, bold = false } },
       options = {
-        always_show_bufferline = true,
-        show_buffer_close_icons = false,
-        show_close_icon = false,
         offsets = { { filetype = "neo-tree", highlight = "Directory" } },
         custom_filter = function(buf_number, _) -- hide shell and other unknown ft
           if vim.bo[buf_number].filetype ~= "" then
@@ -327,27 +324,27 @@ require("lazy").setup({
             },
           },
         },
-        lexical = {
-          cmd = { "/home/hvaria/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
-          filetypes = { "elixir", "eelixir", "heex" },
-          settings = {},
-        },
-        nextls = {
-          filetypes = { "elixir", "eelixir", "heex" },
-          enable = true,
-          -- port = 9000,
-          -- cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
-          -- init_options = {
-          --   mix_env = "dev",
-          --   mix_target = "host",
-          --   experimental = {
-          --     completions = {
-          --       enable = true, -- control if completions are enabled. defaults to false
-          --     },
-          --   },
-          -- },
-          -- capabilities = capabilities,
-        },
+        -- lexical = {
+        --   cmd = { "/home/hvaria/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
+        --   filetypes = { "elixir", "eelixir", "heex" },
+        --   settings = {},
+        -- },
+        -- nextls = {
+        --   filetypes = { "elixir", "eelixir", "heex" },
+        --   enable = true,
+        -- port = 9000,
+        -- cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
+        -- init_options = {
+        --   mix_env = "dev",
+        --   mix_target = "host",
+        --   experimental = {
+        --     completions = {
+        --       enable = true, -- control if completions are enabled. defaults to false
+        --     },
+        --   },
+        -- },
+        -- capabilities = capabilities,
+        -- },
         tsserver = {
           capabilities = capabilities,
           settings = {
@@ -716,7 +713,7 @@ require("lazy").setup({
           end,
         },
         completion = {
-          completeopt = "menu,menuone,noinsert",
+          completeopt = "menu,menuone,preview,noselect",
         },
         snippet = {
           expand = function(args)
@@ -813,16 +810,8 @@ require("lazy").setup({
             },
           },
         },
-        inactive_sections = {
-          lualine_a = { "filename" },
-          lualine_b = {},
-          lualine_c = {},
-          lualine_x = {},
-          lualine_y = {},
-          lualine_z = {},
-        },
         tabline = {},
-        extensions = { "quickfix", "neo-tree", "fzf" },
+        extensions = { "quickfix", "neo-tree", "fzf", "trouble", "mason", "aerial" },
       })
     end,
   },
@@ -1095,7 +1084,7 @@ local width = 85
 vim.opt.hlsearch = true
 vim.opt.backup = false
 vim.opt.breakindent = true
-vim.opt.completeopt = "menuone,noselect" -- Completion options
+vim.opt.completeopt = "menu,menuone,noselect" -- Completion options
 vim.opt.conceallevel = 3 -- Hide * markip for bold and italic
 vim.opt.cursorline = false -- Highlight cursor line
 vim.opt.equalalways = false -- I don't like my windows changing all the time
