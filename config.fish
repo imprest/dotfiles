@@ -130,3 +130,13 @@ function dotenv --description 'Load environment variables from .env file'
         end
     end
 end
+
+# fo [FUZZY PATTERN] - Open the selected file with the default editor
+#   - Bypass fuzzy finder if there's only one match (--select-1)
+#   - Exit if there's no match (--exit-0)
+function fo 
+  set files (fzf-tmux --query=$argv --multi --select-1 --exit-0) 
+  if test $status -eq 0; and test -n $files; and test -e $files 
+    $EDITOR $files
+  end
+end
