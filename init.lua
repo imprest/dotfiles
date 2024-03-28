@@ -204,7 +204,7 @@ require("lazy").setup({
         opts = {
           ensure_installed = {
             "lua_ls",
-            "cssls",
+            -- "cssls",
             "html",
             "jsonls",
             "tsserver",
@@ -305,6 +305,12 @@ require("lazy").setup({
         },
       })
 
+      require("elixir").setup({
+        nextls = { enable = false },
+        credo = { enable = true },
+        elixirls = { enable = false },
+      })
+
       -- Enable the following language servers
       --  Add any additional override configuration in the following tables. Available keys are:
       --  - cmd (table): Override the default command used to start the server
@@ -314,7 +320,6 @@ require("lazy").setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         lua_ls = {
-          -- cmd = {...},
           settings = {
             Lua = {
               completion = { callSnippet = "Replace" },
@@ -327,26 +332,13 @@ require("lazy").setup({
         -- lexical = {
         --   cmd = { "/home/hvaria/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
         --   filetypes = { "elixir", "eelixir", "heex" },
+        --   root_dir = function(fname)
+        --     return require("lspconfig").util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
+        --   end,
         --   settings = {},
         -- },
-        -- nextls = {
-        --   filetypes = { "elixir", "eelixir", "heex" },
-        --   enable = true,
-        -- port = 9000,
-        -- cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
-        -- init_options = {
-        --   mix_env = "dev",
-        --   mix_target = "host",
-        --   experimental = {
-        --     completions = {
-        --       enable = true, -- control if completions are enabled. defaults to false
-        --     },
-        --   },
-        -- },
-        -- capabilities = capabilities,
-        -- },
+        elixirls = { settings = { dialyzerEnabled = false, enableTestLenses = true } },
         tsserver = {
-          capabilities = capabilities,
           settings = {
             completions = { completeFunctionCalls = true },
             javascript = {
@@ -381,7 +373,7 @@ require("lazy").setup({
           end,
           settings = { json = { validate = { enable = true } } },
         },
-        cssls = { settings = { css = { lint = { unknownAtRules = "ignore" } } } },
+        -- cssls = { settings = { css = { lint = { unknownAtRules = "ignore" } } } },
         tailwindcss = {},
         svelte = {},
       }
@@ -408,61 +400,33 @@ require("lazy").setup({
             require("lspconfig")[server_name].setup(server)
           end,
         },
-        -- local lexical_config = {
-        --   filetypes = { "elixir", "eelixir", "heex" },
-        --   cmd = { "/home/hvaria/lexical/_build/dev/package/lexical/bin/start_lexical.sh" },
-        --   settings = {},
-        -- }
-        --
-        -- if not configs.lexical then
-        --   configs.lexical = {
-        --     default_config = {
-        --       filetypes = lexical_config.filetypes,
-        --       cmd = lexical_config.cmd,
-        --       root_dir = function(fname)
-        --         return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
-        --       end,
-        --       -- optional settings
-        --       settings = lexical_config.settings,
-        --     },
-        --   }
-        -- end
-        --
-        -- lspconfig.lexical.setup({
-        --   on_attach = on_attach,
-        --   capabilities = capabilities,
-        -- })
       })
 
-      -- local elixir = require("elixir")
-      -- local elixirls = require("elixir.elixirls")
+      -- local lspconfig = require("lspconfig")
+      -- local configs = require("lspconfig.configs")
       --
-      -- elixir.setup({
-      --   nextls = {
-      --     enable = false,
-      --     port = 9000,
-      --     cmd = "/home/hvaria/.local/share/nvim/mason/bin/nextls",
-      --     init_options = {
-      --       mix_env = "dev",
-      --       mix_target = "host",
-      --       experimental = {
-      --         completions = {
-      --           enable = true, -- control if completions are enabled. defaults to false
-      --         },
-      --       },
+      -- local lexical_config = {
+      --   filetypes = { "elixir", "eelixir", "heex" },
+      --   cmd = { "/home/hvaria/lexical/_build/dev/package/lexical/bin/start_lexical.sh" },
+      --   settings = {},
+      -- }
+      --
+      -- if not configs.lexical then
+      --   configs.lexical = {
+      --     default_config = {
+      --       filetypes = lexical_config.filetypes,
+      --       cmd = lexical_config.cmd,
+      --       root_dir = function(fname)
+      --         return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
+      --       end,
+      --       -- optional settings
+      --       settings = lexical_config.settings,
       --     },
-      --     capabilities = capabilities,
-      --   },
-      --   credo = { enable = true },
-      --   elixirls = {
-      --     enable = true,
-      --     settings = elixirls.settings({
-      --       dialyzerEnabled = false,
-      --       enableTestLenses = true,
-      --       suggestSpecs = true,
-      --     }),
-      --     capabilities = capabilities,
-      --   },
+      --   }
+      -- end
+      --
+      -- lspconfig.lexical.setup({
+      --   capabilities = vim.tbl_deep_extend("force", {}, capabilities, lspconfig.lexical.capabilities or {}),
       -- })
     end,
   },
