@@ -56,6 +56,15 @@ require("lazy").setup({
       vim.cmd.colorscheme("tokyonight-moon")
       -- You can configure highlights by doing something like:
       -- vim.cmd.hi 'Comment gui=none'
+      vim.api.nvim_set_hl(0, "Normal", { bg = "none", ctermbg = "none" })
+      vim.api.nvim_set_hl(0, "NormalNC", { bg = "none", ctermbg = "none" })
+      vim.api.nvim_set_hl(0, "NormalSB", { bg = "none", ctermbg = "none" })
+      vim.api.nvim_set_hl(0, "NonText", { bg = "none", ctermbg = "none" })
+      vim.api.nvim_set_hl(0, "SignColumn", { bg = "none", ctermbg = "none" })
+      vim.api.nvim_set_hl(0, "SignColumnNC", { bg = "none", ctermbg = "none" })
+      vim.api.nvim_set_hl(0, "SignColumnSB", { bg = "none", ctermbg = "none" })
+      vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "none", ctermbg = "none" })
+      vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "none", ctermbg = "none" })
     end,
   },
   -- {
@@ -1101,7 +1110,7 @@ vim.opt.undofile = true
 vim.opt.updatetime = 250 -- make updates faster and trigger CursorHold
 vim.opt.wildmode = "longest:full,full" -- Command-line completion mode
 vim.opt.winminwidth = 5 -- Minimum window width
-vim.opt.wrap = true -- Disable line wrap
+vim.opt.wrap = false -- Disable line wrap
 vim.opt.writebackup = false
 
 -------------------- MAPPINGS ------------------------------
