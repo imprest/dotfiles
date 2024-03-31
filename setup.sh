@@ -23,7 +23,7 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu fish neovim python-pynvim fzf ripgrep bat zoxide \
+sudo pacman -Syu fish neovim python-pynvim fzf ripgrep bat zoxide alacritty \
   ttf-firacode-nerd ttf-firacode exa trash-cli lazygit fd ncdu\
   erlang elixir fop wxgtk inotify-tools postgresql
 # optional
@@ -38,6 +38,9 @@ sudo pacman -Syu fish neovim python-pynvim fzf ripgrep bat zoxide \
 # git
 git config --global user.email "hardikvaria@gmail.com"
 git config --global user.name  "Hardik Varia"
+
+# alacritty
+ln -sf ~/dotfiles/alacritty.toml ~/.alacritty.toml
 
 # neovim
 mkdir -p ~/.config/nvim
