@@ -34,19 +34,20 @@ table.insert(mykeys, { key = "j", mods = "CTRL|ALT", action = act.AdjustPaneSize
 table.insert(mykeys, { key = "k", mods = "CTRL|ALT", action = act.AdjustPaneSize({ "Up", 1 }) })
 table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize({ "Right", 1 }) })
 
--- config.line_height = 1.1
-config.font = wezterm.font({
-	family = "Fira Code",
-	weight = "Medium",
-	stretch = "Expanded",
-	harfbuzz_features = {
-		"calt=1",
-		"clig=1",
-		"liga=1",
+config.line_height = 1.07
+config.font = wezterm.font_with_fallback({
+	{
+		family = "Fira Code",
+		weight = "Medium",
+		harfbuzz_features = {
+			-- "calt=1",
+			-- "clig=1",
+			-- "liga=1",
+		},
 	},
+	{ family = "Symbols Nerd Font Mono", scale = 0.65 },
 })
-config.bold_brightens_ansi_colors = "BrightOnly"
-config.freetype_load_target = "Light"
+config.use_cap_height_to_scale_fallback_fonts = true
 config.font_size = 10.49
 config.anti_alias_custom_block_glyphs = false
 config.warn_about_missing_glyphs = false
