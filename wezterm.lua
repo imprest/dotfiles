@@ -68,8 +68,8 @@ config.initial_cols = 130
 config.initial_rows = 38
 config.window_background_opacity = 0.95
 config.window_padding = {
-	left = 0,
-	right = 0,
+	left = 2,
+	right = 2,
 	top = 0,
 	bottom = 0,
 }
