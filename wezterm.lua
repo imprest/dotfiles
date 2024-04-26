@@ -3,17 +3,17 @@ local act = wezterm.action
 local config = {}
 
 if wezterm.config_builder then
-	config = wezterm.config_builder()
+  config = wezterm.config_builder()
 end
 
 local mykeys = {}
 for i = 1, 8 do
-	-- CTRL+ALT + number to activate that tab
-	table.insert(mykeys, {
-		key = tostring(i),
-		mods = "CTRL|ALT",
-		action = act({ ActivateTab = i - 1 }),
-	})
+  -- CTRL+ALT + number to activate that tab
+  table.insert(mykeys, {
+    key = tostring(i),
+    mods = "CTRL|ALT",
+    action = act({ ActivateTab = i - 1 }),
+  })
 end
 
 table.insert(mykeys, { key = "c", mods = "ALT", action = act.ActivateCopyMode })
@@ -36,21 +36,21 @@ table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize
 
 -- config.line_height = 1.00
 config.font = wezterm.font_with_fallback({
-	{
-		family = "JetBrains Mono",
-		weight = "Medium",
-		harfbuzz_features = {
-			"calt",
-			"clig",
-			"liga",
-			"zero",
-			-- "ss01", -- Classic Construction
-			"ss19", -- == !==
-			"cv02", -- t
-			"cv17", -- f
-		},
-	},
-	{ family = "Symbols Nerd Font Mono", scale = 0.65 },
+  {
+    family = "JetBrains Mono",
+    weight = "Medium",
+    harfbuzz_features = {
+      "calt",
+      "clig",
+      "liga",
+      "zero",
+      -- "ss01", -- Classic Construction
+      "ss19", -- == !==
+      "cv02", -- t
+      "cv17", -- f
+    },
+  },
+  { family = "Symbols Nerd Font Mono", scale = 0.65 },
 })
 config.use_cap_height_to_scale_fallback_fonts = true
 config.font_size = 10.5
@@ -66,12 +66,12 @@ config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = "RESIZE"
 config.initial_cols = 130
 config.initial_rows = 38
-config.window_background_opacity = 0.95
+-- config.window_background_opacity = 0.95
 config.window_padding = {
-	left = 0,
-	right = 0,
-	top = 0,
-	bottom = 0,
+  left = 2,
+  right = 2,
+  top = 0,
+  bottom = 0,
 }
 config.audible_bell = "Disabled"
 config.scrollback_lines = 10000
