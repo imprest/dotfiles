@@ -50,23 +50,31 @@ require("lazy").setup({
     opts = { user_default_options = { tailwind = true } },
   },
   {
-    "folke/tokyonight.nvim",
-    priority = 1000, -- Make sure to load this before all the other start plugins.
+    "catppuccin/nvim",
+    name = "catppuccin",
+    priority = 1000,
     init = function()
-      vim.cmd.colorscheme("tokyonight-moon")
-      -- You can configure highlights by doing something like:
-      -- vim.cmd.hi 'Comment gui=none'
-      vim.api.nvim_set_hl(0, "Normal", { bg = "none", ctermbg = "none" })
-      vim.api.nvim_set_hl(0, "NormalNC", { bg = "none", ctermbg = "none" })
-      vim.api.nvim_set_hl(0, "NormalSB", { bg = "none", ctermbg = "none" })
-      vim.api.nvim_set_hl(0, "NonText", { bg = "none", ctermbg = "none" })
-      vim.api.nvim_set_hl(0, "SignColumn", { bg = "none", ctermbg = "none" })
-      vim.api.nvim_set_hl(0, "SignColumnNC", { bg = "none", ctermbg = "none" })
-      vim.api.nvim_set_hl(0, "SignColumnSB", { bg = "none", ctermbg = "none" })
-      vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "none", ctermbg = "none" })
-      vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "none", ctermbg = "none" })
+      vim.cmd.colorscheme("catppuccin")
     end,
   },
+  -- {
+  --   "folke/tokyonight.nvim",
+  --   priority = 1000, -- Make sure to load this before all the other start plugins.
+  --   init = function()
+  --     vim.cmd.colorscheme("tokyonight-moon")
+  --     -- You can configure highlights by doing something like:
+  --     -- vim.cmd.hi 'Comment gui=none'
+  --     vim.api.nvim_set_hl(0, "Normal", { bg = "none", ctermbg = "none" })
+  --     vim.api.nvim_set_hl(0, "NormalNC", { bg = "none", ctermbg = "none" })
+  --     vim.api.nvim_set_hl(0, "NormalSB", { bg = "none", ctermbg = "none" })
+  --     vim.api.nvim_set_hl(0, "NonText", { bg = "none", ctermbg = "none" })
+  --     vim.api.nvim_set_hl(0, "SignColumn", { bg = "none", ctermbg = "none" })
+  --     vim.api.nvim_set_hl(0, "SignColumnNC", { bg = "none", ctermbg = "none" })
+  --     vim.api.nvim_set_hl(0, "SignColumnSB", { bg = "none", ctermbg = "none" })
+  --     vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "none", ctermbg = "none" })
+  --     vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "none", ctermbg = "none" })
+  --   end,
+  -- },
   -- {
   --   "NTBBloodbath/doom-one.nvim",
   --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
@@ -192,7 +200,7 @@ require("lazy").setup({
     dependencies = {
       { "dgagn/diagflow.nvim", event = "LspAttach", opts = {} }, -- put diagnostic msg @ top right corner
       "elixir-editors/vim-elixir",
-      "elixir-tools/elixir-tools.nvim",
+      -- "elixir-tools/elixir-tools.nvim",
       "jose-elias-alvarez/typescript.nvim",
       {
         "b0o/schemastore.nvim",
@@ -292,12 +300,6 @@ require("lazy").setup({
             map("<leader>o", "<cmd>TypescriptOrganizeImports<CR>", "Organize Imports")
             map("<leader>R", "<cmd>TypescriptRenameFile<CR>", "Rename File")
           end
-
-          if client.name == "elixirls" then
-            vim.keymap.set("n", "<space>fp", ":ElixirFromPipe<cr>", { buffer = true, noremap = true })
-            vim.keymap.set("n", "<space>tp", ":ElixirToPipe<cr>", { buffer = true, noremap = true })
-            vim.keymap.set("v", "<space>em", ":ElixirExpandMacro<cr>", { buffer = true, noremap = true })
-          end
         end,
       })
 
@@ -315,12 +317,6 @@ require("lazy").setup({
         go_to_source_definition = {
           fallback = true, -- fall back to standard LSP definition on failure
         },
-      })
-
-      require("elixir").setup({
-        nextls = { enable = false },
-        credo = { enable = true },
-        elixirls = { enable = false },
       })
 
       -- Enable the following language servers
@@ -341,15 +337,14 @@ require("lazy").setup({
             },
           },
         },
-        -- lexical = {
-        --   cmd = { "/home/hvaria/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
-        --   filetypes = { "elixir", "eelixir", "heex" },
-        --   root_dir = function(fname)
-        --     return require("lspconfig").util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
-        --   end,
-        --   settings = {},
-        -- },
-        elixirls = { settings = { dialyzerEnabled = false, enableTestLenses = true } },
+        lexical = {
+          -- cmd = { "/home/hvaria/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
+          filetypes = { "elixir", "eelixir", "heex" },
+          root_dir = function(fname)
+            return require("lspconfig").util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
+          end,
+          settings = {},
+        },
         tsserver = {
           settings = {
             completions = { completeFunctionCalls = true },
@@ -385,7 +380,7 @@ require("lazy").setup({
           end,
           settings = { json = { validate = { enable = true } } },
         },
-        -- cssls = { settings = { css = { lint = { unknownAtRules = "ignore" } } } },
+        cssls = { settings = { css = { lint = { unknownAtRules = "ignore" } } } },
         tailwindcss = {},
         svelte = {},
       }
@@ -413,33 +408,6 @@ require("lazy").setup({
           end,
         },
       })
-
-      -- local lspconfig = require("lspconfig")
-      -- local configs = require("lspconfig.configs")
-      --
-      -- local lexical_config = {
-      --   filetypes = { "elixir", "eelixir", "heex" },
-      --   cmd = { "/home/hvaria/lexical/_build/dev/package/lexical/bin/start_lexical.sh" },
-      --   settings = {},
-      -- }
-      --
-      -- if not configs.lexical then
-      --   configs.lexical = {
-      --     default_config = {
-      --       filetypes = lexical_config.filetypes,
-      --       cmd = lexical_config.cmd,
-      --       root_dir = function(fname)
-      --         return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.os_homedir()
-      --       end,
-      --       -- optional settings
-      --       settings = lexical_config.settings,
-      --     },
-      --   }
-      -- end
-      --
-      -- lspconfig.lexical.setup({
-      --   capabilities = vim.tbl_deep_extend("force", {}, capabilities, lspconfig.lexical.capabilities or {}),
-      -- })
     end,
   },
   -- linter
@@ -768,7 +736,7 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           icons_enabled = true,
-          theme = "tokyonight",
+          theme = "catppuccin",
           globalstatus = true,
           component_separators = "|",
           section_separators = "",
