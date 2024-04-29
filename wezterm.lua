@@ -75,7 +75,7 @@ config.window_padding = {
 }
 config.audible_bell = "Disabled"
 config.scrollback_lines = 10000
-config.color_scheme = "Catppuccin"
+config.color_scheme = "Catppuccin Macchiato"
 config.exit_behavior = "Close"
 config.front_end = "WebGpu"
 config.keys = mykeys
