@@ -79,5 +79,6 @@ config.color_scheme = "Catppuccin Macchiato"
 config.exit_behavior = "Close"
 config.front_end = "WebGpu"
 config.keys = mykeys
+config.xcursor_theme = "Adwaita"
 
 return config
