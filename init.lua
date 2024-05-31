@@ -97,7 +97,7 @@ require("lazy").setup({
   -- },
   {
     "akinsho/bufferline.nvim",
-    version = "v3.*",
+    version = "*",
     dependencies = { "famiu/bufdelete.nvim", { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font } },
     opts = {
       -- highlights = { fill = { bg = "" }, buffer_selected = { italic = false, bold = false } },
