@@ -7,17 +7,20 @@ vim.g.maplocalleader = ";"
 vim.g.have_nerd_font = true
 
 -------------------- LAZY.NVIM -----------------------------
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy/lazy.nvim"
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "--branch=stable", -- latest stable release
-    lazyrepo,
-    lazypath,
-  })
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -45,7 +48,7 @@ require("lazy").setup({
   },
   {
     "NvChad/nvim-colorizer.lua",
-    ft = { "javascript", "typescript", "typescriptreact", "css", "html", "postcss" },
+    ft = { "javascript", "ts_ls", "css", "html", "postcss" },
     cmd = "ColorizerToggle",
     opts = { user_default_options = { tailwind = true } },
   },
@@ -57,50 +60,12 @@ require("lazy").setup({
       vim.cmd.colorscheme("catppuccin-macchiato")
     end,
   },
-  -- {
-  --   "folke/tokyonight.nvim",
-  --   priority = 1000, -- Make sure to load this before all the other start plugins.
-  --   init = function()
-  --     vim.cmd.colorscheme("tokyonight-moon")
-  --     -- You can configure highlights by doing something like:
-  --     -- vim.cmd.hi 'Comment gui=none'
-  --     vim.api.nvim_set_hl(0, "Normal", { bg = "none", ctermbg = "none" })
-  --     vim.api.nvim_set_hl(0, "NormalNC", { bg = "none", ctermbg = "none" })
-  --     vim.api.nvim_set_hl(0, "NormalSB", { bg = "none", ctermbg = "none" })
-  --     vim.api.nvim_set_hl(0, "NonText", { bg = "none", ctermbg = "none" })
-  --     vim.api.nvim_set_hl(0, "SignColumn", { bg = "none", ctermbg = "none" })
-  --     vim.api.nvim_set_hl(0, "SignColumnNC", { bg = "none", ctermbg = "none" })
-  --     vim.api.nvim_set_hl(0, "SignColumnSB", { bg = "none", ctermbg = "none" })
-  --     vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "none", ctermbg = "none" })
-  --     vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "none", ctermbg = "none" })
-  --   end,
-  -- },
-  -- {
-  --   "NTBBloodbath/doom-one.nvim",
-  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
-  --   priority = 1000, -- make sure to load this before all the other start plugins
-  --   init = function()
-  --     vim.g.doom_one_plugin_telescope = true
-  --   end,
-  --   config = function() -- load the colorscheme here
-  --     -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
-  --     vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guifg=#bbc2cf guibg=#282c34]])
-  --     vim.cmd([[colorscheme doom-one]])
-  --   end,
-  -- },
-  -- {
-  --   "navarasu/onedark.nvim",
-  --   priority = 1000,
-  --   config = function()
-  --     vim.cmd.colorscheme("onedark")
-  --   end,
-  -- },
   {
     "akinsho/bufferline.nvim",
     version = "*",
     dependencies = { "famiu/bufdelete.nvim", { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font } },
     opts = {
-      -- highlights = { fill = { bg = "" }, buffer_selected = { italic = false, bold = false } },
+      highlights = { fill = { bg = "" }, buffer_selected = { italic = false } },
       options = {
         numbers = function(opts)
           return string.format("%s ", opts.ordinal)
@@ -227,7 +192,7 @@ require("lazy").setup({
             -- "cssls",
             "html",
             "jsonls",
-            "tsserver",
+            "ts_ls",
             "tailwindcss",
             "svelte",
           },
@@ -284,17 +249,17 @@ require("lazy").setup({
 
           -- Highlight references under the cursor and clear hl when moving cursor
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.server_capabilities.documentHighlightProvider then
-            vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-              buffer = event.buf,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-              buffer = event.buf,
-              callback = vim.lsp.buf.clear_references,
-            })
-          end
+          -- if client and client.server_capabilities.documentHighlightProvider then
+          --   vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+          --     buffer = event.buf,
+          --     callback = vim.lsp.buf.document_highlight,
+          --   })
+          --
+          --   vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+          --     buffer = event.buf,
+          --     callback = vim.lsp.buf.clear_references,
+          --   })
+          -- end
 
           if client.name == "tsserver" then
             map("<leader>o", "<cmd>TypescriptOrganizeImports<CR>", "Organize Imports")
@@ -311,13 +276,13 @@ require("lazy").setup({
       capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
       -- jose-elias-alvarez/typescript.nvim
-      require("typescript").setup({
-        disable_commands = false, -- prevent the plugin from creating Vim commands
-        debug = false, -- enable debug logging for commands
-        go_to_source_definition = {
-          fallback = true, -- fall back to standard LSP definition on failure
-        },
-      })
+      -- require("typescript").setup({
+      --   disable_commands = false, -- prevent the plugin from creating Vim commands
+      --   debug = false, -- enable debug logging for commands
+      --   go_to_source_definition = {
+      --     fallback = true, -- fall back to standard LSP definition on failure
+      --   },
+      -- })
 
       -- Enable the following language servers
       --  Add any additional override configuration in the following tables. Available keys are:
@@ -345,7 +310,7 @@ require("lazy").setup({
           end,
           settings = {},
         },
-        tsserver = {
+        ts_ls = {
           settings = {
             completions = { completeFunctionCalls = true },
             javascript = {
@@ -657,7 +622,7 @@ require("lazy").setup({
           end,
         },
         completion = {
-          completeopt = "menu,menuone,preview,noselect",
+          completeopt = "menuone,preview,noselect",
         },
         snippet = {
           expand = function(args)
@@ -801,19 +766,6 @@ require("lazy").setup({
           expander_expanded = "",
           expander_highlight = "NeoTreeExpander",
         },
-      },
-    },
-  },
-  -- search/replace in multiple files
-  {
-    "windwp/nvim-spectre",
-    keys = {
-      {
-        "<A-s>",
-        function()
-          require("spectre").open()
-        end,
-        desc = "Replace in files (spectre)",
       },
     },
   },
@@ -1033,64 +985,66 @@ require("lazy").setup({
 -------------------- OPTIONS -------------------------------
 local width = 85
 -- global options
-vim.opt.hlsearch = true
-vim.opt.backup = false
-vim.opt.breakindent = true
-vim.opt.completeopt = "menu,menuone,noselect" -- Completion options
-vim.opt.conceallevel = 3 -- Hide * markip for bold and italic
-vim.opt.cursorline = true -- Highlight cursor line
-vim.opt.equalalways = false -- I don't like my windows changing all the time
-vim.opt.expandtab = true -- Use spaces instead of tabs
-vim.opt.foldcolumn = "0" -- '0' is not bad
-vim.opt.foldlevel = 99
-vim.opt.foldlevelstart = 99
-vim.opt.foldenable = true
-vim.opt.foldmethod = "indent" -- expr
--- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-vim.opt.formatoptions = "q1jl" -- Automatic formatting options
-vim.cmd([[set formatoptions-=ro]])
-vim.opt.guicursor = "i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1"
-vim.opt.grepformat = "%f:%l:%c:%m"
-vim.opt.grepprg = "rg --vimgrep"
-vim.opt.ignorecase = true -- Ignore case
-vim.opt.joinspaces = false -- No double spaces with join
-vim.opt.laststatus = 3 -- global statusline
-vim.opt.linebreak = true
-vim.opt.list = true -- Show some invisible characters
-vim.opt.listchars = "tab:▸ ,extends:>,precedes:<"
-vim.opt.mouse = "a" -- Allow the mouse
-vim.opt.number = true -- Show line numbers
-vim.opt.pumheight = 10 -- Maximum number of entries in a popup
-vim.opt.scrolljump = 4 -- min. lines to scroll
-vim.opt.scrolloff = 10 -- Lines of context
-vim.opt.shiftround = true -- Round indent
-vim.opt.shiftwidth = 2 -- Size of an indent
--- vim.opt.shortmess                = 'IFc' -- Avoid showing extra message on completion
-vim.opt.shortmess:append({ W = true, I = true, c = true })
-vim.opt.showbreak = "↪  "
-vim.opt.showbreak = "↪  "
-vim.opt.showmatch = true
-vim.opt.showmode = false -- Don't show mode since we have a statusline
-vim.opt.sidescrolloff = 8 -- Columns of context
-vim.opt.signcolumn = "yes:1" -- Show sign column
-vim.opt.smartcase = true -- Don't ignore case with capitals
--- vim.opt.smartindent   = true    -- Insert indents automatically
-vim.opt.spelllang = { "en_GB" }
-vim.opt.softtabstop = 2
-vim.opt.splitbelow = true -- Put new windows below current
-vim.opt.splitright = true -- Put new windows right of current
-vim.opt.swapfile = false
-vim.opt.tabstop = 2 -- Number of spaces tabs count for
-vim.opt.termguicolors = true -- True color support
-vim.opt.textwidth = width -- Maximum width of text
-vim.opt.timeoutlen = 300 -- mapping timeout
-vim.opt.undodir = "/home/hvaria/.nvim/undo"
-vim.opt.undofile = true
-vim.opt.updatetime = 250 -- make updates faster and trigger CursorHold
-vim.opt.wildmode = "longest:full,full" -- Command-line completion mode
-vim.opt.winminwidth = 5 -- Minimum window width
-vim.opt.wrap = false -- Disable line wrap
-vim.opt.writebackup = false
+vim.o.hlsearch = true
+vim.o.backup = false
+vim.o.breakindent = true
+vim.o.conceallevel = 0 -- So that `` is visible in markdown files (default: 1)
+vim.o.cursorline = false -- Highlight cursor line
+vim.o.equalalways = false -- I don't like my windows changing all the time
+vim.o.foldcolumn = "0" -- '0' is not bad
+vim.o.foldlevel = 99
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+vim.o.foldmethod = "indent" -- expr
+-- vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+vim.o.guicursor = "i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1"
+vim.o.grepformat = "%f:%l:%c:%m"
+vim.o.grepprg = "rg --vimgrep"
+vim.o.ignorecase = true -- Ignore case
+vim.o.joinspaces = false -- No double spaces with join
+vim.o.laststatus = 3 -- global statusline
+vim.o.wrap = false -- Disable line wrap
+vim.o.linebreak = true -- Companion to wrap, don't split words (default: false)
+vim.o.autoindent = true -- Copy indent from current line when starting new one (default: true)
+vim.o.list = true -- Show some invisible characters
+vim.o.listchars = "tab:▸ ,extends:>,precedes:<"
+vim.o.mouse = "a" -- Allow the mouse
+vim.wo.number = true -- Show line numbers
+vim.o.pumheight = 10 -- Maximum number of entries in a popup
+vim.o.scrolljump = 4 -- min. lines to scroll
+vim.o.scrolloff = 4 -- Lines of context
+vim.o.sidescrolloff = 8 -- Columns of context
+vim.o.shiftround = true -- Round indent
+vim.o.showbreak = "↪  "
+vim.o.showbreak = "↪  "
+vim.o.showmatch = true
+vim.o.showmode = false -- Don't show mode since we have a statusline
+vim.wo.signcolumn = "yes:1" -- Show sign column
+vim.o.smartcase = true -- Don't ignore case with capitals
+vim.o.spelllang = "en_GB"
+vim.o.shiftwidth = 2 -- Size of an indent
+vim.o.tabstop = 2 -- Number of spaces tabs count for
+vim.o.softtabstop = 2
+vim.o.expandtab = true -- Use spaces instead of tabs
+vim.o.splitbelow = true -- Put new windows below current
+vim.o.splitright = true -- Put new windows right of current
+vim.o.smartindent = true -- Make indenting smarter again (default: false)
+vim.o.termguicolors = true -- True color support
+vim.o.textwidth = width -- Maximum width of text
+vim.o.winminwidth = 5 -- Minimum window width
+vim.o.swapfile = false
+vim.o.writebackup = false
+vim.o.updatetime = 250 -- make updates faster and trigger CursorHold
+vim.o.timeoutlen = 300 -- mapping timeout
+vim.o.undofile = true
+vim.o.undodir = "/home/hvaria/.nvim/undo"
+vim.o.completeopt = "menuone,noselect" -- Completion options
+vim.opt.shortmess:append("c") -- Don't give |ins-completion-menu| messages (default: does not include 'c')
+vim.opt.iskeyword:append("-") -- Hyphenated words recognized by searches (default: does not include '-')
+vim.o.formatoptions = "q1jl" -- Automatic formatting options
+vim.opt.formatoptions:remove({ "c", "r", "o" }) -- Don't insert the current comment leader automatically for auto-wrapping comments using 'textwidth', hitting <Enter> in insert mode, or hitting 'o' or 'O' in normal mode. (default: 'croql')
+vim.opt.runtimepath:remove("/usr/share/vim/vimfiles") -- Separate Vim plugins from Neovim in case Vim still in use (default: includes this path if Vim is installed)
+vim.o.wildmode = "longest:full,full" -- Command-line completion mode
 
 -------------------- MAPPINGS ------------------------------
 -- Personal common tasks
@@ -1160,8 +1114,8 @@ vim.keymap.set("n", "<A-9>", "<cmd>BufferLineGoToBuffer 9<cr>", { desc = "Goto B
 
 -- Try and center these motions to the middle of the screen
 vim.keymap.set({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
-vim.keymap.set("n", "n", "nzz", { silent = true })
-vim.keymap.set("n", "N", "Nzz", { silent = true })
+vim.keymap.set("n", "n", "nzzzv", { silent = true })
+vim.keymap.set("n", "N", "Nzzzv", { silent = true })
 vim.keymap.set("n", "*", "*zz", { silent = true })
 vim.keymap.set("n", "#", "#zz", { silent = true })
 vim.keymap.set("n", "g*", "g*zz", { silent = true })
@@ -1170,8 +1124,6 @@ vim.keymap.set("n", "<C-o>", "<C-o>zz", { silent = true })
 vim.keymap.set("n", "<C-i>", "<C-i>zz", { silent = true })
 vim.keymap.set("n", "u", "uzz", { silent = true })
 vim.keymap.set("n", "<C-r>", "<C-r>zz", { silent = true })
--- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
--- vim.keymap.set('n', '<C-d>', '<C-d>zz', { silent = true })
 
 -- Add undo break-points
 vim.keymap.set("i", ",", ",<c-g>u")
@@ -1180,6 +1132,9 @@ vim.keymap.set("i", ";", ";<c-g>u")
 
 -- save file
 vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>update<cr><esc>", { desc = "Save file" })
+
+-- delete single character without copying into register
+vim.keymap.set("n", "x", '"_x', { noremap = true, silent = true })
 
 -- better indenting
 vim.keymap.set("v", "<", "<gv")
@@ -1249,7 +1204,32 @@ local function augroup(name)
   return vim.api.nvim_create_augroup("My_" .. name, { clear = true })
 end
 
--- Highlight on yank
+-- Prevent LSP from overwriting treesitter color settings
+-- https://github.com/NvChad/NvChad/issues/1907
+vim.highlight.priorities.semantic_tokens = 95 -- Or any number lower than 100, treesitter's priority level
+
+-- Appearance of diagnostics
+vim.diagnostic.config({
+  virtual_text = {
+    prefix = "●",
+    -- Add a custom format function to show error codes
+    format = function(diagnostic)
+      local code = diagnostic.code and string.format("[%s]", diagnostic.code) or ""
+      return string.format("%s %s", code, diagnostic.message)
+    end,
+  },
+  underline = false,
+  update_in_insert = true,
+  float = {
+    source = "always", -- Or "if_many"
+  },
+  -- Make diagnostic background transparent
+  on_ready = function()
+    vim.cmd("highlight DiagnosticVirtualText guibg=NONE")
+  end,
+})
+
+-- highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
   callback = function()

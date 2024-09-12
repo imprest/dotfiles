@@ -46,7 +46,7 @@ config.font = wezterm.font_with_fallback({
       "zero",
       -- "ss01", -- Classic Construction
       "ss19", -- == !==
-      "cv02", -- t
+      -- "cv02", -- t
       "cv17", -- f
     },
   },
@@ -77,7 +77,7 @@ config.audible_bell = "Disabled"
 config.scrollback_lines = 10000
 config.color_scheme = "Catppuccin Macchiato"
 config.exit_behavior = "Close"
-config.front_end = "WebGpu"
+-- config.front_end = "WebGpu"
 config.keys = mykeys
 config.xcursor_theme = "Adwaita"
 
