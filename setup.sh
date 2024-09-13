@@ -23,11 +23,15 @@ sudo pacman-mirrors -f 5
 # sudo mhwd -i pci video-hybrid-intel-nvidia-bumblebee
 
 # packages
-sudo pacman -Syu fish neovim python-pynvim fzf ripgrep bat zoxide alacritty \
-  ttf-firacode-nerd ttf-firacode exa trash-cli lazygit fd ncdu\
-  erlang elixir fop wxgtk inotify-tools postgresql
+sudo pacman -Syu fish neovim python-pynvim fzf fd ripgrep bat zoxide wezterm \
+  ttf-jetbrains-mono yazi exa trash-cli github-cli lazygit fd ncdu gvfs-google \
+  curl git fop wxgtk inotify-tools postgresql vlc pdfarranger fastfetch wl-clipboard
 # optional
-# weechat pdfarranger
+# tectonic
+# remmina freerdp gnome-characters transmission-gtk
+# gnome-shell-extension-gsconnect gnome-shell-extension-weather-oclock
+# gnome-shell-extension-dash-to-panel gnome-shell-extension-weather-oclock
+# weechat simple-scan
 # gnome-terminal text/background Gnome | palette Tango
 # dconf write /org/gnome/terminal/legacy/profiles:/:<12312>/font "'Fira Code Retina 9'"
 # size 9 in qterminal for fira mono retina 
@@ -39,8 +43,8 @@ sudo pacman -Syu fish neovim python-pynvim fzf ripgrep bat zoxide alacritty \
 git config --global user.email "hardikvaria@gmail.com"
 git config --global user.name  "Hardik Varia"
 
-# alacritty
-ln -sf ~/dotfiles/alacritty.toml ~/.alacritty.toml
+# wezterm
+ln -sf ~/dotfiles/wezterm.lua ~/.config/wezterm/wezterm.lua
 
 # neovim
 mkdir -p ~/.config/nvim
@@ -49,11 +53,15 @@ ln -sf ~/dotfiles/init.vim ~/.config/nvim/init.vim
 # psql
 ln -sf `pwd`/psqlrc ~/.psqlrc
 
-# fish and fisher
+# asdf
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.1
+# fish and fisher and asdf completions
 curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
 ln -sf ~/dotfiles/config.fish ~/.config/fish/config.fish
 ln -sf ~/dotfiles/fish_plugins ~/.config/fish/fish_plugins
+mkdir -p ~/.config/fish/completions; and ln -s ~/.asdf/completions/asdf.fish ~/.config/fish/completions
 chsh -s /bin/fish
+
 
 # create a file in home dir ~/.npmrc with 'ignore-scripts=true'
 echo 'ignore-scripts=true' > .npmrc

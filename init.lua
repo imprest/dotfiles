@@ -28,7 +28,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   {
     "folke/which-key.nvim",
-    lazy = true,
+    event = "VimEnter",
     opts = {
       plugins = {
         spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints i.e. z=
@@ -173,23 +173,14 @@ require("lazy").setup({
       },
       {
         "williamboman/mason.nvim",
-        opts = {
-          ui = {
-            border = "rounded",
-            icons = {
-              package_installed = "✓",
-              package_pending = "➜",
-              package_uninstalled = "✗",
-            },
-          },
-        },
+        opts = { ui = { border = "rounded" } },
       },
       {
         "williamboman/mason-lspconfig.nvim",
         opts = {
           ensure_installed = {
             "lua_ls",
-            -- "cssls",
+            "cssls",
             "html",
             "jsonls",
             "ts_ls",
@@ -199,6 +190,7 @@ require("lazy").setup({
         },
       },
       "WhoIsSethDaniel/mason-tool-installer.nvim",
+      { "j-hui/fidget.nvim", opts = {} },
     },
     config = function()
       -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
@@ -521,7 +513,7 @@ require("lazy").setup({
   },
 
   -- auto completion
-  { "windwp/nvim-autopairs", config = true },
+  { "windwp/nvim-autopairs", event = "InsertEnter", config = true },
   {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter", -- load cmp on InsertEnter
@@ -583,7 +575,7 @@ require("lazy").setup({
       "hrsh7th/cmp-nvim-lsp-signature-help",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      "kdheepak/cmp-latex-symbols",
+      -- "kdheepak/cmp-latex-symbols",
       "onsails/lspkind-nvim",
       { "roobert/tailwindcss-colorizer-cmp.nvim", config = true },
     },
@@ -703,9 +695,9 @@ require("lazy").setup({
           icons_enabled = true,
           theme = "catppuccin",
           globalstatus = true,
-          component_separators = "|",
           section_separators = "",
-          disabled_filetypes = { "Telescope", "Outline", "dashboard" },
+          component_separators = "|",
+          disabled_filetypes = { "Telescope", "Outline", "dashboard", "alpha", "neo-tree" },
           always_divide_middle = true,
         },
         sections = {
@@ -718,7 +710,13 @@ require("lazy").setup({
               padding = { left = 0, right = 0 },
             },
           },
+          lualine_b = { "branch" },
+          lualine_c = { "filename", "diff" },
+          lualine_x = { "diagnostics", "encoding", "filetype" },
+          lualine_y = { "location" },
+          lualine_z = { "progress" },
         },
+
         tabline = {},
         extensions = { "quickfix", "neo-tree", "fzf", "trouble", "mason", "aerial" },
       })
@@ -886,12 +884,6 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = { current_line_blame = false },
   },
-  {
-    "j-hui/fidget.nvim",
-    tag = "legacy",
-    event = "LspAttach",
-    config = true,
-  },
   { "pbrisbin/vim-mkdir", event = "VeryLazy" }, -- :e this/does/not/exist/file.txt then :w
   { "justinmk/vim-gtfo", event = "VeryLazy" }, -- gof open file in filemanager
   {
@@ -914,11 +906,13 @@ require("lazy").setup({
   -- },
   {
     "lervag/vimtex", -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
+    lazy = false,
     config = function()
-      vim.g["vimtex_quickfix_mode"] = 0
-      vim.g["vimtex_compiler_method"] = "tectonic"
-      vim.g["vimtex_view_general_viewer"] = "evince"
-      vim.g["vimtex_fold_enabled"] = true
+      vim.g.vimtex_quickfix_mode = 0
+      vim.g.vimtex_compiler_method = "tectonic"
+      vim.g.vimtex_view_general_viewer = "evince"
+      -- vim.g.vimtex_view_method = "evince"
+      vim.g.vimtex_fold_enabled = true
     end,
   },
   {
@@ -965,6 +959,7 @@ require("lazy").setup({
   },
 }, {
   checker = { enabled = false, notify = false },
+  rocks = { enabled = false },
   ui = { border = "rounded" },
   performance = {
     rtp = {
@@ -1145,59 +1140,56 @@ vim.keymap.set("n", "Q", "<cmd>Bdelete<cr>")
 
 -- which-key
 local wk = require("which-key")
-wk.register({
-  ["y"] = { '"+y', "Yank System Clipboard" },
-  ["."] = { "<ESC><CMD>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", "Comment" },
-  t = {
-    name = "ToggleTerm",
-    v = { "<cmd>ToggleTermSendVisualLines<cr>", "Send Visual Line" },
-    s = { "<cmd>ToggleTermSendVisualSelection<cr>", "Send Visual Selection" },
+wk.add({
+  {
+    mode = { "v" },
+    { "<leader>.", "<ESC><CMD>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", desc = "Comment" },
+    { "<leader>t", group = "ToggleTerm" },
+    { "<leader>ts", "<cmd>ToggleTermSendVisualSelection<cr>", desc = "Send Visual Selection" },
+    { "<leader>tv", "<cmd>ToggleTermSendVisualLines<cr>", desc = "Send Visual Line" },
+    { "<leader>y", '"+y', desc = "Yank System Clipboard" },
   },
-}, { prefix = "<leader>", mode = "v" })
-wk.register({
-  ["a"] = { "<cmd>AerialToggle!<CR>", "AerialToggle" },
-  ["."] = { "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", "Comment" },
-  ["<leader>"] = { "<C-^>", "Last buffer" },
-  ["m"] = { "<cmd>Mason<cr>", "Mason [LSP Manager]" }, -- mason plugin
-  ["r"] = { "<cmd>lua require('telescope.builtin').oldfiles()<CR>", "Recent Files" },
-  ["s"] = { "<cmd>split<CR>", "Split horizontal" },
-  ["v"] = { "<C-w>v<C-w>l", "Split vertical" },
-  ["w"] = { "<cmd>w!<CR>", "Save" },
-  ["c"] = { "<cmd>ToggleTerm<CR>", "ToggleTerm" },
-  ["d"] = { "<cmd>Bdelete<CR>", "Close Buffer" }, -- bufdelete plugin
-  ["z"] = { "<cmd>Lazy<CR>", "Lazy [Plugin Manager]" }, -- lazy plugin
-  ["t"] = { "<cmd>ToggleTermSendCurrentLine<cr>", "Send Current Line to Term" },
-  l = {
-    name = "LSP",
-    a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
-    c = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-    d = { "<cmd>lua require('telescope.builtin').lsp_definitions()<cr>", "Definition" },
-    D = { "<cmd>lua require('telescope.builtin').diagnostics({bufnr=0})<cr>", "Buffer Diagnostics" },
-    f = { "<cmd>lua vim.lsp.buf.format()<cr>", "Format" },
-    i = { "<cmd>lua require('telescope.builtin').lsp_implementations()<cr>", "Implementation" },
-    j = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
-    k = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
-    l = { "<cmd>LspInfo<cr>", "Info" },
-    t = { "<cmd>lua require('telescope.builtin').lsp_type_definitions()<cr>", "Type Definition" },
-    w = { "<cmd>lua require('telescope.builtin').diagnostics()<cr>", "Diagnostics" },
-    q = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
-    R = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
-    r = { "<cmd>lua require('telescope.builtin').lsp_references()<cr>", "References" },
-    I = { "<cmd>lua require('telescope.builtin').lsp_incoming_calls()<cr>", "Incoming calls" },
-    O = { "<cmd>lua require('telescope.builtin').lsp_outgoing_calls()<cr>", "Outgoing calls" },
-    s = { "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", "Document Symbols" },
-    S = { "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<cr>", "Workspace Symbols" },
-    h = { "<cmd>lua vim.lsp.inlay_hint(0, nil)<cr>", "Toggle Inlay Hints" },
+  {
+    { "<leader>.", "<cmd>lua require('Comment.api').toggle.linewise.current()<CR>", desc = "Comment" },
+    { "<leader><leader>", "<C-^>", desc = "Last buffer" },
+    { "<leader>a", "<cmd>AerialToggle!<CR>", desc = "AerialToggle" },
+    { "<leader>c", "<cmd>ToggleTerm<CR>", desc = "ToggleTerm" },
+    { "<leader>d", "<cmd>Bdelete<CR>", desc = "Close Buffer" },
+    { "<leader>g", group = "Git" },
+    { "<leader>gB", "<cmd>lua require('telescope.builtin').git_branches()<cr>", desc = "Branches" },
+    { "<leader>gb", "<cmd>lua require('telescope.builtin').git_bcommits()<cr>", desc = "Buffer Commits" },
+    { "<leader>gc", "<cmd>lua require('telescope.builtin').git_commits()<cr>", desc = "Commits" },
+    { "<leader>gd", "<cmd>lua require('telescope').extensions.git_diffs.diff_commits()<cr>", desc = "Diff history" },
+    { "<leader>gs", "<cmd>lua require('telescope.builtin').git_status()<cr>", desc = "Status" },
+    { "<leader>l", group = "LSP" },
+    { "<leader>lD", "<cmd>lua require('telescope.builtin').diagnostics({bufnr=0})<cr>", desc = "Buffer Diagnostics" },
+    { "<leader>lI", "<cmd>lua require('telescope.builtin').lsp_incoming_calls()<cr>", desc = "Incoming calls" },
+    { "<leader>lO", "<cmd>lua require('telescope.builtin').lsp_outgoing_calls()<cr>", desc = "Outgoing calls" },
+    { "<leader>lR", "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" },
+    { "<leader>lS", "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<cr>", desc = "Workspace Symbols" },
+    { "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code Action" },
+    { "<leader>lc", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
+    { "<leader>ld", "<cmd>lua require('telescope.builtin').lsp_definitions()<cr>", desc = "Definition" },
+    { "<leader>lf", "<cmd>lua vim.lsp.buf.format()<cr>", desc = "Format" },
+    { "<leader>lh", "<cmd>lua vim.lsp.inlay_hint(0, nil)<cr>", desc = "Toggle Inlay Hints" },
+    { "<leader>li", "<cmd>lua require('telescope.builtin').lsp_implementations()<cr>", desc = "Implementation" },
+    { "<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
+    { "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev()<cr>", desc = "Prev Diagnostic" },
+    { "<leader>ll", "<cmd>LspInfo<cr>", desc = "Info" },
+    { "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<cr>", desc = "Quickfix" },
+    { "<leader>lr", "<cmd>lua require('telescope.builtin').lsp_references()<cr>", desc = "References" },
+    { "<leader>ls", "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", desc = "Document Symbols" },
+    { "<leader>lt", "<cmd>lua require('telescope.builtin').lsp_type_definitions()<cr>", desc = "Type Definition" },
+    { "<leader>lw", "<cmd>lua require('telescope.builtin').diagnostics()<cr>", desc = "Diagnostics" },
+    { "<leader>m", "<cmd>Mason<cr>", desc = "Mason [LSP Manager]" },
+    { "<leader>r", "<cmd>lua require('telescope.builtin').oldfiles()<CR>", desc = "Recent Files" },
+    { "<leader>s", "<cmd>split<CR>", desc = "Split horizontal" },
+    { "<leader>t", "<cmd>ToggleTermSendCurrentLine<cr>", desc = "Send Current Line to Term" },
+    { "<leader>v", "<C-w>v<C-w>l", desc = "Split vertical" },
+    { "<leader>w", "<cmd>w!<CR>", desc = "Save" },
+    { "<leader>z", "<cmd>Lazy<CR>", desc = "Lazy [Plugin Manager]" },
   },
-  g = {
-    name = "Git",
-    c = { "<cmd>lua require('telescope.builtin').git_commits()<cr>", "Commits" },
-    b = { "<cmd>lua require('telescope.builtin').git_bcommits()<cr>", "Buffer Commits" },
-    B = { "<cmd>lua require('telescope.builtin').git_branches()<cr>", "Branches" },
-    s = { "<cmd>lua require('telescope.builtin').git_status()<cr>", "Status" },
-    d = { "<cmd>lua require('telescope').extensions.git_diffs.diff_commits()<cr>", "Diff history" },
-  },
-}, { prefix = "<leader>" })
+})
 
 -------------------- AUTO COMMANDS -------------------------
 local function augroup(name)
