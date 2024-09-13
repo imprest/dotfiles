@@ -30,6 +30,7 @@ require("lazy").setup({
     "folke/which-key.nvim",
     event = "VimEnter",
     opts = {
+      icons = { keys = vim.g.have_nerd_font and {} },
       plugins = {
         spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints i.e. z=
         -- the presets plugin, adds help for a bunch of default keybindings in Neovim
@@ -142,16 +143,20 @@ require("lazy").setup({
       telescope.load_extension("ui-select")
 
       local builtin = require("telescope.builtin")
-      vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find Files" })
-      vim.keymap.set("n", "<C-g>", builtin.live_grep, { desc = "Live Grep" })
-      vim.keymap.set("n", "<leader>b", builtin.buffers, { desc = "Buffers" })
       vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help Tags" })
-      vim.keymap.set("n", "<leader>w", builtin.grep_string, { desc = "Find Word" })
-      vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Commands" })
-      vim.keymap.set("n", "<leader>fcc", builtin.command_history, { desc = "Commands History" })
-      vim.keymap.set("n", "<leader>fss", builtin.search_history, { desc = "Search History" })
+      vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "Keymaps" })
+      vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find Files" })
+      vim.keymap.set("n", "<leader>ft", builtin.builtin, { desc = "Select Telescope" })
+      vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "Find Word" })
+      vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
+      vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Diagnostics" })
+      vim.keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "Recent Files" })
+      vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
+      vim.keymap.set("n", "<leader>fC", builtin.commands, { desc = "Commands" })
+      vim.keymap.set("n", "<leader>fc", builtin.command_history, { desc = "Commands History" })
+      vim.keymap.set("n", "<leader>fs", builtin.search_history, { desc = "Search History" })
 
-      vim.keymap.set("n", "<leader>/", function()
+      vim.keymap.set("n", "<leader>f/", function()
         builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
           winblend = 10,
           previewer = false,
@@ -165,8 +170,6 @@ require("lazy").setup({
     dependencies = {
       { "dgagn/diagflow.nvim", event = "LspAttach", opts = {} }, -- put diagnostic msg @ top right corner
       "elixir-editors/vim-elixir",
-      -- "elixir-tools/elixir-tools.nvim",
-      "jose-elias-alvarez/typescript.nvim",
       {
         "b0o/schemastore.nvim",
         version = false,
@@ -226,37 +229,19 @@ require("lazy").setup({
           map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
           map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
           map("gi", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-          map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
-          map("<leader>ls", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-          map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
-          map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-          map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
           map("K", vim.lsp.buf.hover, "Hover Documentation")
           map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-          if vim.lsp.inlay_hint then
-            map("<leader>uh", function()
-              vim.lsp.inlay_hint(0, nil)
+
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+            map("<leader>lh", function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
             end, "Toggle Inlay Hints")
           end
-
-          -- Highlight references under the cursor and clear hl when moving cursor
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          -- if client and client.server_capabilities.documentHighlightProvider then
-          --   vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-          --     buffer = event.buf,
-          --     callback = vim.lsp.buf.document_highlight,
-          --   })
-          --
-          --   vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-          --     buffer = event.buf,
-          --     callback = vim.lsp.buf.clear_references,
-          --   })
+          -- if client.name == "tsserver" then
+          --   map("<leader>o", "<cmd>TypescriptOrganizeImports<CR>", "Organize Imports")
+          --   map("<leader>R", "<cmd>TypescriptRenameFile<CR>", "Rename File")
           -- end
-
-          if client.name == "tsserver" then
-            map("<leader>o", "<cmd>TypescriptOrganizeImports<CR>", "Organize Imports")
-            map("<leader>R", "<cmd>TypescriptRenameFile<CR>", "Rename File")
-          end
         end,
       })
 
@@ -266,15 +251,6 @@ require("lazy").setup({
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-      -- jose-elias-alvarez/typescript.nvim
-      -- require("typescript").setup({
-      --   disable_commands = false, -- prevent the plugin from creating Vim commands
-      --   debug = false, -- enable debug logging for commands
-      --   go_to_source_definition = {
-      --     fallback = true, -- fall back to standard LSP definition on failure
-      --   },
-      -- })
 
       -- Enable the following language servers
       --  Add any additional override configuration in the following tables. Available keys are:
@@ -337,6 +313,7 @@ require("lazy").setup({
           end,
           settings = { json = { validate = { enable = true } } },
         },
+        html = { filetypes = { "html", "twig", "hbs" } },
         cssls = { settings = { css = { lint = { unknownAtRules = "ignore" } } } },
         tailwindcss = {},
         svelte = {},
@@ -375,9 +352,9 @@ require("lazy").setup({
       local lint = require("lint")
 
       lint.linters_by_ft = {
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-        svelte = { "eslint_d" },
+        javascript = { "eslint" },
+        typescript = { "eslint" },
+        svelte = { "eslint" },
       }
 
       local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
@@ -392,38 +369,45 @@ require("lazy").setup({
   -- Autoformat
   {
     "stevearc/conform.nvim",
-    config = function()
-      local conform = require("conform")
-
-      conform.setup({
-        notify_on_error = false,
-        format_on_save = function(bufnr)
-          local disabled_filetypes = { c = true, cpp = true }
-          return {
-            timeout_ms = 500,
-            lsp_fallback = not disabled_filetypes[vim.bo[bufnr].filetype],
-          }
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    keys = {
+      {
+        "<leader>F",
+        function()
+          require("conform").format({ async = true, lsp_format = "fallback" })
         end,
-        formatters_by_ft = {
-          javascript = { { "prettierd", "prettier" } },
-          typescript = { { "prettierd", "prettier" } },
-          svelte = { { "prettierd", "prettier" } },
-          css = { { "prettierd", "prettier" } },
-          html = { { "prettierd", "prettier" } },
-          json = { { "prettierd", "prettier" } },
-          yaml = { { "prettierd", "prettier" } },
-          markdown = { { "prettierd", "prettier" } },
-          lua = { "stylua" },
-        },
-      })
-
-      vim.keymap.set({ "n", "v" }, "<leader>p", function()
-        conform.format({
-          lsp_fallback = true,
+        mode = "",
+        desc = "[F]ormat buffer",
+      },
+    },
+    opts = {
+      notify_on_error = false,
+      format_on_save = function(bufnr)
+        local disable_filetypes = { c = true, cpp = true }
+        local lsp_format_opt
+        if disable_filetypes[vim.bo[bufnr].filetype] then
+          lsp_format_opt = "never"
+        else
+          lsp_format_opt = "fallback"
+        end
+        return {
           timeout_ms = 500,
-        })
-      end, { desc = "Format file or range (in visual mode)" })
-    end,
+          lsp_format = lsp_format_opt,
+        }
+      end,
+      formatters_by_ft = {
+        javascript = { "prettierd", "prettier", stop_after_first = true },
+        typescript = { "prettierd", "prettier", stop_after_first = true },
+        svelte = { "prettierd", "prettier", stop_after_first = true },
+        css = { "prettierd", "prettier", stop_after_first = true },
+        html = { "prettierd", "prettier", stop_after_first = true },
+        json = { "prettierd", "prettier", stop_after_first = true },
+        yaml = { "prettierd", "prettier", stop_after_first = true },
+        markdown = { "prettierd", "prettier", stop_after_first = true },
+        lua = { "stylua" },
+      },
+    },
   },
   -- better diagnostics list and others
   {
@@ -516,12 +500,10 @@ require("lazy").setup({
   { "windwp/nvim-autopairs", event = "InsertEnter", config = true },
   {
     "hrsh7th/nvim-cmp",
-    event = "InsertEnter", -- load cmp on InsertEnter
-    -- these dependencies will only be loaded when cmp loads
+    event = "InsertEnter",
     dependencies = {
       {
         "L3MON4D3/LuaSnip",
-        version = "v2.*",
         build = "make install_jsregexp",
         dependencies = {
           "rafamadriz/friendly-snippets",
@@ -546,7 +528,7 @@ require("lazy").setup({
         end,
         keys = {
           {
-            "<a-l>",
+            "<C-left>",
             function()
               return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next" or "<tab>"
             end,
@@ -555,14 +537,14 @@ require("lazy").setup({
             mode = "i",
           },
           {
-            "<a-l>",
+            "<C-left>",
             function()
               require("luasnip").jump(1)
             end,
             mode = "s",
           },
           {
-            "<a-h>",
+            "<C-right>",
             function()
               require("luasnip").jump(-1)
             end,
@@ -614,7 +596,7 @@ require("lazy").setup({
           end,
         },
         completion = {
-          completeopt = "menuone,preview,noselect",
+          completeopt = "menu,menuone,noselect",
         },
         snippet = {
           expand = function(args)
@@ -676,7 +658,7 @@ require("lazy").setup({
           { name = "luasnip", priority = 750 },
           { name = "buffer", priority = 500 },
           { name = "path", priority = 250 },
-          { name = "latex_symbols", priority = 200 },
+          -- { name = "latex_symbols", priority = 200 },
         }),
         experimental = {
           ghost_text = {
@@ -1154,7 +1136,6 @@ wk.add({
     { "<leader><leader>", "<C-^>", desc = "Last buffer" },
     { "<leader>a", "<cmd>AerialToggle!<CR>", desc = "AerialToggle" },
     { "<leader>c", "<cmd>ToggleTerm<CR>", desc = "ToggleTerm" },
-    { "<leader>d", "<cmd>Bdelete<CR>", desc = "Close Buffer" },
     { "<leader>g", group = "Git" },
     { "<leader>gB", "<cmd>lua require('telescope.builtin').git_branches()<cr>", desc = "Branches" },
     { "<leader>gb", "<cmd>lua require('telescope.builtin').git_bcommits()<cr>", desc = "Buffer Commits" },
@@ -1171,7 +1152,6 @@ wk.add({
     { "<leader>lc", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
     { "<leader>ld", "<cmd>lua require('telescope.builtin').lsp_definitions()<cr>", desc = "Definition" },
     { "<leader>lf", "<cmd>lua vim.lsp.buf.format()<cr>", desc = "Format" },
-    { "<leader>lh", "<cmd>lua vim.lsp.inlay_hint(0, nil)<cr>", desc = "Toggle Inlay Hints" },
     { "<leader>li", "<cmd>lua require('telescope.builtin').lsp_implementations()<cr>", desc = "Implementation" },
     { "<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
     { "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev()<cr>", desc = "Prev Diagnostic" },
