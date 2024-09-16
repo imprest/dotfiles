@@ -38,7 +38,7 @@ table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize
 config.font = wezterm.font_with_fallback({
   {
     family = "JetBrains Mono",
-    weight = "Medium",
+    weight = 600,
     harfbuzz_features = {
       "calt",
       "clig",
@@ -53,7 +53,7 @@ config.font = wezterm.font_with_fallback({
   { family = "Symbols Nerd Font Mono", scale = 0.65 },
 })
 config.use_cap_height_to_scale_fallback_fonts = true
-config.font_size = 9.5
+config.font_size = 10.5
 config.anti_alias_custom_block_glyphs = false
 config.warn_about_missing_glyphs = false
 config.default_cursor_style = "SteadyBar"
@@ -66,7 +66,7 @@ config.hide_tab_bar_if_only_one_tab = true
 -- config.window_decorations = "RESIZE"
 config.initial_cols = 150
 config.initial_rows = 50
--- config.window_background_opacity = 0.95
+config.window_background_opacity = 0.95
 config.window_padding = {
   left = 2,
   right = 2,

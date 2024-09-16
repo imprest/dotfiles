@@ -60,11 +60,16 @@ require("lazy").setup({
     init = function()
       vim.cmd.colorscheme("catppuccin-macchiato")
     end,
+    opts = {
+      transparent_background = true,
+      no_italic = true,
+    },
   },
   {
     "akinsho/bufferline.nvim",
     version = "*",
     dependencies = { "famiu/bufdelete.nvim", { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font } },
+    after = "catppuccin",
     opts = {
       highlights = { fill = { bg = "" }, buffer_selected = { italic = false } },
       options = {
@@ -193,7 +198,7 @@ require("lazy").setup({
         },
       },
       "WhoIsSethDaniel/mason-tool-installer.nvim",
-      { "j-hui/fidget.nvim", opts = {} },
+      { "j-hui/fidget.nvim", opts = { notification = { window = { winblend = 0 } } } },
     },
     config = function()
       -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
@@ -901,7 +906,7 @@ require("lazy").setup({
     "akinsho/toggleterm.nvim",
     cmd = { "ToggleTerm", "TermExec" },
     version = "*",
-    opts = { open_mapping = [[<C-\>]], shading_factor = 1 },
+    opts = { shading_factor = 1 },
   },
   {
     "echasnovski/mini.surround", -- sr({ sd' <select text>sa'
