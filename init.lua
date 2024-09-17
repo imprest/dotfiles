@@ -623,7 +623,7 @@ require("lazy").setup({
           completion = cmp.config.window.bordered(border_opts),
           documentation = cmp.config.window.bordered(border_opts),
         },
-        mapping = {
+        mapping = cmp.mapping.preset.insert({
           ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
           ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
           ["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-4), { "i", "c" }),
@@ -656,15 +656,17 @@ require("lazy").setup({
               fallback()
             end
           end, { "i", "s" }),
-        },
-        sources = cmp.config.sources({
+        }),
+        -- sources = cmp.config.sources({
+        sources = {
           { name = "nvim_lsp", priority = 1000 },
           { name = "nvim_lsp_signature_help", priority = 900 },
           { name = "luasnip", priority = 750 },
           { name = "buffer", priority = 500 },
           { name = "path", priority = 250 },
           -- { name = "latex_symbols", priority = 200 },
-        }),
+        },
+        -- }),
         experimental = {
           ghost_text = {
             hl_group = "LspCodeLens",
