@@ -61,7 +61,7 @@ require("lazy").setup({
       vim.cmd.colorscheme("catppuccin-macchiato")
     end,
     opts = {
-      transparent_background = true,
+      transparent_background = false,
       no_italic = true,
     },
   },

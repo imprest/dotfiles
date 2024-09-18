@@ -44,7 +44,14 @@ git config --global user.email "hardikvaria@gmail.com"
 git config --global user.name  "Hardik Varia"
 
 # wezterm
-ln -sf ~/dotfiles/wezterm.lua ~/.config/wezterm/wezterm.lua
+# ln -sf ~/dotfiles/wezterm.lua ~/.config/wezterm/wezterm.lua
+
+# gnome-terminal with gtk.css
+gsettings set org.gnome.Terminal.Legacy.Settings headerbar false
+# curl -L https://raw.githubusercontent.com/catppuccin/gnome-terminal/v0.3.0/install.py | python3 -
+dconf write /org/gnome/terminal/legacy/profiles:/:5083e06b-024e-46be-9cd2-892b814f1fc8/font "'Jet Brains Mono Bold 10.5'"
+# 140 x 42
+# hide scrollbar
 
 # neovim
 mkdir -p ~/.config/nvim
