@@ -73,9 +73,6 @@ require("lazy").setup({
     opts = {
       highlights = { fill = { bg = "" }, buffer_selected = { italic = false } },
       options = {
-        numbers = function(opts)
-          return string.format("%s ", opts.ordinal)
-        end,
         offsets = { { filetype = "neo-tree", highlight = "Directory" } },
         custom_filter = function(buf_number, _) -- hide shell and other unknown ft
           if vim.bo[buf_number].filetype ~= "" then
@@ -1089,15 +1086,6 @@ vim.keymap.set("n", "<Right>", "<cmd>BufferLineCycleNext<cr>", { desc = "Prev bu
 vim.keymap.set("n", "<Left>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Next buffer" })
 vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
-vim.keymap.set("n", "<A-1>", "<cmd>BufferLineGoToBuffer 1<cr>", { desc = "Goto Buffer 1" })
-vim.keymap.set("n", "<A-2>", "<cmd>BufferLineGoToBuffer 2<cr>", { desc = "Goto Buffer 2" })
-vim.keymap.set("n", "<A-3>", "<cmd>BufferLineGoToBuffer 3<cr>", { desc = "Goto Buffer 3" })
-vim.keymap.set("n", "<A-4>", "<cmd>BufferLineGoToBuffer 4<cr>", { desc = "Goto Buffer 4" })
-vim.keymap.set("n", "<A-5>", "<cmd>BufferLineGoToBuffer 5<cr>", { desc = "Goto Buffer 5" })
-vim.keymap.set("n", "<A-6>", "<cmd>BufferLineGoToBuffer 6<cr>", { desc = "Goto Buffer 6" })
-vim.keymap.set("n", "<A-7>", "<cmd>BufferLineGoToBuffer 7<cr>", { desc = "Goto Buffer 7" })
-vim.keymap.set("n", "<A-8>", "<cmd>BufferLineGoToBuffer 8<cr>", { desc = "Goto Buffer 8" })
-vim.keymap.set("n", "<A-9>", "<cmd>BufferLineGoToBuffer 9<cr>", { desc = "Goto Buffer 9" })
 
 -- Try and center these motions to the middle of the screen
 vim.keymap.set({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
