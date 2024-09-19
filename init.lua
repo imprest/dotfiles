@@ -569,14 +569,10 @@ require("lazy").setup({
     config = function()
       local cmp = require("cmp")
       local snip_status_ok, luasnip = pcall(require, "luasnip")
-      local lspkind_status_ok, lspkind = pcall(require, "lspkind")
+      local lspkind = require("lspkind")
       if not snip_status_ok then
         return
       end
-      local border_opts = {
-        border = "single",
-        winhighlight = "CursorLine:Visual",
-      }
 
       -- If you want insert `(` after select function or method item
       local cmp_autopairs = require("nvim-autopairs.completion.cmp")
@@ -588,16 +584,20 @@ require("lazy").setup({
         return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
       end
 
-      local format_kinds = lspkind_status_ok and lspkind.cmp_format({ maxwidth = 50, ellipsis_char = "..." }) or nil
-
       cmp.setup({
+        window = {
+          completion = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
+        },
         formatting = {
-          -- ref: https://www.youtube.com/watch?v=_NiWhZeR-MY
-          format = function(entry, item)
-            if format_kinds ~= nil then
-              format_kinds(entry, item) -- add icons
-              return require("tailwindcss-colorizer-cmp").formatter(entry, item)
-            end
+          fields = { "kind", "abbr", "menu" },
+          format = function(entry, vim_item)
+            local kind = lspkind.cmp_format({ mode = "symbol", maxwidth = 50 })(entry, vim_item)
+            local strings = vim.split(kind.kind, "%s", { trimempty = true })
+            kind.kind = " " .. (strings[1] or "") .. " "
+
+            -- ref: https://www.youtube.com/watch?v=_NiWhZeR-MY
+            return require("tailwindcss-colorizer-cmp").formatter(entry, vim_item)
           end,
         },
         completion = {
@@ -619,10 +619,6 @@ require("lazy").setup({
           behavior = cmp.ConfirmBehavior.Replace,
           select = false,
         },
-        window = {
-          completion = cmp.config.window.bordered(border_opts),
-          documentation = cmp.config.window.bordered(border_opts),
-        },
         mapping = cmp.mapping.preset.insert({
           ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
           ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
@@ -638,13 +634,20 @@ require("lazy").setup({
           }),
           ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
-              cmp.select_next_item()
+              if #cmp.get_entries() == 1 then
+                cmp.confirm({ select = true })
+              else
+                cmp.select_next_item()
+              end
             elseif luasnip.expand_or_jumpable() then
               luasnip.expand_or_jump()
             elseif has_words_before() then
               cmp.complete()
-            else
-              fallback()
+              if #cmp.get_entries() == 1 then
+                cmp.confirm({ select = true })
+              else
+                fallback()
+              end
             end
           end, { "i", "s" }),
           ["<S-Tab>"] = cmp.mapping(function(fallback)
