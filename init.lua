@@ -344,6 +344,8 @@ require("lazy").setup({
           end,
         },
       })
+
+      require("lspconfig").gleam.setup({})
     end,
   },
   -- linter
@@ -848,6 +850,7 @@ require("lazy").setup({
         "svelte",
         "erlang",
         "elixir",
+        "gleam",
         "sql",
         "eex",
         "heex",
