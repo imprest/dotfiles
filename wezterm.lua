@@ -39,6 +39,7 @@ config.font = wezterm.font_with_fallback({
   {
     family = "JetBrains Mono",
     weight = 600,
+    -- family = "0xProto Nerd Font",
     harfbuzz_features = {
       "calt",
       "clig",
