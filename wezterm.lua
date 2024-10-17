@@ -34,7 +34,7 @@ table.insert(mykeys, { key = "j", mods = "CTRL|ALT", action = act.AdjustPaneSize
 table.insert(mykeys, { key = "k", mods = "CTRL|ALT", action = act.AdjustPaneSize({ "Up", 1 }) })
 table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize({ "Right", 1 }) })
 
--- config.line_height = 1.00
+config.line_height = 1.10
 config.font = wezterm.font_with_fallback({
   {
     family = "JetBrains Mono",
@@ -54,7 +54,7 @@ config.font = wezterm.font_with_fallback({
   { family = "Symbols Nerd Font Mono", scale = 0.65 },
 })
 config.use_cap_height_to_scale_fallback_fonts = true
-config.font_size = 10.5
+config.font_size = 10
 config.anti_alias_custom_block_glyphs = false
 config.warn_about_missing_glyphs = false
 config.default_cursor_style = "SteadyBar"
