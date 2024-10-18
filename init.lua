@@ -540,9 +540,9 @@ require("lazy").setup({
       "hrsh7th/cmp-nvim-lsp-signature-help",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
-      -- "kdheepak/cmp-latex-symbols",
       "onsails/lspkind-nvim",
-      { "roobert/tailwindcss-colorizer-cmp.nvim", config = true },
+      -- "kdheepak/cmp-latex-symbols",
+      -- { "roobert/tailwindcss-colorizer-cmp.nvim", config = true },
     },
     config = function()
       vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
@@ -571,13 +571,16 @@ require("lazy").setup({
         },
         formatting = {
           fields = { "kind", "abbr", "menu" },
-          format = function(entry, vim_item)
-            local kind = lspkind.cmp_format({ mode = "symbol", maxwidth = 50 })(entry, vim_item)
+          format = function(entry, item)
+            -- ref: https://www.youtube.com/watch?v=_NiWhZeR-MY
+            local kind = lspkind.cmp_format({
+              mode = "symbol",
+              maxwidth = 50,
+              -- before = require("tailwindcss-colorizer-cmp").formatter,
+            })(entry, item)
             local strings = vim.split(kind.kind, "%s", { trimempty = true })
             kind.kind = " " .. (strings[1] or "") .. " "
-
-            -- ref: https://www.youtube.com/watch?v=_NiWhZeR-MY
-            return require("tailwindcss-colorizer-cmp").formatter(entry, kind)
+            return kind
           end,
         },
         completion = {
@@ -810,11 +813,7 @@ require("lazy").setup({
       end,
     },
   },
-  {
-    "folke/ts-comments.nvim",
-    opts = {},
-    event = "VeryLazy",
-  },
+  { "folke/ts-comments.nvim", opts = {}, event = "VeryLazy" },
   {
     "windwp/nvim-ts-autotag",
     event = { "BufReadPre", "BufNewFile" },
@@ -822,6 +821,7 @@ require("lazy").setup({
       require("nvim-ts-autotag").setup()
     end,
   },
+  { "NMAC427/guess-indent.nvim", opts = {}, event = "VeryLazy" },
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
@@ -830,7 +830,7 @@ require("lazy").setup({
     opts = {
       endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
       highlight = { enable = true },
-      indent = { enable = true, disable = { "python" } }, -- guess-indent is better and faster
+      indent = { enable = false, disable = { "python" } }, -- guess-indent is better and faster
       ensure_installed = {
         "vim",
         "lua",
