@@ -61,6 +61,35 @@ require("lazy").setup({
     init = function()
       vim.cmd.colorscheme("catppuccin-macchiato")
     end,
+    opts = {
+      integrations = {
+        aerial = true,
+        cmp = true,
+        grug_far = true,
+        gitsigns = true,
+        indent_blankline = { enabled = true },
+        lsp_trouble = true,
+        mason = true,
+        markdown = true,
+        mini = true,
+        native_lsp = {
+          enabled = true,
+          underlines = {
+            errors = { "undercurl" },
+            hints = { "undercurl" },
+            warnings = { "undercurl" },
+            information = { "undercurl" },
+          },
+        },
+        neotest = true,
+        neotree = false,
+        semantic_tokens = true,
+        telescope = true,
+        treesitter = true,
+        treesitter_context = true,
+        which_key = true,
+      },
+    },
   },
   {
     "akinsho/bufferline.nvim",
@@ -193,6 +222,7 @@ require("lazy").setup({
             "tailwindcss",
             "svelte",
             "elixirls",
+            "typst_lsp",
           },
         },
       },
@@ -272,6 +302,7 @@ require("lazy").setup({
             },
           },
         },
+        typst_lsp = {},
         elixirls = {
           settings = { enableTestLenses = true },
         },
@@ -364,6 +395,12 @@ require("lazy").setup({
         group = lint_augroup,
         callback = function()
           lint.try_lint()
+          -- Only run the linter in buffers that you can modify in order to
+          -- avoid superfluous noise, notably within the handy LSP pop-ups that
+          -- describe the hovered symbol using Markdown.
+          if vim.opt_local.modifiable:get() then
+            lint.try_lint()
+          end
         end,
       })
     end,
@@ -426,7 +463,11 @@ require("lazy").setup({
       { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
       { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
       { "<leader>xs", "<cmd>Trouble symbols toggle<cr>", desc = "Symbols (Trouble)" },
-      { "<leader>xS", "<cmd>Trouble lsp toggle<cr>", desc = "LSP references/definitions/... (Trouble)" },
+      {
+        "<leader>xS",
+        "<cmd>Trouble lsp toggle<cr>",
+        desc = "LSP references/definitions/... (Trouble)",
+      },
       { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
       { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
       {
@@ -469,12 +510,12 @@ require("lazy").setup({
     opts = {},
     -- stylua: ignore
     keys = {
-      { "]t", function() require("todo-comments").jump_next() end, desc = "Next Todo Comment" },
-      { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous Todo Comment" },
-      { "<leader>xt", "<cmd>Trouble todo toggle<cr>", desc = "Todo (Trouble)" },
+      { "]t",         function() require("todo-comments").jump_next() end,              desc = "Next Todo Comment" },
+      { "[t",         function() require("todo-comments").jump_prev() end,              desc = "Previous Todo Comment" },
+      { "<leader>xt", "<cmd>Trouble todo toggle<cr>",                                   desc = "Todo (Trouble)" },
       { "<leader>xT", "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>", desc = "Todo/Fix/Fixme (Trouble)" },
-      { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Todo" },
-      { "<leader>fT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
+      { "<leader>ft", "<cmd>TodoTelescope<cr>",                                         desc = "Todo" },
+      { "<leader>fT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>",                 desc = "Todo/Fix/Fixme" },
     },
   },
 
@@ -645,12 +686,12 @@ require("lazy").setup({
           end, { "i", "s" }),
         }),
         sources = {
-          { name = "nvim_lsp", priority = 1000 },
-          { name = "nvim_lsp_signature_help", priority = 900 },
-          { name = "luasnip", priority = 750 },
-          { name = "buffer", priority = 500 },
-          { name = "path", priority = 250 },
-          { name = "latex_symbols", priority = 200 },
+          { name = "nvim_lsp" },
+          { name = "nvim_lsp_signature_help" },
+          { name = "luasnip" },
+          { name = "buffer" },
+          { name = "path" },
+          -- { name = "latex_symbols", priority = 200 },
         },
         experimental = {
           ghost_text = {
@@ -808,9 +849,13 @@ require("lazy").setup({
     "stevearc/aerial.nvim",
     opts = {
       on_attach = function(bufnr)
-        vim.keymap.set("n", "<A-d>", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-        vim.keymap.set("n", "<A-f>", "<cmd>AerialNext<CR>", { buffer = bufnr })
+        vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+        vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
       end,
+      layout = {
+        default_direction = "float",
+        placement = "edge",
+      },
     },
   },
   { "folke/ts-comments.nvim", opts = {}, event = "VeryLazy" },
@@ -821,7 +866,6 @@ require("lazy").setup({
       require("nvim-ts-autotag").setup()
     end,
   },
-  { "NMAC427/guess-indent.nvim", opts = {}, event = "VeryLazy" },
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
@@ -830,7 +874,7 @@ require("lazy").setup({
     opts = {
       endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
       highlight = { enable = true },
-      indent = { enable = false, disable = { "python" } }, -- guess-indent is better and faster
+      indent = { enable = true, disable = { "python" } }, -- guess-indent is better and faster
       ensure_installed = {
         "vim",
         "lua",
@@ -843,6 +887,7 @@ require("lazy").setup({
         "javascript",
         "json",
         "typescript",
+        "typst",
         "tsx",
         "svelte",
         "erlang",
@@ -885,16 +930,16 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>dd", "<Plug>(DBExeLine)")
     end,
   },
-  {
-    "lervag/vimtex", -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
-    lazy = false,
-    config = function()
-      vim.g.vimtex_quickfix_mode = 0
-      vim.g.vimtex_compiler_method = "tectonic"
-      vim.g.vimtex_view_general_viewer = "evince"
-      vim.g.vimtex_fold_enabled = true
-    end,
-  },
+  -- {
+  --   "lervag/vimtex", -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
+  --   lazy = false,
+  --   config = function()
+  --     vim.g.vimtex_quickfix_mode = 0
+  --     vim.g.vimtex_compiler_method = "tectonic"
+  --     vim.g.vimtex_view_general_viewer = "evince"
+  --     vim.g.vimtex_fold_enabled = true
+  --   end,
+  -- },
   {
     "akinsho/toggleterm.nvim",
     cmd = { "ToggleTerm", "TermExec" },
@@ -968,9 +1013,9 @@ opt.hlsearch = true
 opt.backup = false
 opt.breakindent = true
 opt.conceallevel = 2 -- So that `` is visible in markdown files (default: 1)
-opt.cursorline = false -- Highlight cursor line
+opt.cursorline = true -- Highlight cursor line
 opt.equalalways = false -- I don't like my windows changing all the time
-opt.foldcolumn = "1"
+opt.foldcolumn = "0"
 opt.foldlevel = 99
 opt.fillchars = { foldopen = "", foldclose = "", fold = " ", foldsep = " ", diff = "╱", eob = " " }
 opt.formatoptions = "jcroqlnt" -- tcqj
@@ -1137,40 +1182,136 @@ wk.add({
   },
   {
     { "<leader>.", "<cmd>normal gcc<CR>", desc = "Comment" },
-    { "<leader><leader>", "<C-^>", desc = "Last buffer" },
-    { "<leader>a", "<cmd>AerialToggle!<CR>", desc = "AerialToggle" },
-    { "<leader>c", "<cmd>ToggleTerm<CR>", desc = "ToggleTerm" },
+    {
+      "<leader><leader>",
+      "<C-^>",
+      desc = "Last buffer",
+    },
+    {
+      "<leader>a",
+      "<cmd>AerialToggle!<CR>",
+      desc = "AerialToggle",
+    },
+    {
+      "<leader>c",
+      "<cmd>ToggleTerm<CR>",
+      desc = "ToggleTerm",
+    },
     { "<leader>g", group = "Git" },
     { "<leader>gB", "<cmd>lua require('telescope.builtin').git_branches()<cr>", desc = "Branches" },
-    { "<leader>gb", "<cmd>lua require('telescope.builtin').git_bcommits()<cr>", desc = "Buffer Commits" },
+    {
+      "<leader>gb",
+      "<cmd>lua require('telescope.builtin').git_bcommits()<cr>",
+      desc = "Buffer Commits",
+    },
     { "<leader>gc", "<cmd>lua require('telescope.builtin').git_commits()<cr>", desc = "Commits" },
-    { "<leader>gd", "<cmd>lua require('telescope').extensions.git_diffs.diff_commits()<cr>", desc = "Diff history" },
+    {
+      "<leader>gd",
+      "<cmd>lua require('telescope').extensions.git_diffs.diff_commits()<cr>",
+      desc = "Diff history",
+    },
     { "<leader>gs", "<cmd>lua require('telescope.builtin').git_status()<cr>", desc = "Status" },
     { "<leader>l", group = "LSP" },
-    { "<leader>lD", "<cmd>lua require('telescope.builtin').diagnostics({bufnr=0})<cr>", desc = "Buffer Diagnostics" },
-    { "<leader>lI", "<cmd>lua require('telescope.builtin').lsp_incoming_calls()<cr>", desc = "Incoming calls" },
-    { "<leader>lO", "<cmd>lua require('telescope.builtin').lsp_outgoing_calls()<cr>", desc = "Outgoing calls" },
+    {
+      "<leader>lD",
+      "<cmd>lua require('telescope.builtin').diagnostics({bufnr=0})<cr>",
+      desc = "Buffer Diagnostics",
+    },
+    {
+      "<leader>lI",
+      "<cmd>lua require('telescope.builtin').lsp_incoming_calls()<cr>",
+      desc = "Incoming calls",
+    },
+    {
+      "<leader>lO",
+      "<cmd>lua require('telescope.builtin').lsp_outgoing_calls()<cr>",
+      desc = "Outgoing calls",
+    },
     { "<leader>lR", "<cmd>lua vim.lsp.buf.rename()<cr>", desc = "Rename" },
-    { "<leader>lS", "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<cr>", desc = "Workspace Symbols" },
-    { "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code Action" },
-    { "<leader>lc", "<cmd>lua vim.lsp.codelens.run()<cr>", desc = "CodeLens Action" },
-    { "<leader>ld", "<cmd>lua require('telescope.builtin').lsp_definitions()<cr>", desc = "Definition" },
+    {
+      "<leader>lS",
+      "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<cr>",
+      desc = "Workspace Symbols",
+    },
+    {
+      "<leader>la",
+      "<cmd>lua vim.lsp.buf.code_action()<cr>",
+      desc = "Code Action",
+    },
+    {
+      "<leader>lc",
+      "<cmd>lua vim.lsp.codelens.run()<cr>",
+      desc = "CodeLens Action",
+    },
+    {
+      "<leader>ld",
+      "<cmd>lua require('telescope.builtin').lsp_definitions()<cr>",
+      desc = "Definition",
+    },
     { "<leader>lf", "<cmd>lua vim.lsp.buf.format()<cr>", desc = "Format" },
-    { "<leader>li", "<cmd>lua require('telescope.builtin').lsp_implementations()<cr>", desc = "Implementation" },
-    { "<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
-    { "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev()<cr>", desc = "Prev Diagnostic" },
+    {
+      "<leader>li",
+      "<cmd>lua require('telescope.builtin').lsp_implementations()<cr>",
+      desc = "Implementation",
+    },
+    {
+      "<leader>lj",
+      "<cmd>lua vim.diagnostic.goto_next()<cr>",
+      desc = "Next Diagnostic",
+    },
+    {
+      "<leader>lk",
+      "<cmd>lua vim.diagnostic.goto_prev()<cr>",
+      desc = "Prev Diagnostic",
+    },
     { "<leader>ll", "<cmd>LspInfo<cr>", desc = "Info" },
     { "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<cr>", desc = "Quickfix" },
-    { "<leader>lr", "<cmd>lua require('telescope.builtin').lsp_references()<cr>", desc = "References" },
-    { "<leader>ls", "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>", desc = "Document Symbols" },
-    { "<leader>lt", "<cmd>lua require('telescope.builtin').lsp_type_definitions()<cr>", desc = "Type Definition" },
-    { "<leader>lw", "<cmd>lua require('telescope.builtin').diagnostics()<cr>", desc = "Diagnostics" },
-    { "<leader>m", "<cmd>Mason<cr>", desc = "Mason [LSP Manager]" },
-    { "<leader>r", "<cmd>lua require('telescope.builtin').oldfiles()<CR>", desc = "Recent Files" },
-    { "<leader>s", "<cmd>split<CR>", desc = "Split horizontal" },
-    { "<leader>v", "<C-w>v<C-w>l", desc = "Split vertical" },
+    {
+      "<leader>lr",
+      "<cmd>lua require('telescope.builtin').lsp_references()<cr>",
+      desc = "References",
+    },
+    {
+      "<leader>ls",
+      "<cmd>lua require('telescope.builtin').lsp_document_symbols()<cr>",
+      desc = "Document Symbols",
+    },
+    {
+      "<leader>lt",
+      "<cmd>lua require('telescope.builtin').lsp_type_definitions()<cr>",
+      desc = "Type Definition",
+    },
+    {
+      "<leader>lw",
+      "<cmd>lua require('telescope.builtin').diagnostics()<cr>",
+      desc = "Diagnostics",
+    },
+    {
+      "<leader>m",
+      "<cmd>Mason<cr>",
+      desc = "Mason [LSP Manager]",
+    },
+    {
+      "<leader>r",
+      "<cmd>lua require('telescope.builtin').oldfiles()<CR>",
+      desc = "Recent Files",
+    },
+    {
+      "<leader>s",
+      "<cmd>split<CR>",
+      desc = "Split horizontal",
+    },
+    {
+      "<leader>v",
+      "<C-w>v<C-w>l",
+      desc = "Split vertical",
+    },
     { "<leader>w", "<cmd>w!<CR>", desc = "Save" },
-    { "<leader>z", "<cmd>Lazy<CR>", desc = "Lazy [Plugin Manager]" },
+    {
+      "<leader>z",
+      "<cmd>Lazy<CR>",
+      desc = "Lazy [Plugin Manager]",
+    },
   },
 })
 
