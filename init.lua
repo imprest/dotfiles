@@ -92,6 +92,16 @@ require("lazy").setup({
     },
   },
   {
+    "nvimdev/dashboard-nvim",
+    event = "VimEnter",
+    config = function()
+      require("dashboard").setup({
+        -- config
+      })
+    end,
+    dependencies = { { "nvim-tree/nvim-web-devicons" } },
+  },
+  {
     "akinsho/bufferline.nvim",
     version = "*",
     dependencies = { "famiu/bufdelete.nvim", { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font } },
