@@ -30,7 +30,7 @@ require("lazy").setup({
     "folke/which-key.nvim",
     event = "VimEnter",
     opts = {
-      icons = { keys = vim.g.have_nerd_font and {} },
+      icons = { mappings = vim.g.have_nerd_font, keys = vim.g.have_nerd_font and {} },
       plugins = {
         spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints i.e. z=
         -- the presets plugin, adds help for a bunch of default keybindings in Neovim
@@ -126,6 +126,13 @@ require("lazy").setup({
       vim.g["vim_svelte_plugin_use_foldexpr"] = 1
     end,
   },
+  {
+    "amrbashir/nvim-docs-view",
+    lazy = true,
+    cmd = "DocsViewUpdate",
+    opts = { update_mode = "manual" },
+    keys = { { "K", "<cmd>DocsViewUpdate<CR>", mode = "", desc = "DocsViewUpdate" } },
+  },
   { "stevearc/dressing.nvim", event = "VeryLazy" },
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -188,17 +195,23 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
       vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Diagnostics" })
       vim.keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "Recent Files" })
-      vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
+      vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "Buffers" })
       vim.keymap.set("n", "<leader>fC", builtin.commands, { desc = "Commands" })
       vim.keymap.set("n", "<leader>fc", builtin.command_history, { desc = "Commands History" })
       vim.keymap.set("n", "<leader>fs", builtin.search_history, { desc = "Search History" })
 
-      vim.keymap.set("n", "<leader>f/", function()
+      vim.keymap.set("n", "<leader>/", function()
         builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-          winblend = 10,
           previewer = false,
         }))
       end, { desc = "[/] Fuzzily search in current buffer" })
+
+      vim.keymap.set("n", "<leader>f/", function()
+        builtin.live_grep({
+          grep_open_files = true,
+          prompt_title = "Live Grep in Open Files",
+        })
+      end, { desc = "[S]earch [/] in Open Files" })
     end,
   },
   {
@@ -275,7 +288,7 @@ require("lazy").setup({
           map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
           map("gi", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
           map("<leader>D", require("telescope.builtin").lsp_implementations, "Type [D]efinition")
-          map("K", vim.lsp.buf.hover, "Hover Documentation")
+          -- map("K", vim.lsp.buf.hover, "Hover Documentation")
           map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 
           local client = vim.lsp.get_client_by_id(event.data.client_id)
@@ -857,6 +870,7 @@ require("lazy").setup({
   {
     -- Code skimming or outline for quick navigation
     "stevearc/aerial.nvim",
+    cmd = { "AerialToggle", "AerialPrev", "AerialNext" },
     opts = {
       on_attach = function(bufnr)
         vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
@@ -966,13 +980,13 @@ require("lazy").setup({
   },
   {
     "echasnovski/mini.align",
-    event = "VeryLazy",
+    keys = { { "ga", mode = "v" }, { "gA", mode = "v" } },
     version = false,
     config = function()
       require("mini.align").setup()
     end,
   },
-  { "mg979/vim-visual-multi", version = false, event = "VeryLazy" },
+  -- { "mg979/vim-visual-multi", version = false, event = "VeryLazy" },
   {
     "nvim-neotest/neotest",
     dependencies = {
@@ -1044,13 +1058,13 @@ opt.wrap = false -- Disable line wrap
 opt.linebreak = true -- Companion to wrap, don't split words (default: false)
 opt.autoindent = true -- Copy indent from current line when starting new one (default: true)
 opt.list = true -- Show some invisible characters
-opt.listchars = "tab:▸ ,extends:>,precedes:<"
+opt.listchars = "tab:▸ ,extends:>,precedes:<" -- Don't change this line else cwd will not work
 opt.mouse = "a" -- Allow the mouse
 vim.wo.number = true -- Show line numbers
 opt.pumblend = 10 -- Popup blend
 opt.pumheight = 10 -- Maximum number of entries in a popup
 opt.scrolljump = 4 -- min. lines to scroll
-opt.scrolloff = 4 -- Lines of context
+opt.scrolloff = 10 -- Lines of context
 opt.sidescrolloff = 8 -- Columns of context
 opt.shiftround = true -- Round indent
 opt.showbreak = "↪  "
@@ -1095,7 +1109,7 @@ vim.keymap.set("i", "<C-u>", "<C-g>u<C-u>") -- Delete lines in insert mode
 vim.keymap.set("i", "<C-w>", "<C-g>u<C-w>") -- Delete words in insert mode
 
 -- Easier movement
-vim.keymap.set("n", "q", "<C-w>c")
+vim.keymap.set("n", "q", "<C-w>c") -- Prevent usage of macros
 vim.keymap.set("n", "H", "^")
 vim.keymap.set("n", "L", "g_")
 vim.keymap.set("n", "F", "%")
@@ -1177,7 +1191,7 @@ vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
 -- Faster close buffer and window
-vim.keymap.set("n", "Q", "<cmd>Bdelete<cr>")
+vim.keymap.set("n", "<leader>q", "<cmd>Bdelete<cr>")
 
 -- which-key
 local wk = require("which-key")
@@ -1192,11 +1206,6 @@ wk.add({
   },
   {
     { "<leader>.", "<cmd>normal gcc<CR>", desc = "Comment" },
-    {
-      "<leader><leader>",
-      "<C-^>",
-      desc = "Last buffer",
-    },
     {
       "<leader>a",
       "<cmd>AerialToggle!<CR>",
