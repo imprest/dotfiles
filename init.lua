@@ -131,7 +131,7 @@ require("lazy").setup({
     lazy = true,
     cmd = "DocsViewUpdate",
     opts = { update_mode = "manual" },
-    keys = { { "K", "<cmd>DocsViewUpdate<CR>", mode = "", desc = "DocsViewUpdate" } },
+    keys = { { "<leader>k", "<cmd>DocsViewUpdate<CR>", mode = "", desc = "DocsViewUpdate" } },
   },
   { "stevearc/dressing.nvim", event = "VeryLazy" },
   -- Fuzzy Finder (files, lsp, etc)
@@ -288,7 +288,7 @@ require("lazy").setup({
           map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
           map("gi", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
           map("<leader>D", require("telescope.builtin").lsp_implementations, "Type [D]efinition")
-          -- map("K", vim.lsp.buf.hover, "Hover Documentation")
+          map("K", vim.lsp.buf.hover, "Hover Documentation")
           map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
 
           local client = vim.lsp.get_client_by_id(event.data.client_id)
@@ -986,6 +986,7 @@ require("lazy").setup({
       require("mini.align").setup()
     end,
   },
+  { "echasnovski/mini.ai", version = false, opts = {} },
   -- { "mg979/vim-visual-multi", version = false, event = "VeryLazy" },
   {
     "nvim-neotest/neotest",
