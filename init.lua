@@ -49,7 +49,7 @@ require("lazy").setup({
   },
   {
     "NvChad/nvim-colorizer.lua",
-    ft = { "javascript", "ts_ls", "css", "html", "postcss" },
+    ft = { "javascript", "typescript", "css", "html" },
     cmd = "ColorizerToggle",
     opts = { user_default_options = { tailwind = true } },
   },
@@ -138,7 +138,7 @@ require("lazy").setup({
   {
     "nvim-telescope/telescope.nvim",
     event = "VimEnter",
-    branch = "0.1.x",
+    -- branch = "0.1.x",
     dependencies = {
       "nvim-lua/plenary.nvim",
       {
@@ -327,7 +327,11 @@ require("lazy").setup({
         },
         typst_lsp = {},
         elixirls = {
-          settings = { enableTestLenses = true },
+          dialyzerEnabled = false,
+          settings = {
+            cmd = "/home/hvaria/.local/share/nvim/mason/bin/elixir-ls",
+            enableTestLenses = true,
+          },
         },
         ts_ls = {
           settings = {
@@ -1340,31 +1344,6 @@ local function augroup(name)
   return vim.api.nvim_create_augroup("My_" .. name, { clear = true })
 end
 
--- Prevent LSP from overwriting treesitter color settings
--- https://github.com/NvChad/NvChad/issues/1907
-vim.highlight.priorities.semantic_tokens = 95 -- Or any number lower than 100, treesitter's priority level
-
--- Appearance of diagnostics
--- vim.diagnostic.config({
---   virtual_text = {
---     prefix = "●",
---     -- Add a custom format function to show error codes
---     format = function(diagnostic)
---       local code = diagnostic.code and string.format("[%s]", diagnostic.code) or ""
---       return string.format("%s %s", code, diagnostic.message)
---     end,
---   },
---   underline = false,
---   update_in_insert = true,
---   float = {
---     source = "always", -- Or "if_many"
---   },
---   -- Make diagnostic background transparent
---   on_ready = function()
---     vim.cmd("highlight DiagnosticVirtualText guibg=NONE")
---   end,
--- })
-
 -- highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
@@ -1453,9 +1432,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- Postcss
-vim.filetype.add({ extension = { postcss = "css" } })
-
 -- Help Buffer
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup("help"),
@@ -1464,33 +1440,5 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.cmd([[wincmd L | vert res 83<CR>]])
     vim.cmd([[nnoremap <buffer><cr> <c-]>]])
     vim.cmd([[nnoremap <buffer><bs> <c-T>]])
-  end,
-})
-
--- Autocmd to save folds for a file
--- https://github.com/AstroNvim/AstroNvim/blob/271c9c3f71c2e315cb16c31276dec81ddca6a5a6/lua/astronvim/autocmds.lua#L98-L120
-local view_group = vim.api.nvim_create_augroup("auto_view", { clear = true })
-vim.api.nvim_create_autocmd({ "BufWinLeave", "BufWritePost", "WinLeave" }, {
-  desc = "Save view with mkview for real files",
-  group = view_group,
-  callback = function(args)
-    if vim.b[args.buf].view_activated then
-      vim.cmd.mkview({ mods = { emsg_silent = true } })
-    end
-  end,
-})
-vim.api.nvim_create_autocmd("BufWinEnter", {
-  desc = "Try to load file view if available and enable view saving for real files",
-  group = view_group,
-  callback = function(args)
-    if not vim.b[args.buf].view_activated then
-      local filetype = vim.api.nvim_get_option_value("filetype", { buf = args.buf })
-      local buftype = vim.api.nvim_get_option_value("buftype", { buf = args.buf })
-      local ignore_filetypes = { "gitcommit", "gitrebase", "svg", "hgcommit" }
-      if buftype == "" and filetype and filetype ~= "" and not vim.tbl_contains(ignore_filetypes, filetype) then
-        vim.b[args.buf].view_activated = true
-        vim.cmd.loadview({ mods = { emsg_silent = true } })
-      end
-    end
   end,
 })
