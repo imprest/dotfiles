@@ -195,7 +195,7 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live Grep" })
       vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Diagnostics" })
       vim.keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "Recent Files" })
-      vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "Buffers" })
+      vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
       vim.keymap.set("n", "<leader>fC", builtin.commands, { desc = "Commands" })
       vim.keymap.set("n", "<leader>fc", builtin.command_history, { desc = "Commands History" })
       vim.keymap.set("n", "<leader>fs", builtin.search_history, { desc = "Search History" })
@@ -631,7 +631,7 @@ require("lazy").setup({
         return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
       end
 
-      local auto_select = true
+      local auto_select = false
       cmp.setup({
         window = {
           completion = cmp.config.window.bordered(),
@@ -652,6 +652,7 @@ require("lazy").setup({
           end,
         },
         completion = {
+          keyword_length = 2,
           completeopt = "menu,menuone,noselect" .. (auto_select and "" or ",noselect"),
         },
         preselect = auto_select and cmp.PreselectMode.Item or cmp.PreselectMode.None,
@@ -850,7 +851,6 @@ require("lazy").setup({
     opts = {
       close_if_last_window = true,
       enable_git_status = false,
-      source_selector = { statusline = true },
       filesystem = {
         bind_to_cwd = false,
         follow_current_file = { enabled = true },
@@ -880,10 +880,7 @@ require("lazy").setup({
         vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
         vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
       end,
-      layout = {
-        default_direction = "float",
-        placement = "edge",
-      },
+      layout = { placement = "left" },
     },
   },
   { "folke/ts-comments.nvim", opts = {}, event = "VeryLazy" },
@@ -1112,6 +1109,7 @@ vim.keymap.set("n", "<F4>", "<cmd>set spell!<CR>")
 vim.keymap.set("n", "<F5>", "<cmd>ColorizerToggle<CR>")
 vim.keymap.set("i", "<C-u>", "<C-g>u<C-u>") -- Delete lines in insert mode
 vim.keymap.set("i", "<C-w>", "<C-g>u<C-w>") -- Delete words in insert mode
+vim.keymap.set("n", "<leader><leader>", "<C-^>")
 
 -- Easier movement
 vim.keymap.set("n", "q", "<C-w>c") -- Prevent usage of macros
