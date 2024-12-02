@@ -1035,7 +1035,7 @@ require("lazy").setup({
 local width = 85
 -- global options
 local opt = vim.opt
-opt.hlsearch = true
+opt.hlsearch = false
 opt.backup = false
 opt.breakindent = true
 opt.conceallevel = 2 -- So that `` is visible in markdown files (default: 1)
@@ -1169,6 +1169,8 @@ vim.keymap.set("n", "g*", "g*zz", { silent = true })
 vim.keymap.set("n", "g#", "g#zz", { silent = true })
 vim.keymap.set("n", "<C-o>", "<C-o>zz", { silent = true })
 vim.keymap.set("n", "<C-i>", "<C-i>zz", { silent = true })
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { silent = true })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { silent = true })
 vim.keymap.set("n", "u", "uzz", { silent = true })
 vim.keymap.set("n", "<C-r>", "<C-r>zz", { silent = true })
 

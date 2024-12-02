@@ -67,6 +67,7 @@ alias pacS="pacman --query --search"
 alias pacman-list-orphans="sudo pacman --query --deps --unrequired"
 alias pacman-remove-orphans="sudo pacman --remove --recursive \$(pacman --quiet --query --deps --unrequired)"
 alias pacU="sudo pacman --sync --refresh --sysupgrade"
+alias pacman-new-configs='sudo find / -regex /"\(proc\|tmp\|run\)" -prune -o -type f -regex ".*\.pac\(new\|save\|orig\)" -print && echo "sudo nvim -d pacman.conf pacman.conf.new # to audit config changes"'
 # confirm before overwriting something
 alias cp="cp -i"
 alias mv='mv -i'
