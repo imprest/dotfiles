@@ -245,7 +245,7 @@ require("lazy").setup({
             "tailwindcss",
             "svelte",
             "elixirls",
-            "typst_lsp",
+            "tinymist",
           },
         },
       },
@@ -325,7 +325,7 @@ require("lazy").setup({
             },
           },
         },
-        typst_lsp = {},
+        tinymist = {},
         elixirls = {
           dialyzerEnabled = false,
           settings = {
