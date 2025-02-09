@@ -1,42 +1,48 @@
 /* .config/gtk-3.0 */
 /* shrink headerbars (don't forget semicolons after each property) */
 headerbar {
-    min-height: 0;
-    padding-left: 2px; /* same as childrens vertical margins for nicer proportions */
-    padding-right: 2px;
+  min-height: 0;
+  padding-left: 2px;
+  /* same as childrens vertical margins for nicer proportions */
+  padding-right: 2px;
 }
 
 headerbar entry,
 headerbar spinbutton,
 headerbar button,
 headerbar separator {
-    margin-top: 0px; /* same as headerbar side padding for nicer proportions */
-    margin-bottom: 0px;
+  margin-top: 0px;
+  /* same as headerbar side padding for nicer proportions */
+  margin-bottom: 0px;
 }
 
 /* shrink ssd titlebars */
 .default-decoration {
-    min-height: 0; /* let the entry and button drive the titlebar size */
-    padding: 0px;
+  min-height: 0;
+  /* let the entry and button drive the titlebar size */
+  padding: 0px;
 }
 
 .default-decoration .titlebutton {
-    min-height: 0px; /* tweak these two props to reduce button size */
-    min-width: 0px;
+  min-height: 0px;
+  /* tweak these two props to reduce button size */
+  min-width: 0px;
 }
 
 /* Make gnome-terminal tabs smaller */
-terminal-window notebook > header.top button {
+terminal-window notebook>header.top button {
   padding: 0 0 0 0;
   background-image: none;
   border: 0;
   margin-right: 10px;
 }
-terminal-window notebook > header.top > tabs > tab {
+
+terminal-window notebook>header.top>tabs>tab {
   margin: 0 0 0 0;
   padding: 0 0 0 0;
 }
-terminal-window notebook > header.top > tabs > tab label {
+
+terminal-window notebook>header.top>tabs>tab label {
   padding: 0 0 0 0;
   margin: 0 0 0 0;
 }
