@@ -25,8 +25,19 @@ set --export KERL_CONFIGURE_OPTIONS "--without-javac --without-odbc"
 set --export KERL_BUILD_DOCS "yes"
 set --export KERL_DOC_TARGETS "chunks"
 
-# asdf version manager
-source $HOME/.asdf/asdf.fish
+# ASDF configuration code
+if test -z $ASDF_DATA_DIR
+    set _asdf_shims "$HOME/.asdf/shims"
+else
+    set _asdf_shims "$ASDF_DATA_DIR/shims"
+end
+
+# Do not use fish_add_path (added in Fish 3.2) because it
+# potentially changes the order of items in PATH
+if not contains $_asdf_shims $PATH
+    set -gx --prepend PATH $_asdf_shims
+end
+set --erase _asdf_shims
 
 # Fzf config
 set --export FZF_DEFAULT_COMMAND "rg --files --follow"
@@ -36,7 +47,6 @@ set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 # Path
 set fish_user_paths \
-    "$HOME/.asdf/shims" \
     "$HOME/.cache/rebar3/bin" \
     "$HOME/.cargo/bin" \
     "$HOME/.local/bin" \

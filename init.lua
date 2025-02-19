@@ -215,14 +215,14 @@ require("lazy").setup({
       { "<leader>uC", function() require('snacks').picker.colorschemes() end, desc = "Colorschemes" },
     },
   },
-  {
-    "leafOfTree/vim-svelte-plugin",
-    ft = { "svelte" },
-    config = function()
-      vim.g["vim_svelte_plugin_use_typescript"] = 1
-      vim.g["vim_svelte_plugin_use_foldexpr"] = 1
-    end,
-  },
+  -- {
+  --   "leafOfTree/vim-svelte-plugin",
+  --   ft = { "svelte" },
+  --   config = function()
+  --     vim.g["vim_svelte_plugin_use_typescript"] = 1
+  --     vim.g["vim_svelte_plugin_use_foldexpr"] = 1
+  --   end,
+  -- },
   {
     "amrbashir/nvim-docs-view",
     lazy = true,
@@ -580,7 +580,8 @@ require("lazy").setup({
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
+        default = { "lsp", "path", "snippets", "buffer", "dadbod" },
+        providers = { dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" } },
       },
 
       -- don't show in cmdline and search mode
@@ -759,7 +760,7 @@ require("lazy").setup({
         "json",
         "typescript",
         "typst",
-        "tsx",
+        -- "tsx",
         "svelte",
         "erlang",
         "elixir",
@@ -1145,15 +1146,6 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "elixir,eelixir",
   callback = function()
     vim.cmd([[iab pp \|>]])
-  end,
-})
-
--- SQL cmp
-vim.api.nvim_create_autocmd("FileType", {
-  group = augroup("sql_cmp"),
-  pattern = "sql,mysql,plsql",
-  callback = function()
-    require("cmp").setup.buffer({ sources = { { name = "vim-dadbod-completion" } } })
   end,
 })
 
