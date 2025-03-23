@@ -1,4 +1,4 @@
-; .config/nvim/after/queries/elixir
+; .config/nvim/after/queries/elixir <-- remove this line
 ; extends
 
 ; Svelte

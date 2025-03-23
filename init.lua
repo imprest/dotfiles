@@ -3,7 +3,7 @@
 vim.g["loaded_python_provider"] = 1
 vim.g["python3_host_prog"] = "/usr/bin/python3"
 vim.g.mapleader = ","
-vim.g.maplocalleader = "<"
+vim.g.maplocalleader = ","
 vim.g.have_nerd_font = true
 
 -------------------- LAZY.NVIM -----------------------------
@@ -26,11 +26,11 @@ vim.opt.rtp:prepend(lazypath)
 
 -------------------- PLUGINS -------------------------------
 require("lazy").setup({
+  "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
   {
     "folke/which-key.nvim",
     event = "VimEnter",
     opts = {
-      preset = "helix",
       icons = { mappings = vim.g.have_nerd_font, keys = vim.g.have_nerd_font and {} },
       plugins = {
         spelling = { enabled = true, suggestions = 20 }, -- use which-key for spelling hints i.e. z=
@@ -127,17 +127,34 @@ require("lazy").setup({
     opts = {
       bigfile = { enabled = true },
       dashboard = { enabled = true },
-      explorer = { enabled = true },
-      indent = { enabled = false },
+      explorer = { enabled = false },
+      image = { enabled = true },
+      indent = { enabled = true },
       input = { enabled = true, win = { relative = "cursor" } },
-      picker = { enabled = true, layout = { preset = "ivy", cycle = false } },
+      picker = {
+        enabled = true,
+        layout = {
+          layout = {
+            backdrop = false,
+            row = 25,
+            width = 0.4,
+            min_width = 80,
+            height = 0.5,
+            border = "none",
+            box = "vertical",
+            { win = "input", height = 1, border = "rounded", title = "{title} {live} {flags}", title_pos = "center" },
+            { win = "list", border = "rounded", height = 6 },
+            { win = "preview", title = "{preview}", border = "rounded" },
+          },
+        },
+      },
       notifier = { enabled = false },
       quickfile = { enabled = true },
       terminal = { win = { style = "terminal", height = 12 } },
-      scope = { enabled = true },
+      scope = { enabled = true }, -- select and jump to scopes e.g. dii vai vii [i ]i
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
-      words = { enabled = false },
+      words = { enabled = false }, -- highlight variables based on LSP references
     },
     -- stylua: ignore
     keys = {
@@ -147,7 +164,7 @@ require("lazy").setup({
       { "<leader>b", function() require('snacks').picker.buffers() end,         desc = "Buffers" },
       { "<leader>/", function() require('snacks').picker.grep() end,            desc = "Grep" },
       { "<leader>:", function() require('snacks').picker.command_history() end, desc = "Command History" },
-      { "<leader>e", function() require("snacks").explorer() end,               desc = "Explorer Toggle" },
+      -- { "<leader>e", function() require("snacks").explorer() end,               desc = "Explorer Toggle" },
       -- find
       { "<leader>fb", function() require('snacks').picker.buffers() end,                                 desc = "Buffers" },
       { "<leader>fc", function() require('snacks').picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Config File" },
@@ -215,14 +232,6 @@ require("lazy").setup({
       { "<leader>uC", function() require('snacks').picker.colorschemes() end, desc = "Colorschemes" },
     },
   },
-  -- {
-  --   "leafOfTree/vim-svelte-plugin",
-  --   ft = { "svelte" },
-  --   config = function()
-  --     vim.g["vim_svelte_plugin_use_typescript"] = 1
-  --     vim.g["vim_svelte_plugin_use_foldexpr"] = 1
-  --   end,
-  -- },
   {
     "amrbashir/nvim-docs-view",
     lazy = true,
@@ -262,7 +271,7 @@ require("lazy").setup({
         },
       },
       "WhoIsSethDaniel/mason-tool-installer.nvim",
-      { "j-hui/fidget.nvim", opts = { notification = { window = { winblend = 0 } } } },
+      { "j-hui/fidget.nvim", opts = {} },
     },
     config = function()
       -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
@@ -336,7 +345,6 @@ require("lazy").setup({
         elixirls = {
           dialyzerEnabled = false,
           settings = {
-            -- cmd = "/home/hvaria/.local/share/nvim/mason/bin/elixir-ls",
             enableTestLenses = true,
           },
         },
@@ -388,6 +396,8 @@ require("lazy").setup({
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
       require("mason-lspconfig").setup({
+        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+        automatic_installation = false,
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
@@ -533,7 +543,7 @@ require("lazy").setup({
     "folke/todo-comments.nvim",
     cmd = { "TodoTrouble" },
     event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-    opts = {},
+    opts = { signs = false },
     -- stylua: ignore
     keys = {
       { "]t",         function() require("todo-comments").jump_next() end,              desc = "Next Todo Comment" },
@@ -558,8 +568,7 @@ require("lazy").setup({
     "saghen/blink.cmp",
     dependencies = "rafamadriz/friendly-snippets",
     event = "InsertEnter",
-    -- use a release tag to download pre-built binaries
-    version = "v0.11.0",
+    version = "v0.14.1", -- use a release tag to download pre-built binaries
     opts = {
       -- 'default' for mappings similar to built-in completion
       -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
@@ -567,29 +576,22 @@ require("lazy").setup({
       -- See the full "keymap" documentation for information on defining your own keymap.
       keymap = { preset = "super-tab" },
 
-      appearance = {
-        -- Sets the fallback highlight groups to nvim-cmp's highlight groups
-        -- Useful for when your theme doesn't support blink.cmp
-        -- Will be removed in a future release
-        use_nvim_cmp_as_default = true,
-        -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
-        nerd_font_variant = "mono",
-      },
-
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { "lsp", "path", "snippets", "buffer", "dadbod" },
+        default = { "lsp", "path", "snippets", "buffer" },
+        per_filetype = { sql = { "snippets", "dadbod", "buffer" } },
         providers = { dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" } },
       },
 
       -- don't show in cmdline and search mode
       completion = {
         menu = {
-          auto_show = function(ctx)
-            return ctx.mode ~= "cmdline" or not vim.tbl_contains({ "/", "?" }, vim.fn.getcmdtype())
-          end,
+          border = "single",
+          -- auto_show = function(ctx)
+          --   return ctx.mode ~= "cmdline" or not vim.tbl_contains({ "/", "?" }, vim.fn.getcmdtype())
+          -- end,
+
           -- nvim-cmp style menu
           draw = {
             columns = {
@@ -599,13 +601,13 @@ require("lazy").setup({
           },
         },
         -- Show documentation when selecting a completion item
-        documentation = { auto_show = true, auto_show_delay_ms = 500 },
+        documentation = { window = { border = "single" }, auto_show = true, auto_show_delay_ms = 500 },
         -- Display a preview of the selected item on the current line
         ghost_text = { enabled = true },
       },
 
       -- Experimental signature help support
-      signature = { enabled = true },
+      signature = { window = { border = "single" }, enabled = true },
     },
     opts_extend = { "sources.default" },
   },
@@ -795,8 +797,9 @@ require("lazy").setup({
   },
   {
     "kristijanhusak/vim-dadbod-completion",
-    ft = "sql",
-    dependencies = { "tpope/vim-dadbod" },
+    ft = { "sql", "plsql", "elixir", "eelixir" },
+    lazy = true,
+    dependencies = { "tpope/vim-dadbod", lazy = true },
     config = function()
       vim.g["db"] = "postgresql://postgres:@localhost/subledger_dev"
       vim.keymap.set("x", "<Plug>(DBExe)", "db#op_exec()", { expr = true })
@@ -808,16 +811,6 @@ require("lazy").setup({
       vim.keymap.set("n", "<leader>dd", "<Plug>(DBExeLine)")
     end,
   },
-  -- {
-  --   "lervag/vimtex", -- don't lazy load since it breaks the plugin + plugin automatically loads based on ft
-  --   lazy = false,
-  --   config = function()
-  --     vim.g.vimtex_quickfix_mode = 0
-  --     vim.g.vimtex_compiler_method = "tectonic"
-  --     vim.g.vimtex_view_general_viewer = "evince"
-  --     vim.g.vimtex_fold_enabled = true
-  --   end,
-  -- },
   {
     "echasnovski/mini.surround", -- sr({ sd' <select text>sa'
     keys = { "sr", "sh", "sf", "sF", "sd", "sn", { "sa", mode = "v" } }, -- Only load on these keystrokes
@@ -834,7 +827,6 @@ require("lazy").setup({
       require("mini.align").setup()
     end,
   },
-  -- { "mg979/vim-visual-multi", version = false, event = "VeryLazy" },
   {
     "nvim-neotest/neotest",
     dependencies = {
@@ -946,6 +938,7 @@ opt.shortmess:append({ W = true, I = true, c = true, C = true })
 opt.iskeyword:append("-") -- Hyphenated words recognized by searches (default: does not include '-')
 opt.runtimepath:remove("/usr/share/vim/vimfiles") -- Separate Vim plugins from Neovim in case Vim still in use (default: includes this path if Vim is installed)
 opt.wildmode = "longest:full,full" -- Command-line completion mode
+opt.confirm = true -- operation that can fail to due unsave changes; instead raise a dialog asking if you wish to save the current file(s)
 
 -------------------- MAPPINGS ------------------------------
 -- Personal common tasks
@@ -1146,6 +1139,18 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "elixir,eelixir",
   callback = function()
     vim.cmd([[iab pp \|>]])
+  end,
+})
+
+-- Built-in omnifunc for sql
+vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("sql_group"),
+  pattern = "sql,elixir,eelixir",
+  callback = function()
+    vim.cmd([[setlocal omnifunc=vim_dadbod_completion#omni]])
+    -- Remember to patch/add 'elixir' to s:filetypes in
+    -- .local/share/nvim/lazy/vim-dadbod-completion/autoload/vim_dadbod_completion.vim
+    vim.cmd([[call vim_dadbod_completion#fetch(str2nr(expand('<abuf>')))]])
   end,
 })
 
