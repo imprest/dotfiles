@@ -136,7 +136,7 @@ require("lazy").setup({
         layout = {
           layout = {
             backdrop = false,
-            row = 25,
+            row = 28,
             width = 0.4,
             min_width = 80,
             height = 0.5,
@@ -175,7 +175,6 @@ require("lazy").setup({
       -- LSP
       { "gd",         function() require('snacks').picker.lsp_definitions() end,       desc = "Goto Definition" },
       { "gD",         function() require('snacks').picker.lsp_declarations() end,      desc = "Goto Declaration" },
-      { "gr",         function() require('snacks').picker.lsp_references() end,        nowait = true, desc = "References" },
       { "gI",         function() require('snacks').picker.lsp_implementations() end,   desc = "Goto Implementation" },
       { "gt",         function() require('snacks').picker.lsp_type_definitions() end,  desc = "Goto Type Defini[t]ion" },
       { "<leader>ls", function() require('snacks').picker.lsp_symbols() end,           desc = "LSP Symbols" },
@@ -274,28 +273,15 @@ require("lazy").setup({
       { "j-hui/fidget.nvim", opts = {} },
     },
     config = function()
-      -- https://github.com/neovim/nvim-lspconfig/wiki/UI-customization
-      -- To instead override globally for all lsp borders
-      local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-      function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-        opts = opts or {}
-        opts.border = opts.border or "single"
-        return orig_util_open_floating_preview(contents, syntax, opts, ...)
-      end
-
       -- ref: LazyVim & https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
       -- lsp_diagnostics
-      local signs = { Error = " ", Warn = " ", Hint = "⨁ ", Info = " " }
-      for type, icon in pairs(signs) do
-        local hl = "DiagnosticSign" .. type
-        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-      end
-      vim.diagnostic.config({
-        underline = true,
-        update_in_insert = false,
-        virtual_text = false,
-        severity_sort = true,
-      })
+      local icons = {
+        [vim.diagnostic.severity.ERROR] = "✘",
+        [vim.diagnostic.severity.WARN] = "",
+        [vim.diagnostic.severity.INFO] = "",
+        [vim.diagnostic.severity.HINT] = "󰌶",
+      }
+      vim.diagnostic.config({ virtual_text = false, signs = { text = icons } })
 
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
@@ -308,10 +294,13 @@ require("lazy").setup({
           map("K", vim.lsp.buf.hover, "Hover Documentation")
 
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+          if client and client:supports_method("textDocument/inlayHint") then
             map("<leader>lh", function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
             end, "Toggle In[l]ay [H]ints")
+          end
+          if client:supports_method("textDocument/completion") then
+            vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
           end
           -- custom keymaps for individual lsp servers
           -- if client.name == "elixirls" then
@@ -324,10 +313,9 @@ require("lazy").setup({
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
-      --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
+      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
+      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- Enable the following language servers
       local servers = {
@@ -392,11 +380,10 @@ require("lazy").setup({
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, { "stylua" }) -- Used to format Lua code
-      require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+      -- vim.list_extend(ensure_installed, { "stylua" }) -- Used to format Lua code
 
       require("mason-lspconfig").setup({
-        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+        ensure_installed = ensure_installed, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
         handlers = {
           function(server_name)
@@ -568,7 +555,7 @@ require("lazy").setup({
     "saghen/blink.cmp",
     dependencies = "rafamadriz/friendly-snippets",
     event = "InsertEnter",
-    version = "v0.14.1", -- use a release tag to download pre-built binaries
+    version = "v1.2.0", -- use a release tag to download pre-built binaries
     opts = {
       -- 'default' for mappings similar to built-in completion
       -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
@@ -588,9 +575,6 @@ require("lazy").setup({
       completion = {
         menu = {
           border = "single",
-          -- auto_show = function(ctx)
-          --   return ctx.mode ~= "cmdline" or not vim.tbl_contains({ "/", "?" }, vim.fn.getcmdtype())
-          -- end,
 
           -- nvim-cmp style menu
           draw = {
@@ -644,7 +628,7 @@ require("lazy").setup({
           theme = "catppuccin",
           globalstatus = true,
           section_separators = "",
-          component_separators = "|",
+          component_separators = "",
           disabled_filetypes = { "Outline", "dashboard" },
           always_divide_middle = true,
         },
@@ -707,7 +691,7 @@ require("lazy").setup({
         follow_current_file = { enabled = true },
       },
       window = {
-        width = "26",
+        width = "22",
         mappings = {
           ["<space>"] = "none",
         },
@@ -904,7 +888,7 @@ opt.pumblend = 10 -- Popup blend
 opt.pumheight = 10 -- Maximum number of entries in a popup
 opt.scrolljump = 4 -- min. lines to scroll
 opt.scrolloff = 10 -- Lines of context
-opt.sidescrolloff = 8 -- Columns of context
+opt.sidescrolloff = 1 -- Columns of context
 opt.shiftround = true -- Round indent
 opt.showbreak = "↪  "
 opt.showbreak = "↪  "
@@ -939,6 +923,7 @@ opt.iskeyword:append("-") -- Hyphenated words recognized by searches (default: d
 opt.runtimepath:remove("/usr/share/vim/vimfiles") -- Separate Vim plugins from Neovim in case Vim still in use (default: includes this path if Vim is installed)
 opt.wildmode = "longest:full,full" -- Command-line completion mode
 opt.confirm = true -- operation that can fail to due unsave changes; instead raise a dialog asking if you wish to save the current file(s)
+opt.winborder = "rounded"
 
 -------------------- MAPPINGS ------------------------------
 -- Personal common tasks
