@@ -1,0 +1,53 @@
+# The syntax is "key = value". The whitespace around the equals doesn't matter.
+# Comments start with a `#` and are only valid on their own line.
+# Blank lines are ignored!
+theme = catppuccin-mocha
+window-theme = ghostty
+window-height = 42
+window-width = 140
+
+keybind = ctrl+z=close_surface
+keybind = f11=toggle_fullscreen
+keybind = alt+s=new_split:down
+keybind = alt+v=new_split:right
+keybind = ctrl+alt+h=goto_split:left
+keybind = ctrl+alt+j=goto_split:down
+keybind = ctrl+alt+k=goto_split:up
+keybind = ctrl+alt+l=goto_split:right
+
+mouse-hide-while-typing = true
+# window-colorspace = "display-p3"
+# gtk-adwaita = false
+# gtk-titlebar = true
+# adw-toolbar-style = "flat"
+# bold-is-bright = true
+
+# Empty values reset the configuration to the default value
+# font-family = Cascadia Mono NF
+font-family = JetBrainsMono Nerd Font
+# font-family = FiraCode Nerd Font Mono Ret
+font-style = SemiBold
+font-size = 9.5
+font-feature = zero, ss19, # ==, cv17 f,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

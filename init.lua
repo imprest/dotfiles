@@ -26,7 +26,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -------------------- PLUGINS -------------------------------
 require("lazy").setup({
-  "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+  "NMAC427/guess-indent.nvim", -- Detect tabstop and shiftwidth automatically
   {
     "folke/which-key.nvim",
     event = "VimEnter",
@@ -60,7 +60,7 @@ require("lazy").setup({
     name = "catppuccin",
     priority = 1000,
     init = function()
-      vim.cmd.colorscheme("catppuccin")
+      vim.cmd.colorscheme("catppuccin-macchiato")
     end,
     opts = {
       integrations = {
@@ -129,17 +129,17 @@ require("lazy").setup({
       dashboard = { enabled = true },
       explorer = { enabled = false },
       image = { enabled = true },
-      indent = { enabled = true },
+      indent = { enabled = false },
       input = { enabled = true, win = { relative = "cursor" } },
       picker = {
         enabled = true,
         layout = {
           layout = {
             backdrop = false,
-            row = 28,
+            row = 15,
             width = 0.4,
-            min_width = 80,
-            height = 0.5,
+            min_width = 90,
+            height = 0.7,
             border = "none",
             box = "vertical",
             { win = "input", height = 1, border = "rounded", title = "{title} {live} {flags}", title_pos = "center" },
@@ -252,9 +252,9 @@ require("lazy").setup({
     dependencies = {
       { "saghen/blink.cmp" },
       { "b0o/schemastore.nvim", version = false },
-      { "williamboman/mason.nvim", opts = { ui = { border = "rounded" } } },
+      { "mason-org/mason.nvim", opts = { ui = { border = "rounded" } } },
       {
-        "williamboman/mason-lspconfig.nvim",
+        "mason-org/mason-lspconfig.nvim",
         opts = {
           ensure_installed = {
             "lua_ls",
@@ -332,9 +332,10 @@ require("lazy").setup({
         tinymist = {},
         elixirls = {
           dialyzerEnabled = false,
-          settings = {
-            enableTestLenses = true,
-          },
+          fetchDeps = true,
+          enableTestLenses = true,
+          suggestSpecs = true,
+          signatureAfterComplete = true,
         },
         ts_ls = {
           settings = {
@@ -553,23 +554,32 @@ require("lazy").setup({
   },
   {
     "saghen/blink.cmp",
-    dependencies = "rafamadriz/friendly-snippets",
-    event = "InsertEnter",
-    version = "v1.2.0", -- use a release tag to download pre-built binaries
+    event = "VimEnter",
+    version = "1.*", -- use a release tag to download pre-built binaries
+    dependencies = {
+      "L3MON4D3/LuaSnip",
+      version = "2.*",
+      build = (function()
+        if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
+          return
+        end
+        return "make install_jsregexp"
+      end)(),
+      dependencies = {
+        {
+          "rafamadriz/friendly-snippets",
+          config = function()
+            require("luasnip.loaders.from_vscode").lazy_load()
+          end,
+        },
+      },
+    },
     opts = {
       -- 'default' for mappings similar to built-in completion
       -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
       -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
       -- See the full "keymap" documentation for information on defining your own keymap.
       keymap = { preset = "super-tab" },
-
-      -- Default list of enabled providers defined so that you can extend it
-      -- elsewhere in your config, without redefining it, due to `opts_extend`
-      sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
-        per_filetype = { sql = { "snippets", "dadbod", "buffer" } },
-        providers = { dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" } },
-      },
 
       -- don't show in cmdline and search mode
       completion = {
@@ -584,16 +594,27 @@ require("lazy").setup({
             },
           },
         },
-        -- Show documentation when selecting a completion item
-        documentation = { window = { border = "single" }, auto_show = true, auto_show_delay_ms = 500 },
+        -- Show documentation with <c-space>
+        documentation = { window = { border = "single" }, auto_show = false, auto_show_delay_ms = 500 },
         -- Display a preview of the selected item on the current line
         ghost_text = { enabled = true },
       },
 
-      -- Experimental signature help support
+      -- Default list of enabled providers defined so that you can extend it
+      -- elsewhere in your config, without redefining it, due to `opts_extend`
+      sources = {
+        default = { "lsp", "path", "snippets", "buffer" },
+        per_filetype = { sql = { "snippets", "dadbod", "buffer" } },
+        providers = { dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" } },
+      },
+
+      snippets = { preset = "luasnip" },
+
+      fuzzy = { implementation = "prefer_rust_with_warning" },
+
+      -- Shows a signature help window while you type arguments for a function
       signature = { window = { border = "single" }, enabled = true },
     },
-    opts_extend = { "sources.default" },
   },
   -- search/replace in multiple files
   -- {
@@ -665,7 +686,7 @@ require("lazy").setup({
   -- file explorer
   {
     "nvim-neo-tree/neo-tree.nvim",
-    cmd = "Neotree",
+    lazy = false,
     version = "v3.*",
     dependencies = { "MunifTanjim/nui.nvim" },
     keys = {
@@ -691,7 +712,7 @@ require("lazy").setup({
         follow_current_file = { enabled = true },
       },
       window = {
-        width = "22",
+        width = 22,
         mappings = {
           ["<space>"] = "none",
         },
@@ -1052,7 +1073,7 @@ end
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
   callback = function()
-    vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
 })
 
