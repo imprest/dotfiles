@@ -63,6 +63,7 @@ require("lazy").setup({
       vim.cmd.colorscheme("catppuccin-macchiato")
     end,
     opts = {
+      no_italic = true,
       integrations = {
         aerial = true,
         blink_cmp = true,
@@ -131,26 +132,10 @@ require("lazy").setup({
       image = { enabled = true },
       indent = { enabled = false },
       input = { enabled = true, win = { relative = "cursor" } },
-      picker = {
-        enabled = true,
-        layout = {
-          layout = {
-            backdrop = false,
-            row = 15,
-            width = 0.4,
-            min_width = 90,
-            height = 0.7,
-            border = "none",
-            box = "vertical",
-            { win = "input", height = 1, border = "rounded", title = "{title} {live} {flags}", title_pos = "center" },
-            { win = "list", border = "rounded", height = 6 },
-            { win = "preview", title = "{preview}", border = "rounded" },
-          },
-        },
-      },
+      picker = { enabled = true },
       notifier = { enabled = false },
       quickfile = { enabled = true },
-      terminal = { win = { style = "terminal", height = 12 } },
+      terminal = { win = { style = "terminal", height = 15 } },
       scope = { enabled = true }, -- select and jump to scopes e.g. dii vai vii [i ]i
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
@@ -232,11 +217,8 @@ require("lazy").setup({
     },
   },
   {
-    "amrbashir/nvim-docs-view",
-    lazy = true,
-    cmd = "DocsViewUpdate",
-    opts = { update_mode = "manual" },
-    keys = { { "<leader>k", "<cmd>DocsViewUpdate<CR>", mode = "", desc = "DocsViewUpdate" } },
+    "sphamba/smear-cursor.nvim",
+    opts = { smear_between_neighbor_lines = false, smear_insert_mode = false },
   },
   {
     "rachartier/tiny-inline-diagnostic.nvim",
@@ -891,7 +873,7 @@ vim.opt.formatoptions:remove({ "c", "r", "o" }) -- Don't insert the current comm
 opt.foldmethod = "expr"
 opt.foldexpr = "nvim_treesitter#foldexpr()"
 opt.foldtext = ""
-opt.guicursor = "i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1"
+opt.guicursor = "i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkon1,t:ver20"
 opt.grepformat = "%f:%l:%c:%m"
 opt.grepprg = "rg --vimgrep"
 opt.jumpoptions = "view"
@@ -1002,21 +984,6 @@ vim.keymap.set("n", "<Right>", "<cmd>BufferLineCycleNext<cr>", { desc = "Prev bu
 vim.keymap.set("n", "<Left>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Next buffer" })
 vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
-
--- Try and center these motions to the middle of the screen
-vim.keymap.set({ "n", "x" }, "gw", "*Nzz", { desc = "Search word under cursor" })
-vim.keymap.set("n", "n", "nzzzv", { silent = true })
-vim.keymap.set("n", "N", "Nzzzv", { silent = true })
-vim.keymap.set("n", "*", "*zz", { silent = true })
-vim.keymap.set("n", "#", "#zz", { silent = true })
-vim.keymap.set("n", "g*", "g*zz", { silent = true })
-vim.keymap.set("n", "g#", "g#zz", { silent = true })
-vim.keymap.set("n", "<C-o>", "<C-o>zz", { silent = true })
-vim.keymap.set("n", "<C-i>", "<C-i>zz", { silent = true })
-vim.keymap.set("n", "<C-d>", "<C-d>zz", { silent = true })
-vim.keymap.set("n", "<C-u>", "<C-u>zz", { silent = true })
-vim.keymap.set("n", "u", "uzz", { silent = true })
-vim.keymap.set("n", "<C-r>", "<C-r>zz", { silent = true })
 
 -- Add undo break-points
 vim.keymap.set("i", ",", ",<c-g>u")

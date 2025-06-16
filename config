@@ -2,6 +2,7 @@
 # Comments start with a `#` and are only valid on their own line.
 # Blank lines are ignored!
 theme = catppuccin-mocha
+cursor-text = #11111b
 window-theme = ghostty
 window-height = 42
 window-width = 140
