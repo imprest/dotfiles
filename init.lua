@@ -54,57 +54,51 @@ require("lazy").setup({
     cmd = "ColorizerToggle",
     opts = { user_default_options = { tailwind = true } },
   },
+
   {
-    "catppuccin/nvim",
+    "NTBBloodbath/doom-one.nvim",
     lazy = true,
-    name = "catppuccin",
     priority = 1000,
     init = function()
-      vim.cmd.colorscheme("catppuccin-macchiato")
+      vim.cmd.colorscheme("doom-one")
+      vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#3b3b3b" })
     end,
-    opts = {
-      no_italic = true,
-      integrations = {
-        aerial = true,
-        blink_cmp = true,
-        cmp = true,
-        grug_far = true,
-        gitsigns = true,
-        lsp_trouble = true,
-        mason = true,
-        markdown = true,
-        mini = true,
-        native_lsp = {
-          enabled = true,
-          underlines = {
-            errors = { "undercurl" },
-            hints = { "undercurl" },
-            warnings = { "undercurl" },
-            information = { "undercurl" },
-          },
-        },
-        neotest = true,
-        neotree = false,
-        semantic_tokens = true,
-        snacks = true,
-        treesitter = true,
-        treesitter_context = true,
-        which_key = true,
-      },
-    },
+    config = function()
+      vim.g.doom_one_cursor_coloring = true
+      vim.g.doom_one_terminal_colors = true
+      vim.g.doom_one_italic_comments = false
+      vim.g.doom_one_enable_treesitter = true
+      vim.g.doom_one_diagnostics_text_color = true
+      -- Plugins integration
+      vim.g.doom_one_plugin_neorg = true
+      vim.g.doom_one_plugin_nvim_tree = true
+      vim.g.doom_one_plugin_dashboard = true
+      vim.g.doom_one_plugin_startify = true
+      vim.g.doom_one_plugin_whichkey = true
+      vim.g.doom_one_plugin_indent_blankline = true
+    end,
   },
   {
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
     version = "*",
     dependencies = { { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font } },
-    after = "catppuccin",
-    opts = {
-      highlights = { fill = { bg = "" } },
-      options = {
-        offsets = { { filetype = "neo-tree", highlight = "Directory" } },
-      },
-    },
+    after = "doom-one.nvim",
+    config = function()
+      local bufferline = require("bufferline")
+      bufferline.setup({
+        options = {
+          separator_style = "slope",
+          style_preset = {
+            bufferline.style_preset.no_italic,
+            bufferline.style_preset.no_bold,
+            bufferline.style_preset.minimal,
+          },
+          offsets = { { filetype = "neo-tree", highlight = "Directory" } },
+          highlights = { fill = { bg = "#282c34" } },
+        },
+      })
+    end,
   },
   {
     "folke/persistence.nvim",
@@ -130,12 +124,12 @@ require("lazy").setup({
       dashboard = { enabled = true },
       explorer = { enabled = false },
       image = { enabled = true },
-      indent = { enabled = false },
+      indent = { enabled = true },
       input = { enabled = true, win = { relative = "cursor" } },
-      picker = { enabled = true },
+      picker = { enabled = true, layout = { preset = "ivy" } },
       notifier = { enabled = false },
       quickfile = { enabled = true },
-      terminal = { win = { style = "terminal", height = 15 } },
+      terminal = { win = { style = "terminal", height = 14 } },
       scope = { enabled = true }, -- select and jump to scopes e.g. dii vai vii [i ]i
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
@@ -628,7 +622,7 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           icons_enabled = true,
-          theme = "catppuccin",
+          theme = "auto",
           globalstatus = true,
           section_separators = "",
           component_separators = "",
@@ -645,17 +639,17 @@ require("lazy").setup({
               padding = { left = 0, right = 0 },
             },
           },
-          lualine_b = { "branch" },
-          lualine_c = { { "filename", path = 1 }, "diff" },
-          lualine_x = { "diagnostics", "encoding", "filetype", "filesize" },
+          lualine_b = {}, -- "branch" },
+          lualine_c = { "filesize", { "filename", path = 1 }, "diff" },
+          lualine_x = { "diagnostics", "filetype" }, -- "encoding", "filetype", "filesize" },
           lualine_y = {
-            { "progress", separator = " ", padding = { left = 1, right = 0 } },
-            { "location", padding = { left = 0, right = 1 } },
+            { "location", padding = { left = 1, right = 0 } },
+            { "progress", separator = " ", padding = { left = 1, right = 1 } },
           },
           lualine_z = {
-            function()
-              return " " .. os.date("%I:%M%p %d/%m")
-            end,
+            -- function()
+            --   return " " .. os.date("%I:%M%p %d/%m")
+            -- end,
           },
         },
 
@@ -669,7 +663,7 @@ require("lazy").setup({
   {
     "nvim-neo-tree/neo-tree.nvim",
     lazy = false,
-    version = "v3.*",
+    version = "*",
     dependencies = { "MunifTanjim/nui.nvim" },
     keys = {
       { "<F2>", "<cmd>Neotree toggle<CR>", desc = "Toggle NeoTree" },
@@ -677,15 +671,7 @@ require("lazy").setup({
     deactivate = function()
       vim.cmd([[Neotree close]])
     end,
-    init = function()
-      vim.g.neo_tree_remove_legacy_commands = 1
-      if vim.fn.argc() == 1 then
-        local stat = vim.loop.fs_stat(vim.fn.argv(0))
-        if stat and stat.type == "directory" then
-          require("neo-tree")
-        end
-      end
-    end,
+    init = function() end,
     opts = {
       close_if_last_window = true,
       enable_git_status = false,
@@ -694,7 +680,7 @@ require("lazy").setup({
         follow_current_file = { enabled = true },
       },
       window = {
-        width = 22,
+        width = 26,
         mappings = {
           ["<space>"] = "none",
         },
@@ -702,9 +688,15 @@ require("lazy").setup({
       default_component_configs = {
         indent = {
           with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
-          expander_collapsed = "",
-          expander_expanded = "",
           expander_highlight = "NeoTreeExpander",
+        },
+      },
+      event_handlers = {
+        {
+          event = "neo_tree_buffer_enter",
+          handler = function()
+            vim.cmd([[ highlight TabLineFill guibg=#282c34 ]])
+          end,
         },
       },
     },
@@ -769,6 +761,12 @@ require("lazy").setup({
         },
       },
     },
+  },
+  {
+    "chomosuke/typst-preview.nvim",
+    ft = "typst",
+    version = "1.*",
+    opts = {}, -- lazy.nvim will implicitly calls `setup {}`
   },
   {
     "lewis6991/gitsigns.nvim",
@@ -880,7 +878,7 @@ opt.jumpoptions = "view"
 opt.ignorecase = true -- Ignore case
 opt.joinspaces = false -- No double spaces with join
 opt.laststatus = 3 -- global statusline
-opt.wrap = false -- Disable line wrap
+opt.wrap = true -- Disable line wrap
 opt.linebreak = true -- Companion to wrap, don't split words (default: false)
 opt.autoindent = true -- Copy indent from current line when starting new one (default: true)
 opt.list = true -- Show some invisible characters
@@ -901,9 +899,9 @@ vim.wo.signcolumn = "yes" -- Show sign column
 opt.smartcase = true -- Don't ignore case with capitals
 opt.inccommand = "split" -- Preview substitutions live, as you type!
 opt.spelllang = { "en" }
+-- opt.tabstop = 2 -- Number of spaces tabs count for
 opt.shiftwidth = 2 -- Size of an indent
-opt.tabstop = 2 -- Number of spaces tabs count for
-opt.softtabstop = 2
+opt.softtabstop = -1 -- mirror shiftwidth
 opt.expandtab = true -- Use spaces instead of tabs
 opt.splitbelow = true -- Put new windows below current
 opt.splitkeep = "screen"
@@ -914,8 +912,6 @@ opt.textwidth = width -- Maximum width of text
 opt.winminwidth = 5 -- Minimum window width
 opt.swapfile = false
 opt.writebackup = false
-opt.updatetime = 200 -- make updates faster and trigger CursorHold
-opt.timeoutlen = 300 -- mapping timeout
 opt.undofile = true
 opt.undolevels = 10000
 opt.undodir = "/home/hvaria/.nvim/undo"
@@ -1005,6 +1001,10 @@ vim.keymap.set("n", "x", '"_x', { noremap = true, silent = true })
 -- better indenting
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
+
+-- Try and center these motions to the middle of the screen
+vim.keymap.set("n", "<C-o>", "<C-o>zz", { silent = true })
+vim.keymap.set("n", "<C-i>", "<C-i>zz", { silent = true })
 
 -- which-key
 local wk = require("which-key")
