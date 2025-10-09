@@ -1,4 +1,4 @@
--- Based of https://github.com/LazyVim/LazyVim & https://astronvim.com
+-- Based of http://github.com/LazyVim/LazyVim & https://astronvim.com
 -------------------- HELPERS -------------------------------
 vim.g["loaded_python_provider"] = 1
 vim.g["python3_host_prog"] = "/usr/bin/python3"
@@ -26,7 +26,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -------------------- PLUGINS -------------------------------
 require("lazy").setup({
-  "NMAC427/guess-indent.nvim", -- Detect tabstop and shiftwidth automatically
+  -- "NMAC427/guess-indent.nvim", -- Detect tabstop and shiftwidth automatically
   {
     "folke/which-key.nvim",
     event = "VimEnter",
@@ -54,51 +54,27 @@ require("lazy").setup({
     cmd = "ColorizerToggle",
     opts = { user_default_options = { tailwind = true } },
   },
-
   {
-    "NTBBloodbath/doom-one.nvim",
-    lazy = true,
+    "folke/tokyonight.nvim",
+    lazy = false,
     priority = 1000,
+    opts = {},
     init = function()
-      vim.cmd.colorscheme("doom-one")
-      vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#3b3b3b" })
-    end,
-    config = function()
-      vim.g.doom_one_cursor_coloring = true
-      vim.g.doom_one_terminal_colors = true
-      vim.g.doom_one_italic_comments = false
-      vim.g.doom_one_enable_treesitter = true
-      vim.g.doom_one_diagnostics_text_color = true
-      -- Plugins integration
-      vim.g.doom_one_plugin_neorg = true
-      vim.g.doom_one_plugin_nvim_tree = true
-      vim.g.doom_one_plugin_dashboard = true
-      vim.g.doom_one_plugin_startify = true
-      vim.g.doom_one_plugin_whichkey = true
-      vim.g.doom_one_plugin_indent_blankline = true
+      vim.cmd.colorscheme("tokyonight-moon")
     end,
   },
   {
-    "akinsho/bufferline.nvim",
-    event = "VeryLazy",
-    version = "*",
-    dependencies = { { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font } },
-    after = "doom-one.nvim",
-    config = function()
-      local bufferline = require("bufferline")
-      bufferline.setup({
-        options = {
-          separator_style = "slope",
-          style_preset = {
-            bufferline.style_preset.no_italic,
-            bufferline.style_preset.no_bold,
-            bufferline.style_preset.minimal,
-          },
-          offsets = { { filetype = "neo-tree", highlight = "Directory" } },
-          highlights = { fill = { bg = "#282c34" } },
-        },
-      })
+    "romgrk/barbar.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    init = function()
+      vim.g.barbar_auto_setup = false
     end,
+    opts = {
+      sidebar_filetypes = {
+        ["neo-tree"] = { event = "BufWipeout" },
+      },
+    },
+    version = "^1.0.0", -- optional: only update when a new 1.x version is released
   },
   {
     "folke/persistence.nvim",
@@ -106,10 +82,10 @@ require("lazy").setup({
     opts = {},
     -- stylua: ignore
     keys = {
-      { "<leader>ps", function() require("persistence").load() end, desc = "Restore Session" },
-      { "<leader>pS", function() require("persistence").select() end,desc = "Select Session" },
+      { "<leader>ps", function() require("persistence").load() end,                desc = "Restore Session" },
+      { "<leader>pS", function() require("persistence").select() end,              desc = "Select Session" },
       { "<leader>pl", function() require("persistence").load({ last = true }) end, desc = "Restore Last Session" },
-      { "<leader>pd", function() require("persistence").stop() end, desc = "Don't Save Current Session" },
+      { "<leader>pd", function() require("persistence").stop() end,                desc = "Don't Save Current Session" },
     },
   },
   {
@@ -124,7 +100,7 @@ require("lazy").setup({
       dashboard = { enabled = true },
       explorer = { enabled = false },
       image = { enabled = true },
-      indent = { enabled = true },
+      indent = { enabled = false },
       input = { enabled = true, win = { relative = "cursor" } },
       picker = { enabled = true, layout = { preset = "ivy" } },
       notifier = { enabled = false },
@@ -138,76 +114,76 @@ require("lazy").setup({
     -- stylua: ignore
     keys = {
       -- Top Pickers & Explorer
-      { "<C-p>",     function() require('snacks').picker.smart() end,           desc = "Smart Find Files" },
-      { "<leader>r", function() require('snacks').picker.recent() end,          desc = "Recent" },
-      { "<leader>b", function() require('snacks').picker.buffers() end,         desc = "Buffers" },
-      { "<leader>/", function() require('snacks').picker.grep() end,            desc = "Grep" },
-      { "<leader>:", function() require('snacks').picker.command_history() end, desc = "Command History" },
+      { "<C-p>",      function() require('snacks').picker.git_files() end,                                   desc = "Smart Find Files" },
+      { "<leader>r",  function() require('snacks').picker.recent() end,                                  desc = "Recent" },
+      { "B",          "<Cmd>BufferPick<CR>"                            ,                                 desc = "Buffers" },
+      { "<leader>/",  function() require('snacks').picker.grep() end,                                    desc = "Grep" },
+      { "<leader>:",  function() require('snacks').picker.command_history() end,                         desc = "Command History" },
       -- { "<leader>e", function() require("snacks").explorer() end,               desc = "Explorer Toggle" },
       -- find
       { "<leader>fb", function() require('snacks').picker.buffers() end,                                 desc = "Buffers" },
       { "<leader>fc", function() require('snacks').picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Config File" },
-      { "<leader>ff", function() require('snacks').picker.files() end,                                   desc = "Find Files" },
+      { "<leader>ff", function() require('snacks').picker.smart() end,                                   desc = "Find Files" },
       { "<leader>fg", function() require('snacks').picker.git_files() end,                               desc = "Find Git Files" },
       { "<leader>fp", function() require('snacks').picker.projects() end,                                desc = "Projects" },
       { "<leader>fr", function() require('snacks').picker.recent() end,                                  desc = "Recent" },
       -- LSP
-      { "gd",         function() require('snacks').picker.lsp_definitions() end,       desc = "Goto Definition" },
-      { "gD",         function() require('snacks').picker.lsp_declarations() end,      desc = "Goto Declaration" },
-      { "gI",         function() require('snacks').picker.lsp_implementations() end,   desc = "Goto Implementation" },
-      { "gt",         function() require('snacks').picker.lsp_type_definitions() end,  desc = "Goto Type Defini[t]ion" },
-      { "<leader>ls", function() require('snacks').picker.lsp_symbols() end,           desc = "LSP Symbols" },
-      { "<leader>lS", function() require('snacks').picker.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
-      { "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>",                        desc = "Code Action" },
-      { "<leader>lc", "<cmd>lua vim.lsp.codelens.run()<cr>",                           desc = "CodeLens Action" },
-      { "<leader>lf", "<cmd>lua vim.lsp.buf.format()<cr>",                             desc = "Format" },
-      { "<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<cr>",                       desc = "Next Diagnostic" },
-      { "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev()<cr>",                       desc = "Prev Diagnostic" },
-      { "<leader>ll", "<cmd>LspInfo<cr>",                                              desc = "Info" },
-      { "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<cr>",                      desc = "Quickfix" },
+      { "gd",         function() require('snacks').picker.lsp_definitions() end,                         desc = "Goto Definition" },
+      { "gD",         function() require('snacks').picker.lsp_declarations() end,                        desc = "Goto Declaration" },
+      { "gI",         function() require('snacks').picker.lsp_implementations() end,                     desc = "Goto Implementation" },
+      { "gt",         function() require('snacks').picker.lsp_type_definitions() end,                    desc = "Goto Type Defini[t]ion" },
+      { "<leader>ls", function() require('snacks').picker.lsp_symbols() end,                             desc = "LSP Symbols" },
+      { "<leader>lS", function() require('snacks').picker.lsp_workspace_symbols() end,                   desc = "LSP Workspace Symbols" },
+      { "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>",                                          desc = "Code Action" },
+      { "<leader>lc", "<cmd>lua vim.lsp.codelens.run()<cr>",                                             desc = "CodeLens Action" },
+      { "<leader>lf", "<cmd>lua vim.lsp.buf.format()<cr>",                                               desc = "Format" },
+      { "<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<cr>",                                         desc = "Next Diagnostic" },
+      { "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev()<cr>",                                         desc = "Prev Diagnostic" },
+      { "<leader>ll", "<cmd>LspInfo<cr>",                                                                desc = "Info" },
+      { "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<cr>",                                        desc = "Quickfix" },
       -- git
-      { "<leader>gb", function() require('snacks').picker.git_branches() end, desc = "Git Branches" },
-      { "<leader>gl", function() require('snacks').picker.git_log() end,      desc = "Git Log" },
-      { "<leader>gL", function() require('snacks').picker.git_log_line() end, desc = "Git Log Line" },
-      { "<leader>gs", function() require('snacks').picker.git_status() end,   desc = "Git Status" },
-      { "<leader>gS", function() require('snacks').picker.git_stash() end,    desc = "Git Stash" },
-      { "<leader>gd", function() require('snacks').picker.git_diff() end,     desc = "Git Diff (Hunks)" },
-      { "<leader>gf", function() require('snacks').picker.git_log_file() end, desc = "Git Log File" },
-      { "<leader>gB", function() require('snacks').gitbrowse() end,           desc = "Git Browse" },
-      { "<leader>gg", function() require("snacks").lazygit() end,             desc = "Lazygit", },
-      { "<leader>go", function() require("snacks").lazygit.log() end,         desc = "Lazygit Log", },
+      { "<leader>gb", function() require('snacks').picker.git_branches() end,                            desc = "Git Branches" },
+      { "<leader>gl", function() require('snacks').picker.git_log() end,                                 desc = "Git Log" },
+      { "<leader>gL", function() require('snacks').picker.git_log_line() end,                            desc = "Git Log Line" },
+      { "<leader>gs", function() require('snacks').picker.git_status() end,                              desc = "Git Status" },
+      { "<leader>gS", function() require('snacks').picker.git_stash() end,                               desc = "Git Stash" },
+      { "<leader>gd", function() require('snacks').picker.git_diff() end,                                desc = "Git Diff (Hunks)" },
+      { "<leader>gf", function() require('snacks').picker.git_log_file() end,                            desc = "Git Log File" },
+      { "<leader>gB", function() require('snacks').gitbrowse() end,                                      desc = "Git Browse" },
+      { "<leader>gg", function() require("snacks").lazygit() end,                                        desc = "Lazygit", },
+      { "<leader>go", function() require("snacks").lazygit.log() end,                                    desc = "Lazygit Log", },
       -- Grep
-      { "<leader>sB", function() require('snacks').picker.grep_buffers() end, desc = "Grep Open Buffers" },
-      { "<leader>sg", function() require('snacks').picker.grep() end,         desc = "Grep" },
-      { "<leader>sw", function() require('snacks').picker.grep_word() end,    desc = "Visual selection or word", mode = { "n", "x" } },
+      { "<leader>sB", function() require('snacks').picker.grep_buffers() end,                            desc = "Grep Open Buffers" },
+      { "<leader>sg", function() require('snacks').picker.grep() end,                                    desc = "Grep" },
+      { "<leader>sw", function() require('snacks').picker.grep_word() end,                               desc = "Visual selection or word", mode = { "n", "x" } },
       -- search
-      { '<leader>s"', function() require('snacks').picker.registers() end,          desc = "Registers" },
-      { '<leader>s/', function() require('snacks').picker.search_history() end,     desc = "Search History" },
-      { "<leader>sa", function() require('snacks').picker.autocmds() end,           desc = "Autocmds" },
-      { "<leader>sb", function() require('snacks').picker.lines() end,              desc = "Buffer Lines" },
-      { "<leader>sc", function() require('snacks').picker.command_history() end,    desc = "Command History" },
-      { "<leader>sC", function() require('snacks').picker.commands() end,           desc = "Commands" },
-      { "<leader>sd", function() require('snacks').picker.diagnostics() end,        desc = "Diagnostics" },
-      { "<leader>sD", function() require('snacks').picker.diagnostics_buffer() end, desc = "Buffer Diagnostics" },
-      { "<leader>sh", function() require('snacks').picker.help() end,               desc = "Help Pages" },
-      { "<leader>sH", function() require('snacks').picker.highlights() end,         desc = "Highlights" },
-      { "<leader>si", function() require('snacks').picker.icons() end,              desc = "Icons" },
-      { "<leader>sj", function() require('snacks').picker.jumps() end,              desc = "Jumps" },
-      { "<leader>sk", function() require('snacks').picker.keymaps() end,            desc = "Keymaps" },
-      { "<leader>sl", function() require('snacks').picker.loclist() end,            desc = "Location List" },
-      { "<leader>sm", function() require('snacks').picker.marks() end,              desc = "Marks" },
-      { "<leader>sM", function() require('snacks').picker.man() end,                desc = "Man Pages" },
-      { "<leader>sp", function() require('snacks').picker.lazy() end,               desc = "Search for Plugin Spec" },
-      { "<leader>sq", function() require('snacks').picker.qflist() end,             desc = "Quickfix List" },
-      { "<leader>sR", function() require('snacks').picker.resume() end,             desc = "Resume" },
-      { "<leader>su", function() require('snacks').picker.undo() end,               desc = "Undo History" },
+      { '<leader>s"', function() require('snacks').picker.registers() end,                               desc = "Registers" },
+      { '<leader>s/', function() require('snacks').picker.search_history() end,                          desc = "Search History" },
+      { "<leader>sa", function() require('snacks').picker.autocmds() end,                                desc = "Autocmds" },
+      { "<leader>sb", function() require('snacks').picker.lines() end,                                   desc = "Buffer Lines" },
+      { "<leader>sc", function() require('snacks').picker.command_history() end,                         desc = "Command History" },
+      { "<leader>sC", function() require('snacks').picker.commands() end,                                desc = "Commands" },
+      { "<leader>sd", function() require('snacks').picker.diagnostics() end,                             desc = "Diagnostics" },
+      { "<leader>sD", function() require('snacks').picker.diagnostics_buffer() end,                      desc = "Buffer Diagnostics" },
+      { "<leader>sh", function() require('snacks').picker.help() end,                                    desc = "Help Pages" },
+      { "<leader>sH", function() require('snacks').picker.highlights() end,                              desc = "Highlights" },
+      { "<leader>si", function() require('snacks').picker.icons() end,                                   desc = "Icons" },
+      { "<leader>sj", function() require('snacks').picker.jumps() end,                                   desc = "Jumps" },
+      { "<leader>sk", function() require('snacks').picker.keymaps() end,                                 desc = "Keymaps" },
+      { "<leader>sl", function() require('snacks').picker.loclist() end,                                 desc = "Location List" },
+      { "<leader>sm", function() require('snacks').picker.marks() end,                                   desc = "Marks" },
+      { "<leader>sM", function() require('snacks').picker.man() end,                                     desc = "Man Pages" },
+      { "<leader>sp", function() require('snacks').picker.lazy() end,                                    desc = "Search for Plugin Spec" },
+      { "<leader>sq", function() require('snacks').picker.qflist() end,                                  desc = "Quickfix List" },
+      { "<leader>sR", function() require('snacks').picker.resume() end,                                  desc = "Resume" },
+      { "<leader>su", function() require('snacks').picker.undo() end,                                    desc = "Undo History" },
       -- others
-      { "<leader>q",  "<cmd>lua Snacks.bufdelete()<cr>",                      desc = "Buffer Delete"},
-      { "<leader>lR", function() require('snacks').rename.rename_file()           end, desc = "Rename File" },
-      { "<leader>cR", function() require('snacks').rename.rename_file() end,  desc = "Rename File" },
-      { "<leader>c",  "<cmd>lua Snacks.terminal()<CR>",                       desc = "ToggleTerm" },
-      { "<leader>o",  "<cmd>lua Snacks.terminal.open()<CR>",                  desc = "Open Term" },
-      { "<leader>uC", function() require('snacks').picker.colorschemes() end, desc = "Colorschemes" },
+      { "<leader>q",  "<cmd>lua Snacks.bufdelete()<cr>",                                                 desc = "Buffer Delete" },
+      { "<leader>lR", function() require('snacks').rename.rename_file() end,                             desc = "Rename File" },
+      { "<leader>cR", function() require('snacks').rename.rename_file() end,                             desc = "Rename File" },
+      { "<leader>c",  "<cmd>lua Snacks.terminal()<CR>",                                                  desc = "ToggleTerm" },
+      { "<leader>o",  "<cmd>lua Snacks.terminal.open()<CR>",                                             desc = "Open Term" },
+      { "<leader>uC", function() require('snacks').picker.colorschemes() end,                            desc = "Colorschemes" },
     },
   },
   {
@@ -218,7 +194,7 @@ require("lazy").setup({
     "rachartier/tiny-inline-diagnostic.nvim",
     event = "VeryLazy",
     config = function()
-      require("tiny-inline-diagnostic").setup()
+      require("tiny-inline-diagnostic").setup({ preset = "classic" })
     end,
   },
   -- LSP
@@ -240,7 +216,7 @@ require("lazy").setup({
             "ts_ls",
             "tailwindcss",
             "svelte",
-            "elixirls",
+            "expert",
             "tinymist",
           },
         },
@@ -306,13 +282,7 @@ require("lazy").setup({
           },
         },
         tinymist = {},
-        elixirls = {
-          dialyzerEnabled = false,
-          fetchDeps = true,
-          enableTestLenses = true,
-          suggestSpecs = true,
-          signatureAfterComplete = true,
-        },
+        expert = {},
         ts_ls = {
           settings = {
             completions = { completeFunctionCalls = true },
@@ -369,14 +339,11 @@ require("lazy").setup({
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
             server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-            require("lspconfig")[server_name].setup(server)
+            vim.lsp.config(server_name, server)
+            -- require("lspconfig")[server_name].setup(server)
           end,
         },
       })
-
-      -- require("lspconfig").gleam.setup({
-      --   capabilities = vim.tbl_deep_extend("force", {}, capabilities, {}),
-      -- })
     end,
   },
   -- linter
@@ -510,11 +477,11 @@ require("lazy").setup({
     opts = { signs = false },
     -- stylua: ignore
     keys = {
-      { "]t",         function() require("todo-comments").jump_next() end,              desc = "Next Todo Comment" },
-      { "[t",         function() require("todo-comments").jump_prev() end,              desc = "Previous Todo Comment" },
-      { "<leader>xt", "<cmd>Trouble todo toggle<cr>",                                   desc = "Todo (Trouble)" },
-      { "<leader>xT", "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>", desc = "Todo/Fix/Fixme (Trouble)" },
-      { "<leader>st", function() require('snacks').picker.todo_comments() end,          desc = "Todo" },
+      { "]t",         function() require("todo-comments").jump_next() end,                                              desc = "Next Todo Comment" },
+      { "[t",         function() require("todo-comments").jump_prev() end,                                              desc = "Previous Todo Comment" },
+      { "<leader>xt", "<cmd>Trouble todo toggle<cr>",                                                                   desc = "Todo (Trouble)" },
+      { "<leader>xT", "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>",                                 desc = "Todo/Fix/Fixme (Trouble)" },
+      { "<leader>st", function() require('snacks').picker.todo_comments() end,                                          desc = "Todo" },
       { "<leader>sT", function() require('snacks').picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } }) end, desc = "Todo/Fix/Fixme" },
     },
   },
@@ -530,7 +497,7 @@ require("lazy").setup({
   },
   {
     "saghen/blink.cmp",
-    event = "VimEnter",
+    event = { "InsertEnter", "CmdlineEnter" },
     version = "1.*", -- use a release tag to download pre-built binaries
     dependencies = {
       "L3MON4D3/LuaSnip",
@@ -571,7 +538,7 @@ require("lazy").setup({
           },
         },
         -- Show documentation with <c-space>
-        documentation = { window = { border = "single" }, auto_show = false, auto_show_delay_ms = 500 },
+        documentation = { window = { border = "single" }, auto_show = true, auto_show_delay_ms = 200 },
         -- Display a preview of the selected item on the current line
         ghost_text = { enabled = true },
       },
@@ -622,7 +589,7 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           icons_enabled = true,
-          theme = "auto",
+          theme = "tokyonight",
           globalstatus = true,
           section_separators = "",
           component_separators = "",
@@ -664,7 +631,7 @@ require("lazy").setup({
     "nvim-neo-tree/neo-tree.nvim",
     lazy = false,
     version = "*",
-    dependencies = { "MunifTanjim/nui.nvim" },
+    dependencies = { "MunifTanjim/nui.nvim", "nvim-tree/nvim-web-devicons" },
     keys = {
       { "<F2>", "<cmd>Neotree toggle<CR>", desc = "Toggle NeoTree" },
     },
@@ -710,7 +677,6 @@ require("lazy").setup({
         vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
         vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
       end,
-      layout = { placement = "left" },
     },
     keys = {
       { "<leader>a", "<cmd>AerialToggle!<CR>", desc = "AerialToggle" },
@@ -797,7 +763,7 @@ require("lazy").setup({
     end,
   },
   {
-    "echasnovski/mini.surround", -- sr({ sd' <select text>sa'
+    "nvim-mini/mini.surround", -- sr({ sd' <select text>sa'
     keys = { "sr", "sh", "sf", "sF", "sd", "sn", { "sa", mode = "v" } }, -- Only load on these keystrokes
     version = false,
     config = function()
@@ -805,7 +771,7 @@ require("lazy").setup({
     end,
   },
   {
-    "echasnovski/mini.align",
+    "nvim-mini/mini.align",
     keys = { { "ga", mode = "v" }, { "gA", mode = "v" } },
     version = false,
     config = function()
@@ -878,7 +844,7 @@ opt.jumpoptions = "view"
 opt.ignorecase = true -- Ignore case
 opt.joinspaces = false -- No double spaces with join
 opt.laststatus = 3 -- global statusline
-opt.wrap = true -- Disable line wrap
+opt.wrap = false -- Disable line wrap
 opt.linebreak = true -- Companion to wrap, don't split words (default: false)
 opt.autoindent = true -- Copy indent from current line when starting new one (default: true)
 opt.list = true -- Show some invisible characters
@@ -899,9 +865,9 @@ vim.wo.signcolumn = "yes" -- Show sign column
 opt.smartcase = true -- Don't ignore case with capitals
 opt.inccommand = "split" -- Preview substitutions live, as you type!
 opt.spelllang = { "en" }
--- opt.tabstop = 2 -- Number of spaces tabs count for
+opt.tabstop = 2 -- Number of spaces tabs count for
 opt.shiftwidth = 2 -- Size of an indent
-opt.softtabstop = -1 -- mirror shiftwidth
+opt.softtabstop = 2
 opt.expandtab = true -- Use spaces instead of tabs
 opt.splitbelow = true -- Put new windows below current
 opt.splitkeep = "screen"
@@ -975,11 +941,11 @@ vim.keymap.set("n", "<A-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window 
 vim.keymap.set("n", "<A-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
 vim.keymap.set("n", "<A-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
--- buffers
-vim.keymap.set("n", "<Right>", "<cmd>BufferLineCycleNext<cr>", { desc = "Prev buffer" })
-vim.keymap.set("n", "<Left>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Next buffer" })
-vim.keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev buffer" })
-vim.keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next buffer" })
+-- -- buffers
+vim.keymap.set("n", "<Right>", "<cmd>BufferNext<cr>", { desc = "Prev buffer" })
+vim.keymap.set("n", "<Left>", "<cmd>BufferPrevious<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "[b", "<cmd>BufferMoveNext<cr>", { desc = "Prev buffer" })
+vim.keymap.set("n", "]b", "<cmd>BufferMovePrevious<cr>", { desc = "Next buffer" })
 
 -- Add undo break-points
 vim.keymap.set("i", ",", ",<c-g>u")
@@ -1003,6 +969,8 @@ vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
 -- Try and center these motions to the middle of the screen
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { silent = true })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { silent = true })
 vim.keymap.set("n", "<C-o>", "<C-o>zz", { silent = true })
 vim.keymap.set("n", "<C-i>", "<C-i>zz", { silent = true })
 

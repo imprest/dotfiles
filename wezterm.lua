@@ -3,17 +3,17 @@ local act = wezterm.action
 local config = {}
 
 if wezterm.config_builder then
-  config = wezterm.config_builder()
+	config = wezterm.config_builder()
 end
 
 local mykeys = {}
 for i = 1, 8 do
-  -- ALT + number to activate that tab
-  table.insert(mykeys, {
-    key = tostring(i),
-    mods = "ALT",
-    action = act({ ActivateTab = i - 1 }),
-  })
+	-- ALT + number to activate that tab
+	table.insert(mykeys, {
+		key = tostring(i),
+		mods = "ALT",
+		action = act({ ActivateTab = i - 1 }),
+	})
 end
 
 table.insert(mykeys, { key = "c", mods = "ALT", action = act.ActivateCopyMode })
@@ -36,28 +36,28 @@ table.insert(mykeys, { key = "l", mods = "CTRL|ALT", action = act.AdjustPaneSize
 
 -- config.line_height = 1.10
 config.font = wezterm.font_with_fallback({
-  {
-    family = "JetBrains Mono",
-    weight = 600,
-    -- family = "0xProto Nerd Font",
-    harfbuzz_features = {
-      "calt",
-      "clig",
-      "liga",
-      "zero",
-      -- "ss01", -- Classic Construction
-      "ss19", -- == !==
-      -- "cv02", -- t
-      -- "cv03", -- g
-      -- "cv10", -- r
-      -- "cv12", -- u
-      -- "cv17", -- f
-    },
-  },
-  { family = "Symbols Nerd Font Mono", scale = 0.65 },
+	{
+		family = "JetBrains Mono",
+		-- weight = 600,
+		-- family = "0xProto Nerd Font",
+		harfbuzz_features = {
+			"calt",
+			"clig",
+			"liga",
+			"zero",
+			-- "ss01", -- Classic Construction
+			"ss19", -- == !==
+			-- "cv02", -- t
+			-- "cv03", -- g
+			-- "cv10", -- r
+			-- "cv12", -- u
+			-- "cv17", -- f
+		},
+	},
+	{ family = "Symbols Nerd Font Mono", scale = 0.65 },
 })
 config.use_cap_height_to_scale_fallback_fonts = true
-config.font_size = 9
+config.font_size = 9.5
 config.anti_alias_custom_block_glyphs = false
 config.warn_about_missing_glyphs = false
 config.default_cursor_style = "SteadyBar"
@@ -72,10 +72,10 @@ config.initial_cols = 150
 config.initial_rows = 50
 -- config.window_background_opacity = 0.95
 config.window_padding = {
-  left = 2,
-  right = 2,
-  top = 0,
-  bottom = 0,
+	left = 2,
+	right = 2,
+	top = 0,
+	bottom = 0,
 }
 config.audible_bell = "Disabled"
 config.scrollback_lines = 10000

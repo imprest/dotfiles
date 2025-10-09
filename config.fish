@@ -25,6 +25,11 @@ set --export KERL_CONFIGURE_OPTIONS "--without-javac --without-odbc"
 set --export KERL_BUILD_DOCS "yes"
 set --export KERL_DOC_TARGETS "chunks"
 
+# Elixir 1.19 env variable to speedup compilation
+set -x MIX_OS_DEPS_COMPILE_PARTITION_COUNT (
+  lscpu | awk '/^Core\(s\) per socket:/ {cores=$NF} /^Socket\(s\):/ {sockets=$NF} END {print cores * sockets / 2}'
+)
+
 # ASDF configuration code
 if test -z $ASDF_DATA_DIR
     set _asdf_shims "$HOME/.asdf/shims"
@@ -51,6 +56,7 @@ set fish_user_paths \
     "$HOME/.cargo/bin" \
     "$HOME/.local/bin" \
     "$HOME/bin"
+
 # Aliases
 alias vim="nvim"
 alias v="nvim"
@@ -109,14 +115,14 @@ function fish_prompt -d "Write out the prompt"
     set laststatus $status
 
     if set -q VIRTUAL_ENV
-        printf "(%s) " (basename "$VIRTUAL_ENV")
+        printf "(%s) " (basename "$VIRTUAL_ENV")\n
     end
 
     printf '%s%s %s%s%s%s%s' \
         (set_color green) (echo $USER) \
         (set_color yellow) (echo $PWD | sed -e "s|^$HOME|~|") \
         (set_color white) (__fish_git_prompt) \
-        (set_color white)
+        (set_color white)\n
     if test $laststatus -eq 0
         printf " %s\$ %s" (set_color grey) (set_color normal)
     else

@@ -1,10 +1,10 @@
 # The syntax is "key = value". The whitespace around the equals doesn't matter.
 # Comments start with a `#` and are only valid on their own line.
 # Blank lines are ignored!
-theme = DoomOne
+theme = TokyoNight Moon
 cursor-text = #11111b
 window-theme = ghostty
-window-height = 42
+window-height = 50
 window-width = 140
 
 keybind = ctrl+z=close_surface
@@ -17,9 +17,9 @@ keybind = ctrl+alt+k=goto_split:up
 keybind = ctrl+alt+l=goto_split:right
 
 mouse-hide-while-typing = true
-# window-colorspace = "display-p3"
+# window-decoration = none
 # gtk-adwaita = false
-# gtk-titlebar = true
+gtk-titlebar = false
 # adw-toolbar-style = "flat"
 # bold-is-bright = true
 
@@ -27,11 +27,12 @@ mouse-hide-while-typing = true
 # font-family = Cascadia Mono
 # font-family = JetBrainsMono Nerd Font
 font-family = FiraCode Nerd Font Mono
-font-style = Medium
+# font-family = 'Monaspace Neon'
+font-style = Retina
 font-size = 10
+# font-feature = "'calt', 'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'ss07', 'ss08', 'ss09', 'ss10', 'liga'"
 adjust-cell-height = 1
 # font-feature = zero, ss19 # ==, cv17 f,
-
 
 
 
