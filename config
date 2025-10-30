@@ -1,7 +1,7 @@
 # The syntax is "key = value". The whitespace around the equals doesn't matter.
 # Comments start with a `#` and are only valid on their own line.
 # Blank lines are ignored!
-theme = TokyoNight Moon
+theme = TokyoNight Night
 cursor-text = #11111b
 window-theme = ghostty
 window-height = 50
@@ -20,18 +20,20 @@ mouse-hide-while-typing = true
 # window-decoration = none
 # gtk-adwaita = false
 gtk-titlebar = false
+# gtk-titlebar-style=tabs
 # adw-toolbar-style = "flat"
 # bold-is-bright = true
 
 # Empty values reset the configuration to the default value
 # font-family = Cascadia Mono
 # font-family = JetBrainsMono Nerd Font
-font-family = FiraCode Nerd Font Mono
+# font-family = FiraCode Nerd Font Mono
 # font-family = 'Monaspace Neon'
-font-style = Retina
-font-size = 10
+font-family = Inconsolata
+font-style = SemiBold
+font-size = 12
 # font-feature = "'calt', 'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'ss07', 'ss08', 'ss09', 'ss10', 'liga'"
-adjust-cell-height = 1
+# adjust-cell-height = 1
 # font-feature = zero, ss19 # ==, cv17 f,
 
 

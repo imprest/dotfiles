@@ -26,10 +26,10 @@ vim.opt.rtp:prepend(lazypath)
 
 -------------------- PLUGINS -------------------------------
 require("lazy").setup({
-  -- "NMAC427/guess-indent.nvim", -- Detect tabstop and shiftwidth automatically
+  { "NMAC427/guess-indent.nvim", opts = {} }, -- Detect tabstop and shiftwidth automatically
   {
     "folke/which-key.nvim",
-    event = "VimEnter",
+    event = "VeryLazy",
     opts = {
       icons = { mappings = vim.g.have_nerd_font, keys = vim.g.have_nerd_font and {} },
       plugins = {
@@ -49,10 +49,20 @@ require("lazy").setup({
     },
   },
   {
-    "NvChad/nvim-colorizer.lua",
-    ft = { "javascript", "typescript", "css", "html" },
-    cmd = "ColorizerToggle",
-    opts = { user_default_options = { tailwind = true } },
+    "eero-lehtinen/oklch-color-picker.nvim",
+    event = "VeryLazy",
+    version = "*",
+    -- keys = {
+    --   -- One handed keymap recommended, you will be using the mouse
+    --   {
+    --     "<F5>",
+    --     function()
+    --       require("oklch-color-picker").pick_under_cursor()
+    --     end,
+    --     desc = "Color pick under cursor",
+    --   },
+    -- },
+    opts = { auto_download = false },
   },
   {
     "folke/tokyonight.nvim",
@@ -60,7 +70,7 @@ require("lazy").setup({
     priority = 1000,
     opts = {},
     init = function()
-      vim.cmd.colorscheme("tokyonight-moon")
+      vim.cmd.colorscheme("tokyonight-night")
     end,
   },
   {
@@ -99,13 +109,13 @@ require("lazy").setup({
       bigfile = { enabled = true },
       dashboard = { enabled = true },
       explorer = { enabled = false },
-      image = { enabled = true },
+      image = { enabled = false },
       indent = { enabled = false },
       input = { enabled = true, win = { relative = "cursor" } },
-      picker = { enabled = true, layout = { preset = "ivy" } },
+      picker = { enabled = true }, -- , layout = { preset = "ivy" } },
       notifier = { enabled = false },
       quickfile = { enabled = true },
-      terminal = { win = { style = "terminal", height = 14 } },
+      terminal = { win = { style = "terminal", height = 16 } },
       scope = { enabled = true }, -- select and jump to scopes e.g. dii vai vii [i ]i
       scroll = { enabled = true },
       statuscolumn = { enabled = true },
@@ -114,7 +124,7 @@ require("lazy").setup({
     -- stylua: ignore
     keys = {
       -- Top Pickers & Explorer
-      { "<C-p>",      function() require('snacks').picker.git_files() end,                                   desc = "Smart Find Files" },
+      { "<C-p>",      function() require('snacks').picker.git_files() end,                               desc = "Smart Find Files" },
       { "<leader>r",  function() require('snacks').picker.recent() end,                                  desc = "Recent" },
       { "B",          "<Cmd>BufferPick<CR>"                            ,                                 desc = "Buffers" },
       { "<leader>/",  function() require('snacks').picker.grep() end,                                    desc = "Grep" },
@@ -180,16 +190,15 @@ require("lazy").setup({
       -- others
       { "<leader>q",  "<cmd>lua Snacks.bufdelete()<cr>",                                                 desc = "Buffer Delete" },
       { "<leader>lR", function() require('snacks').rename.rename_file() end,                             desc = "Rename File" },
-      { "<leader>cR", function() require('snacks').rename.rename_file() end,                             desc = "Rename File" },
-      { "<leader>c",  "<cmd>lua Snacks.terminal()<CR>",                                                  desc = "ToggleTerm" },
+      { "<leader>c",  "<cmd>lua Snacks.terminal.toggle()<CR>",                                           desc = "ToggleTerm" },
       { "<leader>o",  "<cmd>lua Snacks.terminal.open()<CR>",                                             desc = "Open Term" },
       { "<leader>uC", function() require('snacks').picker.colorschemes() end,                            desc = "Colorschemes" },
     },
   },
-  {
-    "sphamba/smear-cursor.nvim",
-    opts = { smear_between_neighbor_lines = false, smear_insert_mode = false },
-  },
+  -- {
+  --   "sphamba/smear-cursor.nvim",
+  --   opts = { smear_between_neighbor_lines = false, smear_insert_mode = false },
+  -- },
   {
     "rachartier/tiny-inline-diagnostic.nvim",
     event = "VeryLazy",
@@ -222,19 +231,16 @@ require("lazy").setup({
         },
       },
       "WhoIsSethDaniel/mason-tool-installer.nvim",
-      { "j-hui/fidget.nvim", opts = {} },
+      {
+        "j-hui/fidget.nvim",
+        config = function()
+          vim.notify = require("fidget").notify
+        end,
+      },
     },
     config = function()
       -- ref: LazyVim & https://github.com/wookayin/dotfiles/blob/master/nvim/lua/config/lsp.lua
-      -- lsp_diagnostics
-      local icons = {
-        [vim.diagnostic.severity.ERROR] = "✘",
-        [vim.diagnostic.severity.WARN] = "",
-        [vim.diagnostic.severity.INFO] = "",
-        [vim.diagnostic.severity.HINT] = "󰌶",
-      }
-      vim.diagnostic.config({ virtual_text = false, signs = { text = icons } })
-
+      -- ref: kickstart.nvim
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
         callback = function(event)
@@ -246,12 +252,12 @@ require("lazy").setup({
           map("K", vim.lsp.buf.hover, "Hover Documentation")
 
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client:supports_method("textDocument/inlayHint") then
+          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map("<leader>lh", function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
             end, "Toggle In[l]ay [H]ints")
           end
-          if client:supports_method("textDocument/completion") then
+          if client:supports_method("textDocument/completion", event.buf) then
             vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
           end
           -- custom keymaps for individual lsp servers
@@ -263,22 +269,33 @@ require("lazy").setup({
         end,
       })
 
+      -- Diagnostic Config
+      -- See :help vim.diagnostic.Opts
+      vim.diagnostic.config({
+        virtual_text = false,
+        severity_sort = true,
+        underline = { severity = vim.diagnostic.severity.ERROR },
+        signs = vim.g.have_nerd_font and {
+          text = {
+            [vim.diagnostic.severity.ERROR] = "󰅚 ",
+            [vim.diagnostic.severity.WARN] = "󰀪 ",
+            [vim.diagnostic.severity.INFO] = "󰋽 ",
+            [vim.diagnostic.severity.HINT] = "󰌶 ",
+          },
+        },
+      })
+
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
-      local capabilities = require("blink.cmp").get_lsp_capabilities()
+      -- local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- Enable the following language servers
       local servers = {
         lua_ls = {
           settings = {
-            Lua = {
-              completion = { callSnippet = "Replace" },
-              telemetry = { enable = false },
-              hint = { enable = true },
-              diagnostics = { globals = { "vim" } },
-            },
+            Lua = { completion = { callSnippet = "Replace" }, telemetry = { enable = false } },
           },
         },
         tinymist = {},
@@ -327,22 +344,16 @@ require("lazy").setup({
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
-      -- vim.list_extend(ensure_installed, { "stylua" }) -- Used to format Lua code
+      vim.list_extend(ensure_installed, { "stylua" }) -- Used to format Lua code
+      require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+
+      for server_name, config in pairs(servers) do
+        vim.lsp.config(server_name, config)
+      end
 
       require("mason-lspconfig").setup({
-        ensure_installed = ensure_installed, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-            vim.lsp.config(server_name, server)
-            -- require("lspconfig")[server_name].setup(server)
-          end,
-        },
       })
     end,
   },
@@ -523,26 +534,24 @@ require("lazy").setup({
       -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
       -- See the full "keymap" documentation for information on defining your own keymap.
       keymap = { preset = "super-tab" },
-
       -- don't show in cmdline and search mode
       completion = {
         menu = {
-          border = "single",
+          -- border = "single",
 
           -- nvim-cmp style menu
           draw = {
             columns = {
               { "label", "label_description", gap = 1 },
-              { "kind_icon", gap = 1, "kind" },
+              { "kind_icon" }, -- , gap = 1, "kind" },
             },
           },
         },
         -- Show documentation with <c-space>
-        documentation = { window = { border = "single" }, auto_show = true, auto_show_delay_ms = 200 },
+        documentation = { window = { border = "single" }, auto_show = true, auto_show_delay_ms = 500 },
         -- Display a preview of the selected item on the current line
         ghost_text = { enabled = true },
       },
-
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
@@ -550,13 +559,10 @@ require("lazy").setup({
         per_filetype = { sql = { "snippets", "dadbod", "buffer" } },
         providers = { dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" } },
       },
-
       snippets = { preset = "luasnip" },
-
       fuzzy = { implementation = "prefer_rust_with_warning" },
-
       -- Shows a signature help window while you type arguments for a function
-      signature = { window = { border = "single" }, enabled = true },
+      signature = { enabled = true },
     },
   },
   -- search/replace in multiple files
@@ -629,7 +635,7 @@ require("lazy").setup({
   -- file explorer
   {
     "nvim-neo-tree/neo-tree.nvim",
-    lazy = false,
+    lazy = true,
     version = "*",
     dependencies = { "MunifTanjim/nui.nvim", "nvim-tree/nvim-web-devicons" },
     keys = {
@@ -693,13 +699,11 @@ require("lazy").setup({
     opts = {
       endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
       highlight = { enable = true },
-      indent = { enable = true, disable = { "python" } }, -- guess-indent is better and faster
+      indent = { enable = false, disable = { "python" } }, -- guess-indent is better and faster
       ensure_installed = {
-        "vim",
         "lua",
         "markdown",
         "markdown_inline",
-        "bash",
         "regex",
         "css",
         "html",
@@ -707,9 +711,7 @@ require("lazy").setup({
         "json",
         "typescript",
         "typst",
-        -- "tsx",
         "svelte",
-        "erlang",
         "elixir",
         -- "gleam",
         "sql",
@@ -759,7 +761,7 @@ require("lazy").setup({
       vim.keymap.set("x", "<leader>d", "<Plug>(DBExe)")
       vim.keymap.set("n", "<leader>d", "<Plug>(DBExe)")
       vim.keymap.set("o", "<leader>d", "<Plug>(DBExe)")
-      vim.keymap.set("n", "<leader>dd", "<Plug>(DBExeLine)")
+      vim.keymap.set("n", "<leader><ctrl-d>", "<Plug>(DBExeLine)")
     end,
   },
   {
@@ -862,6 +864,8 @@ opt.showbreak = "↪  "
 opt.showmatch = true
 opt.showmode = false -- Don't show mode since we have a statusline
 vim.wo.signcolumn = "yes" -- Show sign column
+vim.o.updatetime = 250
+vim.o.timeoutlen = 300
 opt.smartcase = true -- Don't ignore case with capitals
 opt.inccommand = "split" -- Preview substitutions live, as you type!
 opt.spelllang = { "en" }
@@ -894,7 +898,7 @@ opt.winborder = "rounded"
 -- Personal common tasks
 vim.keymap.set("n", "<BS>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<F4>", "<cmd>set spell!<CR>")
-vim.keymap.set("n", "<F5>", "<cmd>ColorizerToggle<CR>")
+-- vim.keymap.set("n", "<F5>", "<cmd>ColorizerToggle<CR>")
 vim.keymap.set("i", "<C-u>", "<C-g>u<C-u>") -- Delete lines in insert mode
 vim.keymap.set("i", "<C-w>", "<C-g>u<C-w>") -- Delete words in insert mode
 vim.keymap.set("n", "<leader><leader>", "<C-^>")
@@ -981,6 +985,7 @@ wk.add({
     mode = { "v" },
     { "<leader>.", "<cmd>normal gcc<CR>", desc = "Comment" },
     { "<leader>y", '"+y', desc = "Yank System Clipboard" },
+    { "<leader>d", '"+d', desc = "Cut to System Clipboard" },
   },
   {
     { "<leader>.", "<cmd>normal gcc<CR>", desc = "Comment" },
@@ -1020,20 +1025,28 @@ vim.api.nvim_create_autocmd({ "VimResized" }, {
   end,
 })
 
--- go to last loc when opening a buffer
+-- Restore cursor position on file open
 vim.api.nvim_create_autocmd("BufReadPost", {
-  group = augroup("last_loc"),
-  callback = function(event)
-    local exclude = { "gitcommit" }
-    local buf = event.buf
-    if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].lazyvim_last_loc then
-      return
+  desc = "Restore cursor position on file open",
+  group = vim.api.nvim_create_augroup("kickstart-restore-cursor", { clear = true }),
+  pattern = "*",
+  callback = function()
+    local line = vim.fn.line("'\"")
+    if line > 1 and line <= vim.fn.line("$") then
+      vim.cmd("normal! g'\"")
     end
-    vim.b[buf].lazyvim_last_loc = true
-    local mark = vim.api.nvim_buf_get_mark(buf, '"')
-    local lcount = vim.api.nvim_buf_line_count(buf)
-    if mark[1] > 0 and mark[1] <= lcount then
-      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+  end,
+})
+
+-- auto-create missing dirs when saving a file
+vim.api.nvim_create_autocmd("BufWritePre", {
+  desc = "Auto-create missing dirs when saving a file",
+  group = vim.api.nvim_create_augroup("kickstart-auto-create-dir", { clear = true }),
+  pattern = "*",
+  callback = function()
+    local dir = vim.fn.expand("<afile>:p:h")
+    if vim.fn.isdirectory(dir) == 0 then
+      vim.fn.mkdir(dir, "p")
     end
   end,
 })

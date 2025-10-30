@@ -124,9 +124,9 @@ function fish_prompt -d "Write out the prompt"
         (set_color white) (__fish_git_prompt) \
         (set_color white)\n
     if test $laststatus -eq 0
-        printf " %s\$ %s" (set_color grey) (set_color normal)
+        printf "%s\$ %s" (set_color grey) (set_color normal)
     else
-        printf " %s✘ %s\$ %s" (set_color -o red) (set_color grey) (set_color normal)
+        printf "%s✘ %s\$ %s" (set_color -o red) (set_color grey) (set_color normal)
     end
 end
 
