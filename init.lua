@@ -65,12 +65,16 @@ require("lazy").setup({
     opts = { auto_download = false },
   },
   {
-    "folke/tokyonight.nvim",
+    -- "folke/tokyonight.nvim",
+    -- "ribru17/bamboo.nvim",
+    "Mofiqul/dracula.nvim",
     lazy = false,
     priority = 1000,
     opts = {},
     init = function()
-      vim.cmd.colorscheme("tokyonight-night")
+      -- vim.cmd.colorscheme("tokyonight-night")
+      -- require("bamboo").load()
+      vim.cmd.colorscheme("dracula")
     end,
   },
   {
@@ -110,9 +114,9 @@ require("lazy").setup({
       dashboard = { enabled = true },
       explorer = { enabled = false },
       image = { enabled = false },
-      indent = { enabled = false },
+      indent = { enabled = true },
       input = { enabled = true, win = { relative = "cursor" } },
-      picker = { enabled = true }, -- , layout = { preset = "ivy" } },
+      picker = { enabled = true, layout = { preset = "select" } },
       notifier = { enabled = false },
       quickfile = { enabled = true },
       terminal = { win = { style = "terminal", height = 16 } },
@@ -285,12 +289,6 @@ require("lazy").setup({
         },
       })
 
-      -- LSP servers and clients are able to communicate to each other what features they support.
-      --  By default, Neovim doesn't support everything that is in the LSP specification.
-      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
-      -- local capabilities = require("blink.cmp").get_lsp_capabilities()
-
       -- Enable the following language servers
       local servers = {
         lua_ls = {
@@ -300,6 +298,7 @@ require("lazy").setup({
         },
         tinymist = {},
         expert = {},
+        -- zls = {},
         ts_ls = {
           settings = {
             completions = { completeFunctionCalls = true },
@@ -348,6 +347,7 @@ require("lazy").setup({
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
       for server_name, config in pairs(servers) do
+        config.capabilities = require("blink.cmp").get_lsp_capabilities(config.capabilities)
         vim.lsp.config(server_name, config)
       end
 
@@ -507,6 +507,35 @@ require("lazy").setup({
     end,
   },
   {
+    "abecodes/tabout.nvim",
+    lazy = false,
+    config = function()
+      require("tabout").setup({
+        tabkey = "<Tab>", -- key to trigger tabout, set to an empty string to disable
+        backwards_tabkey = "<S-Tab>", -- key to trigger backwards tabout, set to an empty string to disable
+        act_as_tab = true, -- shift content if tab out is not possible
+        act_as_shift_tab = false, -- reverse shift content if tab out is not possible (if your keyboard/terminal supports <S-Tab>)
+        default_tab = "<C-t>", -- shift default action (only at the beginning of a line, otherwise <TAB> is used)
+        default_shift_tab = "<C-d>", -- reverse shift default action,
+        enable_backwards = true, -- well ...
+        completion = false, -- if the tabkey is used in a completion pum
+        tabouts = {
+          { open = "'", close = "'" },
+          { open = '"', close = '"' },
+          { open = "`", close = "`" },
+          { open = "(", close = ")" },
+          { open = "[", close = "]" },
+          { open = "{", close = "}" },
+        },
+        ignore_beginning = true, --[[ if the cursor is at the beginning of a filled element it will rather tab out than shift the content ]]
+        exclude = {}, -- tabout will ignore these filetypes
+      })
+    end,
+    opt = true, -- Set this to true if the plugin is optional
+    event = "InsertCharPre", -- Set the event to 'InsertCharPre' for better compatibility
+    priority = 1000,
+  },
+  {
     "saghen/blink.cmp",
     event = { "InsertEnter", "CmdlineEnter" },
     version = "1.*", -- use a release tag to download pre-built binaries
@@ -537,13 +566,15 @@ require("lazy").setup({
       -- don't show in cmdline and search mode
       completion = {
         menu = {
-          -- border = "single",
-
-          -- nvim-cmp style menu
+          border = "none",
           draw = {
-            columns = {
-              { "label", "label_description", gap = 1 },
-              { "kind_icon" }, -- , gap = 1, "kind" },
+            padding = { 0, 1 }, -- padding only on right side
+            components = {
+              kind_icon = {
+                text = function(ctx)
+                  return " " .. ctx.kind_icon .. ctx.icon_gap .. " "
+                end,
+              },
             },
           },
         },
@@ -564,6 +595,7 @@ require("lazy").setup({
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
     },
+    opts_extend = { "sources.default" },
   },
   -- search/replace in multiple files
   -- {
@@ -595,10 +627,8 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           icons_enabled = true,
-          theme = "tokyonight",
+          theme = "dracula",
           globalstatus = true,
-          section_separators = "",
-          component_separators = "",
           disabled_filetypes = { "Outline", "dashboard" },
           always_divide_middle = true,
         },
@@ -613,13 +643,15 @@ require("lazy").setup({
             },
           },
           lualine_b = {}, -- "branch" },
-          lualine_c = { "filesize", { "filename", path = 1 }, "diff" },
+          -- lualine_c = { "filesize", { "filename", path = 1 }, "diff" },
+          lualine_c = { { "filename", path = 1 }, "diff" },
           lualine_x = { "diagnostics", "filetype" }, -- "encoding", "filetype", "filesize" },
           lualine_y = {
-            { "location", padding = { left = 1, right = 0 } },
-            { "progress", separator = " ", padding = { left = 1, right = 1 } },
+            { "location", padding = { left = 1, right = 1 } },
+            -- { "progress", separator = " ", padding = { left = 1, right = 1 } },
           },
           lualine_z = {
+            { "progress", separator = " ", padding = { left = 1, right = 1 } },
             -- function()
             --   return " " .. os.date("%I:%M%p %d/%m")
             -- end,
@@ -717,7 +749,8 @@ require("lazy").setup({
         "sql",
         "eex",
         "heex",
-        "ledger", --, "toml", "zig"
+        "ledger", --, "toml",
+        -- "zig",
       },
       incremental_selection = {
         enable = true,
@@ -829,7 +862,7 @@ opt.hlsearch = true
 opt.backup = false
 opt.breakindent = true
 opt.conceallevel = 2 -- So that `` is visible in markdown files (default: 1)
-opt.cursorline = true -- Highlight cursor line
+opt.cursorline = false -- Highlight cursor line
 opt.equalalways = false -- I don't like my windows changing all the time
 opt.foldcolumn = "0"
 opt.foldlevel = 99
@@ -945,7 +978,7 @@ vim.keymap.set("n", "<A-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window 
 vim.keymap.set("n", "<A-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
 vim.keymap.set("n", "<A-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
--- -- buffers
+-- buffers
 vim.keymap.set("n", "<Right>", "<cmd>BufferNext<cr>", { desc = "Prev buffer" })
 vim.keymap.set("n", "<Left>", "<cmd>BufferPrevious<cr>", { desc = "Next buffer" })
 vim.keymap.set("n", "[b", "<cmd>BufferMoveNext<cr>", { desc = "Prev buffer" })
