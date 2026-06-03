@@ -57,6 +57,7 @@ set fish_user_paths \
     "$HOME/.local/bin" \
     "$HOME/bin"
 
+set -gx LAUNCH_EDITOR launch-editor-nvim
 # Aliases
 alias vim="nvim"
 alias v="nvim"
@@ -124,9 +125,9 @@ function fish_prompt -d "Write out the prompt"
         (set_color white) (__fish_git_prompt) \
         (set_color white)
     if test $laststatus -eq 0
-        printf "%s \$ %s" (set_color grey) (set_color normal)
+        printf "%s 󰁔 %s" (set_color grey) (set_color normal)
     else
-        printf "%s✘%s\$ %s" (set_color -o red) (set_color grey) (set_color normal)
+        printf "%s 󰁔 %s" (set_color red) (set_color normal)
     end
 end
 
@@ -157,3 +158,14 @@ function fo
     $EDITOR $files
   end
 end
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH /home/hvaria/.lmstudio/bin
+# End of LM Studio CLI section
+
+# android sdk
+set -x ANDROID_HOME $HOME/Android/Sdk
+set -x PATH $PATH $ANDROID_HOME/cmdline-tools/latest/bin $ANDROID_HOME/platform-tools
+
+# direnv
+# direnv hook fish | source

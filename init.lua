@@ -26,7 +26,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -------------------- PLUGINS -------------------------------
 require("lazy").setup({
-  { "NMAC427/guess-indent.nvim", opts = {} }, -- Detect tabstop and shiftwidth automatically
+  { "NMAC427/guess-indent.nvim", lazy = true, opts = {} }, -- Detect tabstop and shiftwidth automatically
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -49,32 +49,23 @@ require("lazy").setup({
     },
   },
   {
-    "eero-lehtinen/oklch-color-picker.nvim",
-    event = "VeryLazy",
-    version = "*",
-    -- keys = {
-    --   -- One handed keymap recommended, you will be using the mouse
-    --   {
-    --     "<F5>",
-    --     function()
-    --       require("oklch-color-picker").pick_under_cursor()
-    --     end,
-    --     desc = "Color pick under cursor",
-    --   },
-    -- },
-    opts = { auto_download = false },
-  },
-  {
     -- "folke/tokyonight.nvim",
     -- "ribru17/bamboo.nvim",
-    "Mofiqul/dracula.nvim",
+    -- "Mofiqul/dracula.nvim",
+    -- "olimorris/onedarkpro.nvim",
+    "navarasu/onedark.nvim",
     lazy = false,
     priority = 1000,
     opts = {},
     init = function()
       -- vim.cmd.colorscheme("tokyonight-night")
+      -- vim.cmd.colorscheme("vaporwave")
       -- require("bamboo").load()
-      vim.cmd.colorscheme("dracula")
+      -- vim.cmd.colorscheme("dracula")
+      require("onedark").setup({
+        style = "darker",
+      })
+      require("onedark").load()
     end,
   },
   {
@@ -114,7 +105,7 @@ require("lazy").setup({
       dashboard = { enabled = true },
       explorer = { enabled = false },
       image = { enabled = false },
-      indent = { enabled = true },
+      indent = { enabled = false },
       input = { enabled = true, win = { relative = "cursor" } },
       picker = { enabled = true, layout = { preset = "select" } },
       notifier = { enabled = false },
@@ -215,9 +206,10 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     event = { "BufReadPost", "BufNewFile", "BufWritePre" },
     dependencies = {
+      { "mason-org/mason.nvim", opts = {} },
+      "WhoIsSethDaniel/mason-tool-installer.nvim",
       { "saghen/blink.cmp" },
       { "b0o/schemastore.nvim", version = false },
-      { "mason-org/mason.nvim", opts = { ui = { border = "rounded" } } },
       {
         "mason-org/mason-lspconfig.nvim",
         opts = {
@@ -229,16 +221,17 @@ require("lazy").setup({
             "ts_ls",
             "tailwindcss",
             "svelte",
-            "expert",
+            -- "expert",
+            "dexter",
             "tinymist",
+            "odin",
           },
         },
       },
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
       {
         "j-hui/fidget.nvim",
         config = function()
-          vim.notify = require("fidget").notify
+          -- vim.notify = require("fidget").notify
         end,
       },
     },
@@ -255,14 +248,22 @@ require("lazy").setup({
 
           map("K", vim.lsp.buf.hover, "Hover Documentation")
 
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          local client = assert(vim.lsp.get_client_by_id(event.data.client_id))
           if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
-            map("<leader>lh", function()
+            map("<leader>th", function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-            end, "Toggle In[l]ay [H]ints")
+            end, "[T]oggle Inlay [H]ints")
           end
           if client:supports_method("textDocument/completion", event.buf) then
             vim.lsp.completion.enable(true, client.id, event.buf, { autotrigger = true })
+          end
+          if client:supports_method("textDocument/formatting") then
+            -- the most important part
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              callback = function()
+                vim.lsp.buf.format({ bufnr = event.buf, id = client.id, timeout_ms = 5000 })
+              end,
+            })
           end
           -- custom keymaps for individual lsp servers
           -- if client.name == "elixirls" then
@@ -281,13 +282,15 @@ require("lazy").setup({
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
-            [vim.diagnostic.severity.ERROR] = "󰅚 ",
-            [vim.diagnostic.severity.WARN] = "󰀪 ",
-            [vim.diagnostic.severity.INFO] = "󰋽 ",
-            [vim.diagnostic.severity.HINT] = "󰌶 ",
+            [vim.diagnostic.severity.ERROR] = " ",
+            [vim.diagnostic.severity.WARN] = " ",
+            [vim.diagnostic.severity.INFO] = " ",
+            [vim.diagnostic.severity.HINT] = " ",
           },
         },
       })
+
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- Enable the following language servers
       local servers = {
@@ -297,7 +300,9 @@ require("lazy").setup({
           },
         },
         tinymist = {},
-        expert = {},
+        -- expert = {},
+        dexter = {},
+        -- ols = {},
         -- zls = {},
         ts_ls = {
           settings = {
@@ -346,10 +351,15 @@ require("lazy").setup({
       vim.list_extend(ensure_installed, { "stylua" }) -- Used to format Lua code
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
-      for server_name, config in pairs(servers) do
-        config.capabilities = require("blink.cmp").get_lsp_capabilities(config.capabilities)
-        vim.lsp.config(server_name, config)
+      for name, server in pairs(servers) do
+        server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
+        vim.lsp.config(name, server)
+        vim.lsp.enable(name)
       end
+
+      -- Gleam setup with blink.cmp capabilities
+      -- vim.lsp.config("gleam", { capabilities = capabilities })
+      -- vim.lsp.enable("gleam")
 
       require("mason-lspconfig").setup({
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
@@ -365,9 +375,9 @@ require("lazy").setup({
       local lint = require("lint")
 
       lint.linters_by_ft = {
-        javascript = { "eslint" },
-        typescript = { "eslint" },
-        svelte = { "eslint" },
+        javascript = { "eslint_d" },
+        typescript = { "eslint_d" },
+        svelte = { "eslint_d" },
         elixir = { "credo" },
       }
 
@@ -417,6 +427,7 @@ require("lazy").setup({
         }
       end,
       formatters_by_ft = {
+        -- gleam = { "gleam format" },
         javascript = { "prettierd", "prettier", stop_after_first = true },
         typescript = { "prettierd", "prettier", stop_after_first = true },
         svelte = { "prettierd", "prettier", stop_after_first = true },
@@ -562,9 +573,31 @@ require("lazy").setup({
       -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
       -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
       -- See the full "keymap" documentation for information on defining your own keymap.
-      keymap = { preset = "super-tab" },
+      -- keymap = { preset = "super-tab" },
+      keymap = {
+        preset = "default",
+        ["<C-space>"] = {},
+        ["<C-p>"] = {},
+        ["<C-k>"] = {},
+        ["<C-j>"] = {},
+        ["<C-y>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<CR>"] = { "accept", "fallback" },
+        ["<S-Tab>"] = { "select_prev", "fallback" },
+        ["<Tab>"] = { "select_next", "fallback" },
+        ["<C-b>"] = { "scroll_documentation_down", "fallback" },
+        ["<C-f>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-l>"] = { "snippet_forward", "fallback" },
+        ["<C-h>"] = { "snippet_backward", "fallback" },
+        ["<C-e>"] = { "hide" },
+      },
+      appearance = {
+        use_nvim_cmp_as_default = false,
+        nerd_font_variant = "mono",
+      },
       -- don't show in cmdline and search mode
       completion = {
+        list = { selection = { preselect = false, auto_insert = true } },
+        accept = { auto_brackets = { enabled = true } },
         menu = {
           border = "none",
           draw = {
@@ -579,7 +612,7 @@ require("lazy").setup({
           },
         },
         -- Show documentation with <c-space>
-        documentation = { window = { border = "single" }, auto_show = true, auto_show_delay_ms = 500 },
+        documentation = { auto_show = true, auto_show_delay_ms = 200 },
         -- Display a preview of the selected item on the current line
         ghost_text = { enabled = true },
       },
@@ -587,7 +620,7 @@ require("lazy").setup({
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
-        per_filetype = { sql = { "snippets", "dadbod", "buffer" } },
+        per_filetype = { sql = { "snippets", "dadbod", "buffer" }, codecompanion = { "codecompanion" } },
         providers = { dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" } },
       },
       snippets = { preset = "luasnip" },
@@ -627,7 +660,7 @@ require("lazy").setup({
       require("lualine").setup({
         options = {
           icons_enabled = true,
-          theme = "dracula",
+          theme = "onedark",
           globalstatus = true,
           disabled_filetypes = { "Outline", "dashboard" },
           always_divide_middle = true,
@@ -685,7 +718,7 @@ require("lazy").setup({
         follow_current_file = { enabled = true },
       },
       window = {
-        width = 26,
+        width = 30,
         mappings = {
           ["<space>"] = "none",
         },
@@ -700,46 +733,39 @@ require("lazy").setup({
         {
           event = "neo_tree_buffer_enter",
           handler = function()
-            vim.cmd([[ highlight TabLineFill guibg=#282c34 ]])
+            -- vim.cmd([[ highlight TabLineFill guibg=#282c34 ]])
           end,
         },
       },
     },
   },
   -- Code skimming or outline for quick navigation
-  {
-    "stevearc/aerial.nvim",
-    cmd = { "AerialToggle", "AerialPrev", "AerialNext" },
-    opts = {
-      on_attach = function(bufnr)
-        vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-        vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
-      end,
-    },
-    keys = {
-      { "<leader>a", "<cmd>AerialToggle!<CR>", desc = "AerialToggle" },
-    },
-  },
+  -- {
+  --   "stevearc/aerial.nvim",
+  --   cmd = { "AerialToggle", "AerialPrev", "AerialNext" },
+  --   opts = {
+  --     on_attach = function(bufnr)
+  --       vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+  --       vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+  --     end,
+  --   },
+  --   keys = {
+  --     { "<leader>a", "<cmd>AerialToggle!<CR>", desc = "AerialToggle" },
+  --   },
+  -- },
   { "folke/ts-comments.nvim", opts = {}, event = "VeryLazy" },
   {
     "nvim-treesitter/nvim-treesitter",
-    version = false,
-    event = { "BufReadPost", "BufNewFile", "BufWritePre", "VeryLazy" },
-    build = ":TSUpdate",
-    main = "nvim-treesitter.configs", -- Sets main module to use for opts
     dependencies = { "RRethy/nvim-treesitter-endwise" },
-    opts = {
-      endwise = { enable = true }, -- RRethy/nvim-treesitter-endwise
-      highlight = { enable = true },
-      indent = { enable = false, disable = { "python" } }, -- guess-indent is better and faster
-      ensure_installed = {
+    config = function()
+      local filetypes = {
         "lua",
         "markdown",
         "markdown_inline",
         "regex",
         "css",
         "html",
-        "javascript",
+        "javascrip",
         "json",
         "typescript",
         "typst",
@@ -751,16 +777,27 @@ require("lazy").setup({
         "heex",
         "ledger", --, "toml",
         -- "zig",
-      },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = "<C-space>",
-          node_incremental = "<C-space>",
-          scope_incremental = false,
-          node_decremental = "<space>",
-        },
-      },
+        -- "odin",
+      }
+      require("nvim-treesitter").install(filetypes)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = filetypes,
+        callback = function()
+          vim.treesitter.start()
+        end,
+      })
+    end,
+  },
+  -- Code skimming or outline for quick navigation
+  {
+    "hedyhli/outline.nvim",
+    lazy = true,
+    cmd = { "Outline", "OutlineOpen" },
+    keys = { -- Example mapping to toggle outline
+      { "<F3>", "<cmd>Outline<CR>", desc = "Toggle outline" },
+    },
+    opts = {
+      outline_window = { width = 30 },
     },
   },
   {
@@ -777,8 +814,8 @@ require("lazy").setup({
     keys = {
       { "<leader>gk", "<cmd>Gitsigns prev_hunk<CR>", desc = "Prev Hunk" },
       { "<leader>gj", "<cmd>Gitsigns next_hunk<CR>", desc = "Next Hunk" },
-      { "<leader>ghp", "<cmd>Gitsigns preview_hunk_inline<CR>", desc = "Preview Inline" },
-      { "<leader>ghr", "<cmd>Gitsigns reset_hunk<CR>", desc = "Reset Hunk" },
+      { "<leader>gp", "<cmd>Gitsigns preview_hunk_inline<CR>", desc = "Preview Inline" },
+      { "<leader>gr", "<cmd>Gitsigns reset_hunk<CR>", desc = "Reset Hunk" },
     },
   },
   {
@@ -787,7 +824,7 @@ require("lazy").setup({
     lazy = true,
     dependencies = { "tpope/vim-dadbod", lazy = true },
     config = function()
-      vim.g["db"] = "postgresql://postgres:@localhost/subledger_dev"
+      vim.g["db"] = "postgresql://postgres:@localhost/doable_dev"
       vim.keymap.set("x", "<Plug>(DBExe)", "db#op_exec()", { expr = true })
       vim.keymap.set("n", "<Plug>(DBExe)", "db#op_exec()", { expr = true })
       vim.keymap.set("n", "<Plug>(DBExeLine)", "db#op_exec() . '_'", { expr = true })
@@ -834,6 +871,20 @@ require("lazy").setup({
       { "<leader>tn", "<cmd>lua require('neotest').run.run()<cr>", silent = true, desc = "Run nearest test" },
     },
   },
+  -- {
+  --   "olimorris/codecompanion.nvim",
+  --   version = "^19.0.0",
+  --   opts = {},
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim",
+  --     "nvim-treesitter/nvim-treesitter",
+  --     "ravitemer/mcphub.nvim",
+  --   },
+  -- },
+  -- {
+  --   "MeanderingProgrammer/render-markdown.nvim",
+  --   ft = { "markdown", "codecompanion" },
+  -- },
 }, {
   checker = { enabled = false, notify = false },
   rocks = { enabled = false },
@@ -859,10 +910,11 @@ local width = 85
 -- global options
 local opt = vim.opt
 opt.hlsearch = true
+opt.cmdheight = 0 -- hide the command bar
 opt.backup = false
 opt.breakindent = true
-opt.conceallevel = 2 -- So that `` is visible in markdown files (default: 1)
-opt.cursorline = false -- Highlight cursor line
+-- opt.conceallevel = 2 -- So that `` is visible in markdown files (default: 1)
+opt.cursorline = true -- Highlight cursor line
 opt.equalalways = false -- I don't like my windows changing all the time
 opt.foldcolumn = "0"
 opt.foldlevel = 99
@@ -889,7 +941,7 @@ vim.wo.number = true -- Show line numbers
 opt.pumblend = 10 -- Popup blend
 opt.pumheight = 10 -- Maximum number of entries in a popup
 opt.scrolljump = 4 -- min. lines to scroll
-opt.scrolloff = 10 -- Lines of context
+opt.scrolloff = 8 -- Lines of context
 opt.sidescrolloff = 1 -- Columns of context
 opt.shiftround = true -- Round indent
 opt.showbreak = "↪  "
@@ -897,7 +949,7 @@ opt.showbreak = "↪  "
 opt.showmatch = true
 opt.showmode = false -- Don't show mode since we have a statusline
 vim.wo.signcolumn = "yes" -- Show sign column
-vim.o.updatetime = 250
+vim.o.updatetime = 200
 vim.o.timeoutlen = 300
 opt.smartcase = true -- Don't ignore case with capitals
 opt.inccommand = "split" -- Preview substitutions live, as you type!
@@ -918,7 +970,7 @@ opt.writebackup = false
 opt.undofile = true
 opt.undolevels = 10000
 opt.undodir = "/home/hvaria/.nvim/undo"
-opt.completeopt = "menu,menuone,noselect" -- Completion options
+opt.completeopt = "menu,menuone,noselect,popup" -- Completion options
 opt.shiftwidth = 2 -- Size of an indent
 opt.shortmess:append({ W = true, I = true, c = true, C = true })
 opt.iskeyword:append("-") -- Hyphenated words recognized by searches (default: does not include '-')
@@ -1006,10 +1058,15 @@ vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
 -- Try and center these motions to the middle of the screen
+vim.keymap.set("n", "n", "nzzzv", { silent = true })
+vim.keymap.set("n", "N", "Nzzzv", { silent = true })
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { silent = true })
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { silent = true })
 vim.keymap.set("n", "<C-o>", "<C-o>zz", { silent = true })
 vim.keymap.set("n", "<C-i>", "<C-i>zz", { silent = true })
+
+-- Paste without yanking
+vim.keymap.set("n", "<leader>P", '"_dP', { desc = "Paste without yanking" })
 
 -- which-key
 local wk = require("which-key")
@@ -1087,9 +1144,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- wrap and check for spell in text filetypes
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup("wrap_spell"),
-  pattern = { "gitcommit", "markdown" },
+  pattern = { "gitcommit", "markdown", "text" },
   callback = function()
     vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
     vim.opt_local.spell = true
   end,
 })

@@ -27,7 +27,7 @@ sudo pacman -Syu fish neovim python-pynvim fzf fd ripgrep zoxide ghostty zed \
   ttf-jetbrains-mono exa trash-cli github-cli lazygit fd ncdu gvfs-google \
   curl git fop wxgtk inotify-tools postgresql vlc pdfarranger fastfetch wl-clipboard
 # optional
-# remmina freerdp gnome-characters fragments
+# remmina freerdp gnome-characters fragments foliate shortwave amberol
 # gnome-shell-extension-gsconnect gnome-shell-extension-dash-to-panel
 # weechat simple-scan
 # gnome-terminal text/background Gnome | palette Tango
